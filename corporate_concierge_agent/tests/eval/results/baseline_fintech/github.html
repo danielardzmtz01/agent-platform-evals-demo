@@ -6,16 +6,6 @@
   <title>gbank-gairways / corporate-concierge-agent — Gemini Enterprise Agent Platform</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
-    :root {
-      --background: #0d1117;
-      --card: #161b22;
-      --sidebar: #010409;
-      --border: #30363d;
-      --foreground: #e6edf3;
-      --muted-foreground: #8b949e;
-      --primary: #2f81f7;
-    }
-
     .code-line:hover {
       background-color: rgba(59, 130, 246, 0.08);
     }
@@ -98,6 +88,11 @@
       <button onclick="switchMainTab('report')" id="tab-btn-report"
               class="main-tab-btn px-3.5 py-2.5 text-xs font-semibold border-b-2 border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1.5 transition">
         <span>📊</span> Agent Platform Evals Report (<code class="font-mono">agent-eval</code>)
+      </button>
+      <button onclick="switchMainTab('nocode')" id="tab-btn-nocode"
+              class="main-tab-btn px-3.5 py-2.5 text-xs font-semibold border-b-2 border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1.5 transition">
+        <span>🧩</span> No-Code vs. Code-First Evals
+        <span class="px-1.5 py-0.5 text-xs rounded-full bg-amber-500/15 text-amber-500 font-bold">3 Superficies</span>
       </button>
     </div>
   </div>
@@ -589,6 +584,190 @@
     </div>
     <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden" style="height: 760px;">
       <iframe src="http://danielardzmtz.c.googlers.com:8086/report.html" class="w-full h-full border-0" title="agent-eval Interactive Report"></iframe>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TAB 6: 🧩 NO-CODE VS. CODE-FIRST AGENT EVALUATION ARCHITECTURE        -->
+  <!-- ===================================================================== -->
+  <div id="tab-panel-nocode" class="main-tab-panel hidden space-y-4">
+    <!-- Top Banner: The Architectural Unification Principle -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b border-[var(--border)]">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30">Arquitectura Unificada</span>
+            <span class="text-xs font-semibold text-[var(--muted-foreground)]">Gemini Enterprise Agent Platform · GECX · Agent Designer</span>
+          </div>
+          <h2 class="text-base md:text-lg font-bold text-[var(--foreground)] mt-1">
+            🧩 ¿Qué pasa con los Agentes No-Code / Low-Code en Google Cloud?
+          </h2>
+          <p class="text-xs text-[var(--muted-foreground)] mt-1 leading-relaxed">
+            <strong>Principio Arquitectónico:</strong> Los <strong>4 pilares de evaluación</strong> (1. Trayectoria/Tools, 2. Fidelidad/Grounding, 3. Latencia/Costo y 4. Simulación Multi-turno) son <strong>idénticos</strong> para agentes No-Code y Code-First. Lo único que cambia es dónde vive el contrato: <strong>Point-and-Click / CSV en la Consola Visual</strong> vs. <strong>Archivos JSON/Pytest en Git</strong>. Por debajo, ambos emiten trazas <code class="font-mono">OpenTelemetry (gen_ai.*)</code> hacia el mismo motor de jueces LLM y simulador de usuarios.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 shrink-0">
+          <button onclick="selectNoCodeSurface('gecx')" id="nc-surf-btn-gecx"
+                  class="px-3 py-2 rounded-lg text-xs font-bold border-2 border-blue-500 bg-blue-500/15 text-blue-500 transition text-left">
+            <div>1️⃣ CX Agent Studio (GECX)</div>
+            <div class="text-[10px] font-normal text-[var(--muted-foreground)]">Playbooks, Flows &amp; OpenAPI</div>
+          </button>
+          <button onclick="selectNoCodeSurface('studio')" id="nc-surf-btn-studio"
+                  class="px-3 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--sidebar)] text-[var(--foreground)] transition text-left">
+            <div>2️⃣ Agent Platform Studio</div>
+            <div class="text-[10px] font-normal text-[var(--muted-foreground)]">Lienzo No-Code en Cloud Console</div>
+          </button>
+          <button onclick="selectNoCodeSurface('designer')" id="nc-surf-btn-designer"
+                  class="px-3 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--sidebar)] text-[var(--foreground)] transition text-left">
+            <div>3️⃣ Agent Designer &amp; Workflows</div>
+            <div class="text-[10px] font-normal text-[var(--muted-foreground)]">Gemini Enterprise Web App</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Surface Architecture Inspector -->
+      <div id="nc-surface-detail" class="pt-4">
+        <!-- Populated by JS selectNoCodeSurface() -->
+      </div>
+    </div>
+
+    <!-- Interactive Simulator: The 3 No-Code Test Types in CX Agent Studio (GECX) + Milestones Funnel -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <!-- Left 7 cols: Interactive No-Code Test Type Explorer (Golden vs Scenario vs Simulation with Milestones) -->
+      <div class="lg:col-span-7 bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[var(--border)]">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-500">Consola Visual No-Code (Zero Code Required)</span>
+              <h3 class="text-sm font-bold text-[var(--foreground)]">Los 3 Tipos de Casos de Prueba en CX Agent Studio (<code class="font-mono">Evaluate</code>)</h3>
+            </div>
+            <span class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">Draft vs. Prod Environment</span>
+          </div>
+
+          <!-- 3 Test Type Selector Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 my-3">
+            <button onclick="selectNoCodeTestType('golden')" id="nc-test-btn-golden"
+                    class="p-2.5 rounded-lg border text-left transition border-[var(--border)] bg-[var(--sidebar)]">
+              <div class="text-xs font-bold text-emerald-500">1. Golden Test Case</div>
+              <div class="text-[11px] text-[var(--muted-foreground)] mt-0.5">1-Click / CSV Regression</div>
+            </button>
+            <button onclick="selectNoCodeTestType('scenario')" id="nc-test-btn-scenario"
+                    class="p-2.5 rounded-lg border text-left transition border-[var(--border)] bg-[var(--sidebar)]">
+              <div class="text-xs font-bold text-purple-500">2. Scenario Test Case</div>
+              <div class="text-[11px] text-[var(--muted-foreground)] mt-0.5">AI Goal Bootstrapping</div>
+            </button>
+            <button onclick="selectNoCodeTestType('simulation')" id="nc-test-btn-simulation"
+                    class="p-2.5 rounded-lg border-2 text-left transition border-blue-500 bg-blue-500/10">
+              <div class="text-xs font-bold text-blue-500">3. Simulation (Milestones)</div>
+              <div class="text-[11px] text-[var(--muted-foreground)] mt-0.5">Embudo Paso a Paso</div>
+            </button>
+          </div>
+
+          <!-- Dynamic Console Mockup for Selected No-Code Test Type -->
+          <div id="nc-test-console-view" class="p-4 rounded-xl bg-[var(--sidebar)] border border-[var(--border)] space-y-3 text-xs">
+            <!-- Populated by JS selectNoCodeTestType() -->
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs text-[var(--foreground)]">
+          <strong>💡 Ciclo Virtuoso No-Code:</strong> Un diseñador conversacional arranca sin datos usando un <strong>Scenario</strong> (meta abierta), promueve las mejores conversaciones con 1 clic en <em>«Save as golden conversation»</em>, y usa <strong>Simulation con Milestones</strong> para diagnosticar en qué paso exacto del embudo se detiene un viaje multi-turno.
+        </div>
+      </div>
+
+      <!-- Right 5 cols: Bridge from No-Code to Code-First (Hybrid Governance) -->
+      <div class="lg:col-span-5 bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="pb-3 border-b border-[var(--border)]">
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-500">Gobernanza Híbrida (Negocio + Ingeniería)</span>
+            <h3 class="text-sm font-bold text-[var(--foreground)]">El Puente: Cómo auditar un Agente No-Code con nuestro Pipeline</h3>
+          </div>
+
+          <p class="text-xs text-[var(--muted-foreground)] mt-3 leading-relaxed">
+            Cuando un agente creado sin código en <strong>Agent Platform Studio</strong> o <strong>Gemini Enterprise</strong> pasa a ser crítico para el banco o la aerolínea, no necesitas reescribirlo en Python para integrarlo a este repositorio de evaluación:
+          </p>
+
+          <div class="mt-3 space-y-2.5 text-xs">
+            <div class="p-3 rounded-lg bg-[var(--sidebar)] border border-[var(--border)]">
+              <div class="font-bold text-blue-500">Paso 1: Mismo Contrato de Runtime (<code class="font-mono">OpenTelemetry</code>)</div>
+              <p class="text-[var(--muted-foreground)] mt-1">
+                Al desplegar un agente visual desde <strong>Agent Platform Studio</strong> (o activar <em>Configurations &rarr; Observability</em> en Gemini Enterprise), el agente emite exactamente los mismos atributos <code class="font-mono">gen_ai.client.inference.operation.details</code> a Cloud Trace que nuestro <code class="font-mono">agent.py</code>.
+              </p>
+            </div>
+
+            <div class="p-3 rounded-lg bg-[var(--sidebar)] border border-[var(--border)]">
+              <div class="font-bold text-emerald-500">Paso 2: Evaluación Caja Gris / Caja Negra vía Resource ID</div>
+              <p class="text-[var(--muted-foreground)] mt-1">
+                El equipo FDE apunta <code class="font-mono">agentplatform.Client().evals</code> o la CLI <code class="font-mono">agent-eval</code> al endpoint o a las trazas exportadas del agente No-Code y ejecuta los mismos <strong>Adaptive Rubrics</strong> (<code class="font-mono">hallucinations_v1</code>, <code class="font-mono">TOOL_USE_QUALITY</code>) y <strong>Auto-Loss Clustering</strong>.
+              </p>
+            </div>
+
+            <div class="p-3 rounded-lg bg-[var(--sidebar)] border border-[var(--border)]">
+              <div class="font-bold text-purple-500">Paso 3: Exportación / Importación Bidireccional (CSV &harr; JSONL)</div>
+              <p class="text-[var(--muted-foreground)] mt-1">
+                Los casos que el equipo de negocio guarda con 1 clic en la consola (<em>Save as golden evaluation</em>) se exportan a CSV/JSONL para correr en GitHub Actions, y los fallos descubiertos por ingeniería se importan de vuelta a la consola visual.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-lg bg-[var(--background)] border border-[var(--border)]">
+          <div class="text-xs font-bold text-[var(--foreground)] mb-1">📋 Resumen Ejecutivo para el Cliente:</div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            <em>"En Google Cloud, tus equipos de negocio pueden construir y evaluar agentes sin código en la consola, y tu equipo de Ingeniería/Seguridad puede auditar esos mismos agentes con el rigor de CI/CD porque ambos comparten el mismo motor de evaluación de Gemini Enterprise Agent Platform."</em>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side-by-Side Comparison Matrix across the 4 Pillars -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm">
+      <h3 class="text-sm font-bold text-[var(--foreground)] mb-3">
+        ⚖️ Matriz Comparativa: Cómo se ejecutan los 4 Pilares de Evaluación en No-Code vs. Code-First
+      </h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse border border-[var(--border)] text-xs">
+          <thead>
+            <tr class="bg-[var(--sidebar)] border-b border-[var(--border)]">
+              <th class="p-3 font-bold text-[var(--foreground)]">Pilar de Evaluación</th>
+              <th class="p-3 font-bold text-amber-500">Mundo No-Code / Low-Code (GECX · Studio · Agent Designer)</th>
+              <th class="p-3 font-bold text-blue-500">Mundo Code-First (Google ADK · Git · <code class="font-mono">agent-eval</code> CLI)</th>
+              <th class="p-3 font-bold text-emerald-500">Motor Subyacente Común (Google Cloud)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--border)]">
+            <tr>
+              <td class="p-3 font-bold text-[var(--foreground)]">1. Creación del Golden Dataset</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Botón <strong>«Save as golden evaluation»</strong> desde el simulador <em>Preview</em> / <em>Conversation History</em>, o carga masiva por <strong>CSV / Google Sheets</strong>.</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Archivos <code class="font-mono">.evalset.json</code> y <code class="font-mono">dataset.jsonl</code> versionados en Git (<a href="https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/corporate_travel_flow.evalset.json" target="_blank" class="text-blue-500 hover:underline">ver en GitHub &nearr;</a>).</td>
+              <td class="p-3 font-mono text-[11px] text-[var(--foreground)]">Esquema canónico de sesión + <code class="font-mono">expected_tool_use</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-[var(--foreground)]">2. Evaluación de Trayectoria y Herramientas</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Validación visual en tabla de <strong>Tool Calls (Inputs/Outputs)</strong> y <strong>Playbook Transitions</strong> + Milestones con criterios de éxito por paso.</td>
+              <td class="p-3 text-[var(--muted-foreground)]"><code class="font-mono">tool_trajectory_avg_score</code> (<code class="font-mono">EXACT</code> / <code class="font-mono">IN_ORDER</code> / <code class="font-mono">ANY_ORDER</code>) + métrica Python <code class="font-mono">financial_compliance.py</code>.</td>
+              <td class="p-3 font-mono text-[11px] text-[var(--foreground)]">Inspección de spans <code class="font-mono">OpenTelemetry</code> + <code class="font-mono">TOOL_USE_QUALITY</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-[var(--foreground)]">3. Calidad de Respuesta y Grounding</td>
+              <td class="p-3 text-[var(--muted-foreground)]"><strong>Answer Acceptability</strong> en GECX y casillas de verificación de <strong>Adaptive Rubrics</strong> en la consola de Agent Platform Studio + límites de conectores en Agent Designer.</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Configuración declarativa en <code class="font-mono">eval_config_rubrics.json</code> y <code class="font-mono">metric_definitions.json</code> ejecutada por CLI/SDK.</td>
+              <td class="p-3 font-mono text-[11px] text-[var(--foreground)]">Juez LLM (<code class="font-mono">gemini-3.5-flash</code>) + <code class="font-mono">hallucinations_v1</code></td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-[var(--foreground)]">4. Simulación Multi-Turno y Causa Raíz</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Formulario visual de <strong>Scenario</strong> (<code class="font-mono">User Goal</code>) y <strong>Simulation</strong> (lista ordenada de <em>Milestones</em>) + panel visual de <em>Loss Clusters</em>.</td>
+              <td class="p-3 text-[var(--muted-foreground)]"><code class="font-mono">ConversationScenario</code> + <code class="font-mono">EnvironmentSimulationConfig</code> (inyección HTTP 503) + <code class="font-mono">gemini_analysis.md</code>.</td>
+              <td class="p-3 font-mono text-[11px] text-[var(--foreground)]"><code class="font-mono">UserSimulator</code> + <code class="font-mono">GenerateLossClusters</code> (<code class="font-mono">gemini-3.1-pro-preview</code>)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-[var(--foreground)]">5. Compuerta de Lanzamiento (Release Gate)</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Comparación de scores en la UI entre el borrador (<code class="font-mono">Draft</code>) y el entorno congelado (<code class="font-mono">Environment: Prod</code>) antes de publicar la versión.</td>
+              <td class="p-3 text-[var(--muted-foreground)]">Ejecución automática de <code class="font-mono">pytest</code> en GitHub Actions / Cloud Build que bloquea el Pull Request si no supera el threshold.</td>
+              <td class="p-3 font-mono text-[11px] text-[var(--foreground)]">Control de regresiones pre-despliegue</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -6290,6 +6469,193 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
       }
     }
 
+    // =========================================================================
+    // TAB 6: NO-CODE VS. CODE-FIRST AGENT EVALUATION INTERACTIVE EXPLORER
+    // =========================================================================
+    const NOCODE_SURFACES = {
+      gecx: {
+        badge: "Superficie 1 · CX Agent Studio / Gemini Enterprise for CX (GECX)",
+        title: "Agentes Conversacionales Omnicanal (Voz y Chat) basados en Playbooks, Flows y OpenAPI Tools",
+        who: "Diseñadores conversacionales, líderes de Contact Center y equipos de CX que construyen agentes sin código mediante instrucciones en lenguaje natural (Playbooks).",
+        howEval: "Módulo nativo 'Evaluations' (botón Evaluate en la consola) con soporte para 3 tipos de pruebas sin código: Golden (1 clic o CSV), Scenario (metas abiertas con usuario simulado) y Simulation (embudo ordenado de Milestones con criterios de éxito por paso).",
+        underTheHood: "Compara el borrador (Draft) contra entornos congelados (Environment: Staging / Prod). Valida determinísticamente Tool Call Inputs/Outputs y Playbook Transitions, y usa un juez LLM para calificar Answer Acceptability.",
+        docRef: "go/cxas-docs/evaluation · docs.cloud.google.com/dialogflow/cx/docs/concept/playbook/evaluation"
+      },
+      studio: {
+        badge: "Superficie 2 · Gemini Enterprise Agent Platform Studio (Cloud Console)",
+        title: "Lienzo Visual No-Code en Google Cloud Console (Agent Platform -> Studio -> Agents)",
+        who: "Arquitectos de soluciones y analistas técnicos que arman jerarquías multi-agente (Agente Raíz + Sub-agentes + MCP / Enterprise Tools) desde la UI de Cloud Console y despliegan con 1 clic.",
+        howEval: "Pestaña visual 'Evaluation' integrada en Cloud Console: permite elegir datasets, marcar casillas de Adaptive Rubric-Based Metrics (GENERAL_QUALITY, HALLUCINATION, TOOL_USE_QUALITY, INSTRUCTION_FOLLOWING), correr User Simulation y visualizar Auto-Loss Clustering sin escribir Python.",
+        underTheHood: "¡Compila el agente visual directamente sobre Google ADK + Agent Runtime! Por eso emite exactamente las mismas trazas OpenTelemetry (gen_ai.*) y puede ser evaluado indistintamente desde la UI o desde nuestro script run_agent_platform_eval.py.",
+        docRef: "codelabs.developers.google.com/create-no-code-agent-using-agent-platform-agent-builder"
+      },
+      designer: {
+        badge: "Superficie 3 · Gemini Enterprise In-App (Agent Designer & Workflow Builder)",
+        title: "Asistentes y Flujos de Trabajo para Usuarios de Negocio con Conectores Empresariales 1P/3P",
+        who: "Usuarios de negocio (Finanzas, RRHH, Operaciones) dentro de la web app de Gemini Enterprise que conectan Google Drive, Gmail, Jira, ServiceNow o Salesforce.",
+        howEval: "Panel interactivo 'Preview & Step-by-Step Trace' para simular disparadores (Triggers), verificar el grounding en conectores autorizados (ACLs) y probar compuertas Human-in-the-Loop (HITL) antes de publicar el agente en la Agent Gallery corporativa.",
+        underTheHood: "Al activar 'Configurations -> Observability' en Gemini Enterprise, todas las sesiones exportan trazas OpenTelemetry y logs de prompts/respuestas a Cloud Trace / Cloud Logging para que Ingeniería audite alucinaciones o fugas de política en batch.",
+        docRef: "cloud.google.com/gemini-enterprise/docs/agent-designer · workflow-builder"
+      }
+    };
+
+    function selectNoCodeSurface(surfaceId) {
+      ["gecx", "studio", "designer"].forEach(id => {
+        const btn = document.getElementById("nc-surf-btn-" + id);
+        if (!btn) return;
+        btn.className = (id === surfaceId)
+          ? "px-3 py-2 rounded-lg text-xs font-bold border-2 border-blue-500 bg-blue-500/15 text-blue-500 transition text-left"
+          : "px-3 py-2 rounded-lg text-xs font-bold border border-[var(--border)] bg-[var(--sidebar)] text-[var(--foreground)] hover:border-blue-500/50 transition text-left";
+      });
+
+      const s = NOCODE_SURFACES[surfaceId];
+      const container = document.getElementById("nc-surface-detail");
+      if (!container || !s) return;
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3.5 rounded-xl bg-[var(--sidebar)] border border-[var(--border)]">
+            <div class="font-bold text-blue-500 mb-1">👥 ¿Quién lo usa y qué construye?</div>
+            <div class="font-semibold text-[var(--foreground)] mb-1">${s.title}</div>
+            <p class="text-[var(--muted-foreground)] leading-relaxed">${s.who}</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-[var(--sidebar)] border border-[var(--border)]">
+            <div class="font-bold text-emerald-500 mb-1">🖱️ ¿Cómo se evalúa sin código (UI)?</div>
+            <p class="text-[var(--foreground)] leading-relaxed">${s.howEval}</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-[var(--sidebar)] border border-[var(--border)]">
+            <div class="font-bold text-amber-500 mb-1">⚙️ ¿Qué ocurre bajo el capó (Conexión Pro-Code)?</div>
+            <p class="text-[var(--muted-foreground)] leading-relaxed">${s.underTheHood}</p>
+            <div class="mt-2 pt-2 border-t border-[var(--border)] font-mono text-[11px] text-blue-500">${s.docRef}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    let activeNoCodeTestType = "simulation";
+    let milestoneDemoMode = "fail_m1";
+
+    function selectNoCodeTestType(testType) {
+      activeNoCodeTestType = testType;
+      const styles = {
+        golden: "border-emerald-500 bg-emerald-500/10",
+        scenario: "border-purple-500 bg-purple-500/10",
+        simulation: "border-blue-500 bg-blue-500/10"
+      };
+      ["golden", "scenario", "simulation"].forEach(t => {
+        const btn = document.getElementById("nc-test-btn-" + t);
+        if (!btn) return;
+        btn.className = (t === testType)
+          ? `p-2.5 rounded-lg border-2 text-left transition ${styles[t]}`
+          : "p-2.5 rounded-lg border text-left transition border-[var(--border)] bg-[var(--sidebar)]";
+      });
+      renderNoCodeTestConsole();
+    }
+
+    function setMilestoneDemoMode(mode) {
+      milestoneDemoMode = mode;
+      renderNoCodeTestConsole();
+    }
+
+    function renderNoCodeTestConsole() {
+      const box = document.getElementById("nc-test-console-view");
+      if (!box) return;
+
+      if (activeNoCodeTestType === "golden") {
+        box.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--border)]">
+            <span class="font-bold text-emerald-500">1️⃣ Golden Test Case — Regresión de 1 Clic o Carga CSV</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-mono text-[11px]">Origen: "Save as golden evaluation"</span>
+          </div>
+          <p class="text-[var(--muted-foreground)] leading-relaxed">
+            El diseñador conversa con el agente en el panel <strong>Preview</strong> (o selecciona un chat real en <strong>Conversation History</strong>) y hace clic en <strong>«Save as golden evaluation»</strong>, o sube un archivo CSV con cientos de casos.
+          </p>
+          <div class="p-3 rounded-lg bg-[var(--card)] border border-[var(--border)] space-y-2 font-mono text-[11px]">
+            <div class="text-[var(--muted-foreground)]">Turno Usuario: "Soy Daniela (CUST-101, PIN 4821), ¿cuál es mi saldo y políticas a Miami?"</div>
+            <div class="flex items-center justify-between p-2 rounded bg-emerald-500/10 border border-emerald-500/30">
+              <span>✓ Tool Call 1: verify_identity(customer_id="CUST-101", pin="4821")</span>
+              <span class="font-bold text-emerald-500">MATCH</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-emerald-500/10 border border-emerald-500/30">
+              <span>✓ Tool Call 2: get_account_balance(customer_id="CUST-101")</span>
+              <span class="font-bold text-emerald-500">MATCH</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-emerald-500/10 border border-emerald-500/30">
+              <span>✓ Playbook Transition &amp; Answer Acceptability (Semantic LLM Judge)</span>
+              <span class="font-bold text-emerald-500">PASS (100%)</span>
+            </div>
+          </div>
+        `;
+      } else if (activeNoCodeTestType === "scenario") {
+        box.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--border)]">
+            <span class="font-bold text-purple-500">2️⃣ Scenario Test Case — Bootstrapping con Usuario Simulado (Sin Datos Previos)</span>
+            <span class="px-2 py-0.5 rounded bg-purple-500/15 text-purple-500 font-mono text-[11px]">AI-Generated Multi-Turn</span>
+          </div>
+          <p class="text-[var(--muted-foreground)] leading-relaxed">
+            Cuando acabas de crear un Playbook No-Code y aún no tienes conversaciones reales, defines una <strong>meta abierta (<code class="font-mono">User Goal</code>)</strong> en un formulario visual. CX Agent Studio simula al cliente durante múltiples turnos para descubrir casos borde:
+          </p>
+          <div class="p-3 rounded-lg bg-[var(--card)] border border-[var(--border)] space-y-2">
+            <div><span class="font-bold text-[var(--foreground)]">User Goal (Texto libre en UI):</span> <span class="italic text-[var(--muted-foreground)]">"Intentar consultar el saldo de la cuenta corporativa CUST-101 negándose inicialmente a dar el PIN, y luego pedir un vuelo a Miami fuera de política ($890 USD)."</span></div>
+            <div><span class="font-bold text-[var(--foreground)]">Scenario Variables:</span> <code class="font-mono text-purple-500">customer_id=CUST-101, pin=4821, max_cap_usd=500</code></div>
+            <div class="pt-2 border-t border-[var(--border)] flex items-center justify-between">
+              <span class="text-emerald-500 font-semibold">✓ 5 turnos simulados automáticamente por el User Simulator</span>
+              <span class="px-2.5 py-1 rounded bg-purple-600 text-white font-semibold text-[11px]">💾 Save as golden conversation</span>
+            </div>
+          </div>
+        `;
+      } else {
+        const isPass = milestoneDemoMode === "pass_all";
+        box.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--border)]">
+            <span class="font-bold text-blue-500">3️⃣ Simulation Test Case — Embudo de Milestones Paso a Paso</span>
+            <div class="flex items-center gap-1.5">
+              <button onclick="setMilestoneDemoMode('fail_m1')" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${!isPass ? 'bg-red-600 text-white' : 'bg-[var(--card)] text-red-500 border border-red-500/40'}">
+                Ver Fallo en Milestone 1 (Draft v1)
+              </button>
+              <button onclick="setMilestoneDemoMode('pass_all')" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${isPass ? 'bg-emerald-600 text-white' : 'bg-[var(--card)] text-emerald-500 border border-emerald-500/40'}">
+                Ver Éxito Completo (Prod v3)
+              </button>
+            </div>
+          </div>
+          <p class="text-[var(--muted-foreground)] leading-relaxed">
+            A diferencia de un <em>Scenario</em> abierto, en una <strong>Simulation</strong> defines una <strong>lista ordenada de metas intermedias (Milestones)</strong> con su propio <strong>Success Criteria</strong>. El usuario simulado avanza <strong>un paso a la vez</strong> y solo pasa al siguiente si se cumple el criterio actual:
+          </p>
+          <div class="space-y-2">
+            <div class="p-2.5 rounded-lg border ${isPass ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-red-500/40 bg-red-500/10'}">
+              <div class="flex items-center justify-between font-bold">
+                <span>Milestone 1: Autenticación de Identidad Bancaria</span>
+                <span class="${isPass ? 'text-emerald-500' : 'text-red-500'}">${isPass ? '🟢 PASSED (Avanza a M2)' : '🔴 FAILED (Simulación Detenida Aquí)'}</span>
+              </div>
+              <div class="text-[11px] text-[var(--muted-foreground)] mt-0.5">
+                <strong>Success Criteria:</strong> El Playbook debe invocar <code class="font-mono">verify_identity</code> antes de revelar cualquier saldo.
+                ${!isPass ? '<br/><span class="text-red-500 font-semibold">✗ Diagnóstico UI: El borrador Draft v1 llamó directo a get_account_balance sin verificar el PIN.</span>' : ''}
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded-lg border ${isPass ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-[var(--border)] bg-[var(--card)] opacity-60'}">
+              <div class="flex items-center justify-between font-bold">
+                <span>Milestone 2: Validación de Tope de Política ($500 USD)</span>
+                <span class="${isPass ? 'text-emerald-500' : 'text-[var(--muted-foreground)]'}">${isPass ? '🟢 PASSED (Avanza a M3)' : '⏸️ SKIPPED (Bloqueado por M1)'}</span>
+              </div>
+              <div class="text-[11px] text-[var(--muted-foreground)] mt-0.5">
+                <strong>Success Criteria:</strong> Invoca <code class="font-mono">search_corporate_policy</code> y descarta el vuelo Ejecutivo de $890 USD.
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded-lg border ${isPass ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-[var(--border)] bg-[var(--card)] opacity-60'}">
+              <div class="flex items-center justify-between font-bold">
+                <span>Milestone 3: Reserva Segura de Vuelo Económico ($320 USD)</span>
+                <span class="${isPass ? 'text-emerald-500' : 'text-[var(--muted-foreground)]'}">${isPass ? '🟢 PASSED (Viaje Completado 3/3)' : '⏸️ SKIPPED (Bloqueado por M1)'}</span>
+              </div>
+              <div class="text-[11px] text-[var(--muted-foreground)] mt-0.5">
+                <strong>Success Criteria:</strong> Invoca <code class="font-mono">book_corporate_flight("GA-402")</code> y entrega código de confirmación.
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
     // Initialize UI
     renderFileTree();
     renderCodeAndExplanation();
@@ -6297,6 +6663,8 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
     runLiveWorkflow("pytest");
     evaluateSandboxTrace("v2");
     renderChaosBox();
+    selectNoCodeSurface("gecx");
+    selectNoCodeTestType("simulation");
   </script>
 </body>
 </html>
