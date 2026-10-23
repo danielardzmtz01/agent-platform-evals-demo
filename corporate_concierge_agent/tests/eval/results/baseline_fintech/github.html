@@ -792,6 +792,165 @@
         </table>
       </div>
     </div>
+
+    <!-- Customer-Shareable Industry Examples & Official Reference Hub -->
+    <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 shadow-sm space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-[var(--border)]">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-500">Material para Compartir con el Cliente</span>
+          <h3 class="text-sm md:text-base font-bold text-[var(--foreground)]">
+            📚 Ejemplos Reales por Industria, Codelabs y Documentación Oficial de Google Cloud
+          </h3>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+          Links Públicos Verificados &nearr;
+        </span>
+      </div>
+
+      <!-- 3 Concrete Industry Examples -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <!-- Example 1: Banking / Fintech -->
+        <div class="p-4 rounded-xl bg-[var(--sidebar)] border border-[var(--border)] flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded font-bold bg-blue-500/15 text-blue-500">🏦 Ejemplo 1 · Banca y Fintech</span>
+              <span class="font-mono text-[var(--muted-foreground)]">Code-First (ADK)</span>
+            </div>
+            <h4 class="font-bold text-sm text-[var(--foreground)]">Concierge Bancario y Asesor Financiero con Compliance Estricto</h4>
+            <p class="text-[var(--muted-foreground)] leading-relaxed">
+              <strong>¿Qué se evalúa?</strong> Que el agente jamás revele saldos sin verificar identidad (<code class="font-mono">IN_ORDER</code> + regla Python de cumplimiento), valide esquemas ISO en APIs core y no alucine saldos ante errores <code class="font-mono">HTTP 503</code>.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-[var(--border)] flex flex-col gap-1.5">
+            <a href="https://github.com/danielardzmtz01/agent-platform-evals-demo" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              🐙 Repo Demo: Corporate Concierge Evals &nearr;
+            </a>
+            <a href="https://github.com/google/adk-samples/tree/main/python/agents/financial-advisor" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              🐙 Google ADK Sample: Financial Advisor Agent &nearr;
+            </a>
+            <a href="https://github.com/google/adk-samples/tree/main/python/agents/travel-concierge" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              🐙 Google ADK Sample: Travel Concierge Multi-Agent &nearr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Example 2: Airlines, Retail & Contact Center (CX Agent Studio / GECX) -->
+        <div class="p-4 rounded-xl bg-[var(--sidebar)] border border-[var(--border)] flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded font-bold bg-amber-500/15 text-amber-500">✈️ Ejemplo 2 · Aerolíneas, Retail y CX</span>
+              <span class="font-mono text-[var(--muted-foreground)]">No-Code / Low-Code</span>
+            </div>
+            <h4 class="font-bold text-sm text-[var(--foreground)]">Atención Omnicanal 24/7 con Playbooks en CX Agent Studio (GECX)</h4>
+            <p class="text-[var(--muted-foreground)] leading-relaxed">
+              <strong>¿Qué se evalúa?</strong> Embudo paso a paso mediante <strong>Simulation con Milestones</strong> (1. Validar PNR &rarr; 2. Verificar tarifa &rarr; 3. Reemitir vuelo por OpenAPI), <strong>Scenario Tests</strong> con usuario simulado y regresión por CSV entre <code class="font-mono">Draft</code> y <code class="font-mono">Prod</code>.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-[var(--border)] flex flex-col gap-1.5">
+            <a href="https://cloud.google.com/dialogflow/cx/docs/concept/playbook/evaluation" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              📘 Docs Oficiales: Playbook Evaluation (Golden &amp; Simulation) &nearr;
+            </a>
+            <a href="https://cloud.google.com/dialogflow/cx/docs/concept/test-case" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              📘 Docs Oficiales: Test Cases &amp; Simulator en Conversational Agents &nearr;
+            </a>
+            <a href="https://github.com/google/adk-samples/tree/main/python/agents/customer-service" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              🐙 Google Sample: Customer Service Agent + Evals &nearr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Example 3: Enterprise Productivity, IT Helpdesk & HR (Agent Platform Studio & Agent Designer) -->
+        <div class="p-4 rounded-xl bg-[var(--sidebar)] border border-[var(--border)] flex flex-col justify-between space-y-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="px-2 py-0.5 rounded font-bold bg-emerald-500/15 text-emerald-500">🏢 Ejemplo 3 · Mesa de Ayuda TI y RRHH</span>
+              <span class="font-mono text-[var(--muted-foreground)]">100% No-Code UI</span>
+            </div>
+            <h4 class="font-bold text-sm text-[var(--foreground)]">Asistentes con Conectores (Drive, Jira, ServiceNow) y HITL</h4>
+            <p class="text-[var(--muted-foreground)] leading-relaxed">
+              <strong>¿Qué se evalúa?</strong> En <strong>Agent Designer / Workflow Builder</strong> se simula el paso a paso de conectores y compuertas <em>Human-in-the-Loop</em>; en <strong>Agent Platform Studio</strong> se evalúa con <em>Adaptive Rubrics</em> y <em>Loss Clusters</em> sobre <code class="font-mono">Agent Runtime</code>.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-[var(--border)] flex flex-col gap-1.5">
+            <a href="https://codelabs.developers.google.com/create-no-code-agent-using-agent-platform-agent-builder" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              🧪 Codelab Oficial: Crear un Agente No-Code en Agent Platform Studio &nearr;
+            </a>
+            <a href="https://cloud.google.com/gemini-enterprise/docs/agent-designer" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              📘 Docs Oficiales: Gemini Enterprise Agent Designer &nearr;
+            </a>
+            <a href="https://cloud.google.com/gemini/enterprise/docs/workflow-builder" target="_blank" rel="noopener"
+               class="text-blue-500 hover:underline font-semibold flex items-center gap-1">
+              📘 Docs Oficiales: Gemini Enterprise Workflow Builder &nearr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Reference Links Bar (Documentation, SDKs & Notebooks) -->
+      <div class="p-4 rounded-xl bg-[var(--sidebar)] border border-[var(--border)]">
+        <div class="text-xs font-bold text-[var(--foreground)] mb-2.5">
+          🔗 Guías Técnicas, SDKs y Notebooks Oficiales para Enviar al Cliente Post-Reunión:
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+          <a href="https://google.github.io/adk-docs/evaluate/" target="_blank" rel="noopener"
+             class="p-2.5 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-blue-500 transition flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-500">Google ADK — Why &amp; How to Evaluate Agents</div>
+              <div class="text-[var(--muted-foreground)] font-mono">google.github.io/adk-docs/evaluate</div>
+            </div>
+            <span>&nearr;</span>
+          </a>
+          <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-agents" target="_blank" rel="noopener"
+             class="p-2.5 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-blue-500 transition flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-500">Agent Platform Evaluation Service Docs</div>
+              <div class="text-[var(--muted-foreground)] font-mono">cloud.google.com/.../evaluation-agents</div>
+            </div>
+            <span>&nearr;</span>
+          </a>
+          <a href="https://github.com/GoogleCloudPlatform/professional-services/tree/main/tools/agent-eval" target="_blank" rel="noopener"
+             class="p-2.5 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-blue-500 transition flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-500">Acelerador CLI <code class="font-mono">agent-eval</code> (PSO)</div>
+              <div class="text-[var(--muted-foreground)] font-mono">GoogleCloudPlatform/professional-services</div>
+            </div>
+            <span>&nearr;</span>
+          </a>
+          <a href="https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/evaluation" target="_blank" rel="noopener"
+             class="p-2.5 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-blue-500 transition flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-500">Notebooks Oficiales de Evaluación (Jupyter)</div>
+              <div class="text-[var(--muted-foreground)] font-mono">GoogleCloudPlatform/generative-ai</div>
+            </div>
+            <span>&nearr;</span>
+          </a>
+          <a href="https://github.com/google/adk-python/tree/main/src/google/adk/evaluation" target="_blank" rel="noopener"
+             class="p-2.5 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-blue-500 transition flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-500">Código Fuente del Motor <code class="font-mono">adk.evaluation</code></div>
+              <div class="text-[var(--muted-foreground)] font-mono">github.com/google/adk-python</div>
+            </div>
+            <span>&nearr;</span>
+          </a>
+          <a href="https://github.com/google/adk-samples/tree/main/python/agents" target="_blank" rel="noopener"
+             class="p-2.5 rounded-lg bg-[var(--card)] border border-[var(--border)] hover:border-blue-500 transition flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-500">Catálogo Completo <code class="font-mono">adk-samples</code> (+15 Agentes)</div>
+              <div class="text-[var(--muted-foreground)] font-mono">github.com/google/adk-samples</div>
+            </div>
+            <span>&nearr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -6502,7 +6661,7 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
         who: "Diseñadores conversacionales, líderes de Contact Center y equipos de CX que construyen agentes sin código mediante instrucciones en lenguaje natural (Playbooks).",
         howEval: "Módulo nativo 'Evaluations' (botón Evaluate en la consola) con soporte para 3 tipos de pruebas sin código: Golden (1 clic o CSV), Scenario (metas abiertas con usuario simulado) y Simulation (embudo ordenado de Milestones con criterios de éxito por paso).",
         underTheHood: "Compara el borrador (Draft) contra entornos congelados (Environment: Staging / Prod). Valida determinísticamente Tool Call Inputs/Outputs y Playbook Transitions, y usa un juez LLM para calificar Answer Acceptability.",
-        docRef: "go/cxas-docs/evaluation · docs.cloud.google.com/dialogflow/cx/docs/concept/playbook/evaluation"
+        docRef: '<a href="https://cloud.google.com/dialogflow/cx/docs/concept/playbook/evaluation" target="_blank" rel="noopener" class="hover:underline font-semibold">📘 Docs: Playbook Evaluation &nearr;</a> · <a href="https://cloud.google.com/dialogflow/cx/docs/concept/test-case" target="_blank" rel="noopener" class="hover:underline font-semibold">📘 Test Cases &amp; Simulator &nearr;</a>'
       },
       studio: {
         badge: "Superficie 2 · Gemini Enterprise Agent Platform Studio (Cloud Console)",
@@ -6510,7 +6669,7 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
         who: "Arquitectos de soluciones y analistas técnicos que arman jerarquías multi-agente (Agente Raíz + Sub-agentes + MCP / Enterprise Tools) desde la UI de Cloud Console y despliegan con 1 clic.",
         howEval: "Pestaña visual 'Evaluation' integrada en Cloud Console: permite elegir datasets, marcar casillas de Adaptive Rubric-Based Metrics (GENERAL_QUALITY, HALLUCINATION, TOOL_USE_QUALITY, INSTRUCTION_FOLLOWING), correr User Simulation y visualizar Auto-Loss Clustering sin escribir Python.",
         underTheHood: "¡Compila el agente visual directamente sobre Google ADK + Agent Runtime! Por eso emite exactamente las mismas trazas OpenTelemetry (gen_ai.*) y puede ser evaluado indistintamente desde la UI o desde nuestro script run_agent_platform_eval.py.",
-        docRef: "codelabs.developers.google.com/create-no-code-agent-using-agent-platform-agent-builder"
+        docRef: '<a href="https://codelabs.developers.google.com/create-no-code-agent-using-agent-platform-agent-builder" target="_blank" rel="noopener" class="hover:underline font-semibold">🧪 Codelab: Create No-Code Agent in Agent Platform &nearr;</a> · <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/evaluation-agents" target="_blank" rel="noopener" class="hover:underline font-semibold">📘 Agent Evaluation Docs &nearr;</a>'
       },
       designer: {
         badge: "Superficie 3 · Gemini Enterprise In-App (Agent Designer & Workflow Builder)",
@@ -6518,7 +6677,7 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
         who: "Usuarios de negocio (Finanzas, RRHH, Operaciones) dentro de la web app de Gemini Enterprise que conectan Google Drive, Gmail, Jira, ServiceNow o Salesforce.",
         howEval: "Panel interactivo 'Preview & Step-by-Step Trace' para simular disparadores (Triggers), verificar el grounding en conectores autorizados (ACLs) y probar compuertas Human-in-the-Loop (HITL) antes de publicar el agente en la Agent Gallery corporativa.",
         underTheHood: "Al activar 'Configurations -> Observability' en Gemini Enterprise, todas las sesiones exportan trazas OpenTelemetry y logs de prompts/respuestas a Cloud Trace / Cloud Logging para que Ingeniería audite alucinaciones o fugas de política en batch.",
-        docRef: "cloud.google.com/gemini-enterprise/docs/agent-designer · workflow-builder"
+        docRef: '<a href="https://cloud.google.com/gemini-enterprise/docs/agent-designer" target="_blank" rel="noopener" class="hover:underline font-semibold">📘 Docs: Agent Designer &nearr;</a> · <a href="https://cloud.google.com/gemini/enterprise/docs/workflow-builder" target="_blank" rel="noopener" class="hover:underline font-semibold">📘 Docs: Workflow Builder &nearr;</a>'
       }
     };
 
