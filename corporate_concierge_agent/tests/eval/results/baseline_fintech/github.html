@@ -608,7 +608,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/corporate_concierge_agent/agent.py",
     "sdkGithubUrl": "https://github.com/google/adk-python/tree/main/src/google/adk/agents",
     "sdkGithubLabel": "google/adk-python",
-    "command": ".venv/bin/adk web . --host 0.0.0.0 --port 8085",
+    "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && .venv/bin/adk web . --host 0.0.0.0 --port 8085 --allow_origins=\"regex:.*\"",
     "expectedOutput": "Inicia el servidor de desarrollo y evaluación visual de Google ADK en el puerto 8085.",
     "annotations": [
       {
@@ -2015,7 +2015,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/corporate_travel_flow.evalset.json",
     "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/eval_set.py",
     "sdkGithubLabel": "ADK EvalSet Schema",
-    "command": "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
+    "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
     "expectedOutput": "Evalúa los 3 escenarios críticos contra las trayectorias de referencia en modo IN_ORDER.",
     "annotations": [
       {
@@ -2736,7 +2736,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/financial_compliance.py",
     "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/custom_metric_evaluator.py",
     "sdkGithubLabel": "ADK CustomMetricEvaluator",
-    "command": "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
+    "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
     "expectedOutput": "Ejecuta la auditoría determinista financial_compliance_score junto con el evaluador de trayectoria.",
     "annotations": [
       {
@@ -3232,7 +3232,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/eval_config_in_order.json",
     "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/trajectory_evaluator.py",
     "sdkGithubLabel": "ADK TrajectoryEvaluator",
-    "command": "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json",
+    "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
     "expectedOutput": "Evalúa el agente combinando IN_ORDER trajectory matching con la función Python financial_compliance_score.",
     "annotations": [
       {
@@ -3347,7 +3347,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/02_autoraters_rubrics/eval_config_rubrics.json",
     "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/eval_config.py",
     "sdkGithubLabel": "ADK EvalConfig",
-    "command": ".venv/bin/python evals/04_cicd_and_platform/run_offline_demo_showcase.py",
+    "command": "cd ~/demos/agent_platform_evals_demo && .venv/bin/python evals/04_cicd_and_platform/run_offline_demo_showcase.py",
     "expectedOutput": "Ejecuta la descomposición oración por oración de hallucinations_v1 y los veredictos por rúbrica.",
     "annotations": [
       {
@@ -3642,7 +3642,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/03_simulation_chaos/dynamic_personas.evalset.json",
     "sdkGithubUrl": "https://github.com/google/adk-python/tree/main/src/google/adk/evaluation/simulation",
     "sdkGithubLabel": "ADK UserSimulator",
-    "command": ".venv/bin/adk eval corporate_concierge_agent evals/03_simulation_chaos/dynamic_personas.evalset.json --config_file_path evals/03_simulation_chaos/eval_config_user_sim.json --print_detailed_results",
+    "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && .venv/bin/adk eval corporate_concierge_agent evals/03_simulation_chaos/dynamic_personas.evalset.json --config_file_path evals/03_simulation_chaos/eval_config_user_sim.json --print_detailed_results",
     "expectedOutput": "Ejecuta conversaciones dinámicas multi-turno entre el UserSimulator (NOVICE, EXPERT, EVALUATOR) y el agente.",
     "annotations": [
       {
@@ -3902,7 +3902,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/03_simulation_chaos/run_chaos_simulation.py",
     "sdkGithubUrl": "https://github.com/google/adk-python/tree/main/src/google/adk/tools/environment_simulation",
     "sdkGithubLabel": "ADK EnvironmentSimulation",
-    "command": ".venv/bin/python evals/03_simulation_chaos/run_chaos_simulation.py",
+    "command": "cd ~/demos/agent_platform_evals_demo && .venv/bin/python evals/03_simulation_chaos/run_chaos_simulation.py",
     "expectedOutput": "Genera el interceptor before_tool_callback e inyecta el fallo HTTP 503 determinista (seed=42).",
     "annotations": [
       {
@@ -4447,7 +4447,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/04_cicd_and_platform/test_agent_evals_cicd.py",
     "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/agent_evaluator.py",
     "sdkGithubLabel": "ADK AgentEvaluator",
-    "command": ".venv/bin/pytest evals/04_cicd_and_platform/test_agent_evals_cicd.py -v",
+    "command": "cd ~/demos/agent_platform_evals_demo && .venv/bin/pytest evals/04_cicd_and_platform/test_agent_evals_cicd.py -v",
     "expectedOutput": "Ejecuta la suite de regresión en ~1.1 segundos validando trayectoria y cumplimiento financiero.",
     "annotations": [
       {
@@ -5470,7 +5470,7 @@
     "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/corporate_concierge_agent/tests/eval/metrics/metric_definitions.json",
     "sdkGithubUrl": "https://github.com/GoogleCloudPlatform/professional-services/tree/main/tools/agent-eval",
     "sdkGithubLabel": "GoogleCloudPlatform/agent-eval",
-    "command": "AGENT_EVAL_NO_PAUSES=1 .venv/bin/agent-eval run --agent-dir corporate_concierge_agent --base-url http://localhost:8085 --no-simulate --no-dashboard --run-id baseline_fintech",
+    "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && AGENT_EVAL_NO_PAUSES=1 .venv/bin/agent-eval run --agent-dir corporate_concierge_agent --base-url http://localhost:8085 --no-simulate --no-dashboard --run-id baseline_fintech",
     "expectedOutput": "Ejecuta el ciclo Generate -> Grade -> Analyze -> Compare en evals-demos y genera report.html.",
     "annotations": [
       {
