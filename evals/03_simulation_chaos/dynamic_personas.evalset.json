@@ -1,7 +1,7 @@
 {
   "eval_set_id": "dynamic_personas_simulation",
-  "name": "Simulación Dinámica Multi-Turno (UserSimulator: NOVICE, EXPERT, EVALUATOR)",
-  "description": "Escenarios dinámicos (Slide 9) donde un LLM simula usuarios con distintas personalidades que conversan con el agente.",
+  "name": "Simulación Dinámica Multi-Turno (Pre-Built: NOVICE, EXPERT, EVALUATOR + Custom UX UserPersona)",
+  "description": "Escenarios dinámicos (Slide 9) donde un LLM simula usuarios con personalidades preconstruidas y perfiles personalizados (UserPersona + UserBehavior) diseñados por equipos de UI/UX.",
   "eval_cases": [
     {
       "eval_id": "novice_traveler_missing_pin",
@@ -39,6 +39,37 @@
       "session_input": {
         "app_name": "corporate_concierge_agent",
         "user_id": "sim_evaluator",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "custom_ux_progressive_impatience_persona",
+      "conversation_scenario": {
+        "starting_prompt": "Hola, necesito revisar urgente el saldo de mi tarjeta corporativa porque estoy en el mostrador del aeropuerto.",
+        "conversation_plan": "1. Inicia tranquilo explicando tu urgencia, pero NO des tu ID (CUST-101) ni tu PIN (4821) en el primer turno. 2. Cuando el agente te pida tus datos de verificación, entrégalos pero muestra impaciencia porque tu vuelo está por abordar. 3. Una vez que te confirme el disponible ($45,000 USD), cierra la sesión.",
+        "user_persona": {
+          "id": "UX_USUARIO_ANSIOSO_IMPACIENTE",
+          "description": "Perfil levantado por el equipo de Diseño UI/UX (aplicable a usuarios en urgencia operativa o triaje clínico como DoctorSV): inicia cordial en el primer turno, pero escala en impaciencia y frustración si siente demora o exceso de preguntas.",
+          "behaviors": [
+            {
+              "name": "Escalada progresiva de impaciencia y urgencia",
+              "description": "El usuario inicia tranquilo en el primer turno, pero a partir del segundo turno muestra prisa, frustración y exige respuestas directas.",
+              "behavior_instructions": [
+                "En tu primer mensaje mantén un tono cordial aunque mencionando que tienes prisa.",
+                "A partir del segundo turno, expresa impaciencia explícita (ej. 'Por favor apúrese que ya están llamando a mi vuelo, aquí tiene mis datos').",
+                "Usa oraciones cortas, coloquiales y directas, sin tecnicismos."
+              ],
+              "violation_rubrics": [
+                "El usuario simulado se mantiene pasivo, excesivamente paciente o sin prisa después del primer turno.",
+                "El usuario simulado redacta párrafos largos o utiliza lenguaje técnico artificial."
+              ]
+            }
+          ]
+        }
+      },
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "sim_custom_ux_persona",
         "state": {}
       }
     }
