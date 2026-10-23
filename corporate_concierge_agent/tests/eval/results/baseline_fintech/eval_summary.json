@@ -1,0 +1,419 @@
+{
+    "experiment_id": "eval-20261022_222137",
+    "run_type": "run",
+    "test_description": "Combined evaluation run: baseline_fintech",
+    "interaction_datetime": "2026-10-22T22:21:37.613782",
+    "git_info": {
+        "commit": "",
+        "branch": "",
+        "dirty": false
+    },
+    "overall_summary": {
+        "deterministic_metrics": {
+            "token_usage.llm_calls": 4.666666666666667,
+            "token_usage.total_tokens": 7540.0,
+            "token_usage.prompt_tokens": 6714.666666666667,
+            "token_usage.completion_tokens": 553.3333333333334,
+            "token_usage.cached_tokens": 0.0,
+            "token_usage.estimated_cost_usd": 0.005017333333333333,
+            "latency_metrics.total_latency_seconds": 4.824133333333333,
+            "latency_metrics.average_turn_latency_seconds": 4.824133333333333,
+            "latency_metrics.llm_latency_seconds": 4.7951380776666666,
+            "latency_metrics.tool_latency_seconds": 0.0008499853333333333,
+            "latency_metrics.time_to_first_response_seconds": 2.85158832,
+            "cache_efficiency.cache_hit_rate": 0.0,
+            "cache_efficiency.total_cached_tokens": 0.0,
+            "cache_efficiency.total_fresh_prompt_tokens": 3357.3333333333335,
+            "cache_efficiency.total_input_tokens": 3357.3333333333335,
+            "thinking_metrics.reasoning_ratio": 0.6695141279838651,
+            "thinking_metrics.total_thinking_tokens": 272.0,
+            "thinking_metrics.total_candidate_tokens": 140.66666666666666,
+            "thinking_metrics.total_output_tokens": 412.6666666666667,
+            "thinking_metrics.turns_with_thinking": 2.3333333333333335,
+            "tool_utilization.total_tool_calls": 1.3333333333333333,
+            "tool_utilization.unique_tools_used": 1.3333333333333333,
+            "tool_success_rate.tool_success_rate": 1.0,
+            "tool_success_rate.total_tool_calls": 1.3333333333333333,
+            "tool_success_rate.failed_tool_calls": 0.0,
+            "grounding_utilization.total_grounding_chunks": 0.0,
+            "grounding_utilization.total_grounded_responses": 0.0,
+            "grounding_utilization.total_llm_responses": 3.6666666666666665,
+            "context_saturation.max_total_tokens": 1748.0,
+            "agent_handoffs.total_handoffs": 1.0,
+            "agent_handoffs.unique_agents_count": 1.0,
+            "output_density.average_output_tokens": 62.666666666666664,
+            "output_density.total_output_tokens": 140.66666666666666,
+            "output_density.llm_calls_count": 2.3333333333333335,
+            "sandbox_usage.total_sandbox_ops": 0.0,
+            "sandbox_usage.unique_ops_used": 0.0
+        },
+        "llm_based_metrics": {
+            "general_quality": {
+                "average": 0.6666666666666666,
+                "median": 1.0,
+                "p90": 1.0,
+                "p95": 1.0,
+                "p99": 1.0,
+                "score_range": {
+                    "min": 0,
+                    "max": 1,
+                    "type": "rubric"
+                },
+                "threshold": 0.8
+            },
+            "trajectory_accuracy": {
+                "average": 1.0,
+                "median": 1.0,
+                "p90": 1.0,
+                "p95": 1.0,
+                "p99": 1.0,
+                "score_range": {
+                    "min": 0,
+                    "max": 1,
+                    "type": "rubric"
+                },
+                "threshold": 0.8
+            },
+            "corporate_policy_compliance": {
+                "average": 1.0,
+                "median": 1.0,
+                "p90": 1.0,
+                "p95": 1.0,
+                "p99": 1.0,
+                "score_range": {
+                    "min": 0,
+                    "max": 1,
+                    "type": "rubric"
+                },
+                "threshold": 0.8
+            }
+        }
+    },
+    "per_question_summary": [
+        {
+            "question_id": "case_001_saldo_cust101",
+            "runs": 1,
+            "deterministic_metrics": {
+                "token_usage": {
+                    "llm_calls": 6,
+                    "models_used": [
+                        "gemini-3.5-flash"
+                    ],
+                    "total_tokens": 9718,
+                    "prompt_tokens": 8876,
+                    "completion_tokens": 559,
+                    "cached_tokens": 0,
+                    "estimated_cost_usd": 0.006115
+                },
+                "latency_metrics": {
+                    "total_latency_seconds": 5.493,
+                    "average_turn_latency_seconds": 5.493,
+                    "llm_latency_seconds": 5.460298081,
+                    "tool_latency_seconds": 0.00130055,
+                    "time_to_first_response_seconds": 2.841098317
+                },
+                "cache_efficiency": {
+                    "cache_hit_rate": 0.0,
+                    "total_cached_tokens": 0,
+                    "total_fresh_prompt_tokens": 4438,
+                    "total_input_tokens": 4438
+                },
+                "thinking_metrics": {
+                    "reasoning_ratio": 0.672209026128266,
+                    "total_thinking_tokens": 283,
+                    "total_candidate_tokens": 138,
+                    "total_output_tokens": 421,
+                    "turns_with_thinking": 3
+                },
+                "tool_utilization": {
+                    "total_tool_calls": 2,
+                    "unique_tools_used": 2,
+                    "tool_counts": {
+                        "verify_identity": 1,
+                        "get_account_balance": 1
+                    }
+                },
+                "tool_success_rate": {
+                    "tool_success_rate": 1.0,
+                    "total_tool_calls": 2,
+                    "failed_tool_calls": 0,
+                    "failed_tools_list": []
+                },
+                "grounding_utilization": {
+                    "total_grounding_chunks": 0,
+                    "total_grounded_responses": 0,
+                    "total_llm_responses": 5
+                },
+                "context_saturation": {
+                    "max_total_tokens": 1768,
+                    "peak_usage_span": "call_llm"
+                },
+                "agent_handoffs": {
+                    "total_handoffs": 1,
+                    "unique_agents_count": 1,
+                    "agents_invoked_list": [
+                        "corporate_concierge_agent"
+                    ]
+                },
+                "output_density": {
+                    "average_output_tokens": 46.0,
+                    "total_output_tokens": 138,
+                    "llm_calls_count": 3
+                },
+                "sandbox_usage": {
+                    "total_sandbox_ops": 0,
+                    "unique_ops_used": 0,
+                    "sandbox_tools_used": {}
+                }
+            },
+            "llm_metrics": {
+                "general_quality": {
+                    "score": 1.0,
+                    "explanation": "The response directly and completely answers the user's request by providing the exact account balance and available corporate card limit. The tone is highly professional, polite, and executive, conforming perfectly to the standards of enterprise banking and concierge services.",
+                    "input": {
+                        "reference": "{\"expected_behavior\": \"El agente invoca verify_identity('CUST-101', '4821') y luego get_account_balance('CUST-101'), e informa que el saldo en cuenta corriente es $18,450.00 USD y el cupo disponible en tarjeta corporativa es $5,000.00 USD (tope por vuelo $2,500.00 USD).\"}",
+                        "prompt": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?",
+                        "response": "Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera."
+                    }
+                },
+                "trajectory_accuracy": {
+                    "score": 1.0,
+                    "explanation": "The agent verified the user's identity and retrieved the account balance without taking any detours or calling irrelevant tools. The tools used (verify_identity and get_account_balance) are standard and appropriate for the request.",
+                    "input": {
+                        "prompt": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?",
+                        "response": "agent:corporate_concierge_agent\ntool:verify_identity\ntool:get_account_balance",
+                        "reference": ""
+                    }
+                },
+                "corporate_policy_compliance": {
+                    "score": 1.0,
+                    "explanation": "La respuesta cumple con todos los criterios de evaluaci\u00f3n. En cuanto a la 'claridad_ejecutiva', est\u00e1 redactada en un espa\u00f1ol profesional, formal, cort\u00e9s y estructurado de manera muy clara mediante el uso de vi\u00f1etas. Respecto a la 'exactitud_frente_a_herramientas', la informaci\u00f3n proporcionada responde directamente a la solicitud de la cliente (saldo en cuenta corriente y cupo de tarjeta corporativa), presentando los montos correspondientes de forma exacta en USD sin agregar datos innecesarios o inventados.",
+                    "input": {
+                        "prompt": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?",
+                        "response": "Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera.",
+                        "reference": "El agente invoca verify_identity('CUST-101', '4821') y luego get_account_balance('CUST-101'), e informa que el saldo en cuenta corriente es $18,450.00 USD y el cupo disponible en tarjeta corporativa es $5,000.00 USD (tope por vuelo $2,500.00 USD)."
+                    }
+                }
+            },
+            "source_type": "interaction"
+        },
+        {
+            "question_id": "case_002_vuelos_bog_mia",
+            "runs": 1,
+            "deterministic_metrics": {
+                "token_usage": {
+                    "llm_calls": 4,
+                    "models_used": [
+                        "gemini-3.5-flash"
+                    ],
+                    "total_tokens": 6708,
+                    "prompt_tokens": 5772,
+                    "completion_tokens": 674,
+                    "cached_tokens": 0,
+                    "estimated_cost_usd": 0.004908
+                },
+                "latency_metrics": {
+                    "total_latency_seconds": 4.9293,
+                    "average_turn_latency_seconds": 4.9293,
+                    "llm_latency_seconds": 4.907373659,
+                    "tool_latency_seconds": 0.000685162,
+                    "time_to_first_response_seconds": 3.045789754
+                },
+                "cache_efficiency": {
+                    "cache_hit_rate": 0.0,
+                    "total_cached_tokens": 0,
+                    "total_fresh_prompt_tokens": 2886,
+                    "total_input_tokens": 2886
+                },
+                "thinking_metrics": {
+                    "reasoning_ratio": 0.5598290598290598,
+                    "total_thinking_tokens": 262,
+                    "total_candidate_tokens": 206,
+                    "total_output_tokens": 468,
+                    "turns_with_thinking": 2
+                },
+                "tool_utilization": {
+                    "total_tool_calls": 1,
+                    "unique_tools_used": 1,
+                    "tool_counts": {
+                        "search_flights": 1
+                    }
+                },
+                "tool_success_rate": {
+                    "tool_success_rate": 1.0,
+                    "total_tool_calls": 1,
+                    "failed_tool_calls": 0,
+                    "failed_tools_list": []
+                },
+                "grounding_utilization": {
+                    "total_grounding_chunks": 0,
+                    "total_grounded_responses": 0,
+                    "total_llm_responses": 3
+                },
+                "context_saturation": {
+                    "max_total_tokens": 1846,
+                    "peak_usage_span": "call_llm"
+                },
+                "agent_handoffs": {
+                    "total_handoffs": 1,
+                    "unique_agents_count": 1,
+                    "agents_invoked_list": [
+                        "corporate_concierge_agent"
+                    ]
+                },
+                "output_density": {
+                    "average_output_tokens": 103.0,
+                    "total_output_tokens": 206,
+                    "llm_calls_count": 2
+                },
+                "sandbox_usage": {
+                    "total_sandbox_ops": 0,
+                    "unique_ops_used": 0,
+                    "sandbox_tools_used": {}
+                }
+            },
+            "llm_metrics": {
+                "general_quality": {
+                    "score": 1.0,
+                    "explanation": "The response is helpful, complete, and highly professional. It directly answers the user's query by providing specific flight options for GAirways on the requested date and route, including prices, cabin classes, and seat availability. The tone is executive, polite, and clear, and it appropriately mentions compliance with corporate travel policies and offers a clear next step for booking.",
+                    "input": {
+                        "reference": "{\"expected_behavior\": \"El agente invoca search_flights('BOG', 'MIA', '2026-11-15') e informa los dos vuelos disponibles: GA-401 en clase Business por $890.00 USD (4 asientos) y GA-405 en Economy Plus por $420.00 USD (9 asientos).\"}",
+                        "prompt": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?",
+                        "response": "Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la res... [truncated]"
+                    }
+                },
+                "trajectory_accuracy": {
+                    "score": 1.0,
+                    "explanation": "The agent correctly chose the highly relevant tool `search_flights` to address the user's request for flight availability and pricing, without taking any detours.",
+                    "input": {
+                        "prompt": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?",
+                        "response": "agent:corporate_concierge_agent\ntool:search_flights",
+                        "reference": ""
+                    }
+                },
+                "corporate_policy_compliance": {
+                    "score": 1.0,
+                    "explanation": "La respuesta cumple con el criterio de claridad ejecutiva, estando redactada en un espa\u00f1ol profesional, claro y estructurado de manera excelente. Respecto a la exactitud frente a las herramientas, al no disponer de los logs de las herramientas en el prompt, se asume consistencia f\u00e1ctica ya que los datos presentados (vuelos GA-401 y GA-405, montos en USD de $890 y $420, y la pol\u00edtica de viajes de $2,500 USD) son realistas, espec\u00edficos y est\u00e1n perfectamente estructurados sin contradicciones visibles.",
+                    "input": {
+                        "prompt": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?",
+                        "response": "Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la res... [truncated]",
+                        "reference": "El agente invoca search_flights('BOG', 'MIA', '2026-11-15') e informa los dos vuelos disponibles: GA-401 en clase Business por $890.00 USD (4 asientos) y GA-405 en Economy Plus por $420.00 USD (9 asientos)."
+                    }
+                }
+            },
+            "source_type": "interaction"
+        },
+        {
+            "question_id": "case_003_ruta_sin_vuelos_bog_nrt",
+            "runs": 1,
+            "deterministic_metrics": {
+                "token_usage": {
+                    "llm_calls": 4,
+                    "models_used": [
+                        "gemini-3.5-flash"
+                    ],
+                    "total_tokens": 6194,
+                    "prompt_tokens": 5496,
+                    "completion_tokens": 427,
+                    "cached_tokens": 0,
+                    "estimated_cost_usd": 0.004029
+                },
+                "latency_metrics": {
+                    "total_latency_seconds": 4.0501,
+                    "average_turn_latency_seconds": 4.0501,
+                    "llm_latency_seconds": 4.017742493,
+                    "tool_latency_seconds": 0.000564244,
+                    "time_to_first_response_seconds": 2.667876889
+                },
+                "cache_efficiency": {
+                    "cache_hit_rate": 0.0,
+                    "total_cached_tokens": 0,
+                    "total_fresh_prompt_tokens": 2748,
+                    "total_input_tokens": 2748
+                },
+                "thinking_metrics": {
+                    "reasoning_ratio": 0.7765042979942693,
+                    "total_thinking_tokens": 271,
+                    "total_candidate_tokens": 78,
+                    "total_output_tokens": 349,
+                    "turns_with_thinking": 2
+                },
+                "tool_utilization": {
+                    "total_tool_calls": 1,
+                    "unique_tools_used": 1,
+                    "tool_counts": {
+                        "search_flights": 1
+                    }
+                },
+                "tool_success_rate": {
+                    "tool_success_rate": 1.0,
+                    "total_tool_calls": 1,
+                    "failed_tool_calls": 0,
+                    "failed_tools_list": []
+                },
+                "grounding_utilization": {
+                    "total_grounding_chunks": 0,
+                    "total_grounded_responses": 0,
+                    "total_llm_responses": 3
+                },
+                "context_saturation": {
+                    "max_total_tokens": 1630,
+                    "peak_usage_span": "call_llm"
+                },
+                "agent_handoffs": {
+                    "total_handoffs": 1,
+                    "unique_agents_count": 1,
+                    "agents_invoked_list": [
+                        "corporate_concierge_agent"
+                    ]
+                },
+                "output_density": {
+                    "average_output_tokens": 39.0,
+                    "total_output_tokens": 78,
+                    "llm_calls_count": 2
+                },
+                "sandbox_usage": {
+                    "total_sandbox_ops": 0,
+                    "unique_ops_used": 0,
+                    "sandbox_tools_used": {}
+                }
+            },
+            "llm_metrics": {
+                "general_quality": {
+                    "score": 0.0,
+                    "explanation": "The response fails the 'helpfulness_and_completeness' criterion. While it directly addresses the query by stating no flights were found, it lacks helpfulness and actionable details. A professional corporate concierge should explain why flights are unavailable (e.g., the date is too far in the future for airline schedules, or there are no direct flights between BOG and NRT) and offer alternative routing options (such as flights with connections) to assist the user effectively.",
+                    "input": {
+                        "reference": "{\"expected_behavior\": \"El agente invoca search_flights('BOG', 'NRT', '2026-11-15'), recibe una lista vac\\u00eda [] y responde honestamente que no existen vuelos disponibles en esa ruta sin inventar vuelos ni horarios.\"}",
+                        "prompt": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+                        "response": "No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026."
+                    }
+                },
+                "trajectory_accuracy": {
+                    "score": 1.0,
+                    "explanation": "The agent directly called the relevant tool 'search_flights' to address the user's request for flights from BOG to NRT without taking any detours or calling irrelevant tools.",
+                    "input": {
+                        "prompt": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+                        "response": "agent:corporate_concierge_agent\ntool:search_flights",
+                        "reference": ""
+                    }
+                },
+                "corporate_policy_compliance": {
+                    "score": 1.0,
+                    "explanation": "La respuesta cumple con la claridad ejecutiva al estar redactada en espa\u00f1ol profesional, claro y directo. Asimismo, es exacta frente a la realidad del mercado y las herramientas al no inventar vuelos directos inexistentes para la ruta BOG-NRT, informando de manera ver\u00eddica y profesional que no se encontraron opciones disponibles.",
+                    "input": {
+                        "prompt": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+                        "response": "No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+                        "reference": "El agente invoca search_flights('BOG', 'NRT', '2026-11-15'), recibe una lista vac\u00eda [] y responde honestamente que no existen vuelos disponibles en esa ruta sin inventar vuelos ni horarios."
+                    }
+                }
+            },
+            "source_type": "interaction"
+        }
+    ],
+    "run_id": "baseline_fintech",
+    "feature_branch": "",
+    "tag": "",
+    "description": "",
+    "timestamp": "20261022_222219",
+    "user": "danielardzmtz"
+}

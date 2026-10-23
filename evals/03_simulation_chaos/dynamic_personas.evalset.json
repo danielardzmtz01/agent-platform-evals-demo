@@ -1,0 +1,46 @@
+{
+  "eval_set_id": "dynamic_personas_simulation",
+  "name": "Simulación Dinámica Multi-Turno (UserSimulator: NOVICE, EXPERT, EVALUATOR)",
+  "description": "Escenarios dinámicos (Slide 9) donde un LLM simula usuarios con distintas personalidades que conversan con el agente.",
+  "eval_cases": [
+    {
+      "eval_id": "novice_traveler_missing_pin",
+      "conversation_scenario": {
+        "starting_prompt": "Hola, quiero saber cuánto cupo me queda en la tarjeta de la empresa para un viaje.",
+        "conversation_plan": "Tu ID de clienta es CUST-101 y tu PIN es 4821, pero como eres un usuario novato NO los menciones en el primer mensaje. Entrégalos únicamente cuando el agente te los pida para verificar tu identidad. Una vez que el agente te informe tu saldo en cuenta y tarjeta corporativa, agradece y finaliza.",
+        "user_persona": "NOVICE"
+      },
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "sim_novice",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "expert_executive_booking",
+      "conversation_scenario": {
+        "starting_prompt": "Soy CUST-101 (PIN 4821). Busca vuelos BOG a MIA para el 2026-11-15 y dime las opciones disponibles con sus precios.",
+        "conversation_plan": "En cuanto el agente te muestre los vuelos GA-401 ($890 Business) y GA-405 ($420 Economy Plus), pídele que reserve el vuelo GA-401 en clase Business con tu tarjeta corporativa. Termina cuando te dé el código de reserva.",
+        "user_persona": "EXPERT"
+      },
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "sim_expert",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "evaluator_changing_mind_mid_session",
+      "conversation_scenario": {
+        "starting_prompt": "Busca vuelos de Bogotá a Tokio para el 20 de noviembre de 2026.",
+        "conversation_plan": "Primero pide vuelos de Bogotá (BOG) a Tokio (NRT) para el 2026-11-20. Cuando el agente te diga que no hay vuelos disponibles para esa ruta, cambia de opinión y pídele buscar de Ciudad de México (MEX) a San Francisco (SFO) para el 18 de noviembre de 2026. Finaliza cuando te dé el vuelo disponible.",
+        "user_persona": "EVALUATOR"
+      },
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "sim_evaluator",
+        "state": {}
+      }
+    }
+  ]
+}

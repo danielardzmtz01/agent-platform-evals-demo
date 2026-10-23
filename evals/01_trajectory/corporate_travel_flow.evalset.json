@@ -1,0 +1,138 @@
+{
+  "eval_set_id": "corporate_travel_flow",
+  "name": "Suite de Trayectoria y Reglas de Negocio (Finanzas y Viajes)",
+  "description": "Evalúa los 3 casos críticos del deck (Slide 6 y Slide 13): (1) Formato de fecha ISO YYYY-MM-DD en search_flights, (2) verify_identity obligatorio antes de get_account_balance, y (3) Cero alucinaciones ante lista vacía [].",
+  "eval_cases": [
+    {
+      "eval_id": "case_1_iso_date_flight_search",
+      "conversation": [
+        {
+          "invocation_id": "inv-flight-1",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Busca vuelos corporativos de Bogotá (BOG) a Miami (MIA) para el 15 de noviembre de 2026."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Para el 2026-11-15 entre Bogotá (BOG) y Miami (MIA) están disponibles los vuelos de GAirways: GA-401 en clase Business por $890.00 USD (4 asientos) y GA-405 en Economy Plus por $420.00 USD (9 asientos)."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "search_flights",
+                "args": {
+                  "origin": "BOG",
+                  "destination": "MIA",
+                  "departure_date": "2026-11-15"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "daniela_demo",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "case_2_verify_before_balance",
+      "conversation": [
+        {
+          "invocation_id": "inv-sec-1",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Mi ID es CUST-101 y mi PIN es 4821. Por favor verifica mi identidad y dime mi saldo disponible."
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Tu identidad ha sido verificada. Cuentas con $18,450.00 USD en tu cuenta corriente y $5,000.00 USD disponibles en tu tarjeta corporativa."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "verify_identity",
+                "args": {
+                  "customer_id": "CUST-101",
+                  "pin": "4821"
+                }
+              },
+              {
+                "name": "get_account_balance",
+                "args": {
+                  "customer_id": "CUST-101"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "daniela_demo",
+        "state": {}
+      }
+    },
+    {
+      "eval_id": "case_3_empty_flights_no_hallucination",
+      "conversation": [
+        {
+          "invocation_id": "inv-empty-1",
+          "user_content": {
+            "parts": [
+              {
+                "text": "¿Qué vuelos directos hay de Bogotá (BOG) a Tokio (NRT) el 20 de noviembre de 2026?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "No se encontraron vuelos disponibles de Bogotá (BOG) a Tokio (NRT) para la fecha 2026-11-20."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "search_flights",
+                "args": {
+                  "origin": "BOG",
+                  "destination": "NRT",
+                  "departure_date": "2026-11-20"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "daniela_demo",
+        "state": {}
+      }
+    }
+  ]
+}

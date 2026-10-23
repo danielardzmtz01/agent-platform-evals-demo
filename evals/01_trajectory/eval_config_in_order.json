@@ -1,0 +1,17 @@
+{
+  "criteria": {
+    "tool_trajectory_avg_score": {
+      "threshold": 1.0,
+      "match_type": "IN_ORDER"
+    },
+    "financial_compliance_score": 1.0
+  },
+  "custom_metrics": {
+    "financial_compliance_score": {
+      "code_config": {
+        "name": "financial_compliance.financial_compliance_score"
+      },
+      "description": "Audita determinísticamente que verify_identity ocurra antes de get_account_balance/book_corporate_flight, que search_flights use YYYY-MM-DD y que ningún vuelo supere $2,500 USD."
+    }
+  }
+}

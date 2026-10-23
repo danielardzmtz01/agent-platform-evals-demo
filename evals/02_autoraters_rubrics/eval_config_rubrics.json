@@ -1,0 +1,53 @@
+{
+  "criteria": {
+    "hallucinations_v1": {
+      "threshold": 0.9,
+      "judge_model_options": {
+        "judge_model": "gemini-3.5-flash"
+      },
+      "evaluate_intermediate_nl_responses": true
+    },
+    "rubric_based_final_response_quality_v1": {
+      "threshold": 0.8,
+      "judge_model_options": {
+        "judge_model": "gemini-3.5-flash",
+        "num_samples": 5
+      },
+      "rubrics": [
+        {
+          "rubric_id": "no_hallucinated_flights_on_empty_list",
+          "rubric_content": {
+            "text_property": "Cuando search_flights devuelve una lista vacía ([]), el agente informa claramente que no hay vuelos disponibles y jamás inventa vuelos, horarios ni precios."
+          }
+        },
+        {
+          "rubric_id": "executive_spanish_tone",
+          "rubric_content": {
+            "text_property": "La respuesta está en español, es concisa y reporta los montos en USD con exactitud frente al payload de las herramientas."
+          }
+        }
+      ]
+    },
+    "rubric_based_tool_use_quality_v1": {
+      "threshold": 1.0,
+      "judge_model_options": {
+        "judge_model": "gemini-3.5-flash",
+        "num_samples": 5
+      },
+      "rubrics": [
+        {
+          "rubric_id": "verify_identity_before_balance",
+          "rubric_content": {
+            "text_property": "Cuando el usuario solicita consultar su saldo bancario o cupo corporativo, el agente siempre invoca verify_identity antes de llamar a get_account_balance."
+          }
+        },
+        {
+          "rubric_id": "strict_iso_date_format",
+          "rubric_content": {
+            "text_property": "Cuando el agente invoca search_flights, siempre pasa departure_date en formato ISO estricto YYYY-MM-DD y códigos IATA de 3 letras."
+          }
+        }
+      ]
+    }
+  }
+}

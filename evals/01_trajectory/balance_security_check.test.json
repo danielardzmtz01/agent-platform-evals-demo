@@ -1,0 +1,54 @@
+{
+  "eval_set_id": "balance_security_check",
+  "name": "Verificación de Identidad antes de Saldo (Unit Test)",
+  "description": "Valida que el agente ejecute verify_identity antes de get_account_balance.",
+  "eval_cases": [
+    {
+      "eval_id": "verify_then_check_balance",
+      "conversation": [
+        {
+          "invocation_id": "inv-balance-1",
+          "user_content": {
+            "parts": [
+              {
+                "text": "Hola, soy la clienta CUST-101, mi PIN de seguridad es 4821. ¿Cuál es mi saldo disponible en cuenta y tarjeta corporativa?"
+              }
+            ],
+            "role": "user"
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Identidad verificada para Daniela Rodríguez (CUST-101). Tu saldo en cuenta corriente es de $18,450.00 USD y tu cupo disponible en tarjeta corporativa es de $5,000.00 USD."
+              }
+            ],
+            "role": "model"
+          },
+          "intermediate_data": {
+            "tool_uses": [
+              {
+                "name": "verify_identity",
+                "args": {
+                  "customer_id": "CUST-101",
+                  "pin": "4821"
+                }
+              },
+              {
+                "name": "get_account_balance",
+                "args": {
+                  "customer_id": "CUST-101"
+                }
+              }
+            ],
+            "intermediate_responses": []
+          }
+        }
+      ],
+      "session_input": {
+        "app_name": "corporate_concierge_agent",
+        "user_id": "daniela_demo",
+        "state": {}
+      }
+    }
+  ]
+}

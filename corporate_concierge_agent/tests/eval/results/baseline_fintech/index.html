@@ -1,0 +1,1837 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>agent-eval — baseline_fintech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8f7f2;          /* warm off-white, like DevFest poster */
+      --surface: #ffffff;
+      --ink: #0f0f0f;          /* near-black, the heavy ink color */
+      --ink-soft: #555;
+      --border: 2.5px solid var(--ink);
+      --radius: 16px;
+      --radius-pill: 999px;
+      /* Google brand four */
+      --g-red: #ea4335;
+      --g-yellow: #fbbc04;
+      --g-green: #34a853;
+      --g-blue: #4285f4;
+      /* Soft tints for backgrounds */
+      --g-red-soft: #fdecea;
+      --g-yellow-soft: #fef7e0;
+      --g-green-soft: #e6f4ea;
+      --g-blue-soft: #e8f0fe;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    code, pre { font-family: 'JetBrains Mono', Menlo, Consolas, monospace; }
+
+    /* ── Header ──────────────────────────────────────────────────────── */
+    header.report-header {
+      padding: 32px 48px 24px;
+      border-bottom: var(--border);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+    }
+    header .ornament {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    header .ornament.asterisk {
+      top: 22px;
+      right: 80px;
+      width: 36px;
+      color: var(--g-yellow);
+    }
+    header .ornament.semicolon {
+      bottom: 18px;
+      right: 32px;
+      width: 28px;
+      color: var(--g-red);
+    }
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+    }
+    header h1 .braces {
+      color: var(--g-blue);
+      font-weight: 700;
+    }
+    header .subtitle {
+      color: var(--ink-soft);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    header .agent-pill {
+      display: inline-block;
+      background: var(--g-green-soft);
+      border: var(--border);
+      border-radius: var(--radius-pill);
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ── Tabs ─────────────────────────────────────────────────────────── */
+    nav.tabs {
+      background: var(--surface);
+      border-bottom: var(--border);
+      padding: 16px 48px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    nav.tabs button {
+      background: var(--surface);
+      border: var(--border);
+      border-radius: var(--radius-pill);
+      padding: 8px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 120ms, transform 60ms;
+      /* Keep button content (icon + label + count badge) on one line so
+         the `6` count never wraps to its own line at narrow viewports. */
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    nav.tabs button:hover { background: var(--g-yellow-soft); }
+    nav.tabs button:active { transform: translateY(1px); }
+    nav.tabs button.active {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    nav.tabs button .count {
+      display: inline-block;
+      background: var(--bg);
+      color: var(--ink);
+      padding: 1px 8px;
+      border-radius: 10px;
+      margin-left: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1.5px solid var(--ink);
+    }
+    nav.tabs button.active .count {
+      background: var(--g-yellow);
+    }
+
+    /* ── Main ─────────────────────────────────────────────────────────── */
+    main { padding: 28px 48px 80px; max-width: 1280px; margin: 0 auto; }
+    section.tab-content { display: none; }
+    section.tab-content.active { display: block; }
+    h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 28px 0 12px;
+      letter-spacing: -0.015em;
+    }
+    h2:first-child { margin-top: 4px; }
+    h2 .accent {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    h2 .accent.red { background: var(--g-red); }
+    h2 .accent.yellow { background: var(--g-yellow); }
+    h2 .accent.green { background: var(--g-green); }
+    h2 .accent.blue { background: var(--g-blue); }
+
+    /* ── Tiles ────────────────────────────────────────────────────────── */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .tile {
+      background: var(--surface);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .tile::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--g-blue);
+    }
+    .tile.color-red::before { background: var(--g-red); }
+    .tile.color-yellow::before { background: var(--g-yellow); }
+    .tile.color-green::before { background: var(--g-green); }
+    .tile.color-blue::before { background: var(--g-blue); }
+    .tile .label {
+      color: var(--ink-soft);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .tile .value {
+      font-size: 28px;
+      font-weight: 900;
+      margin-top: 6px;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+    }
+    .tile .hint { color: var(--ink-soft); font-size: 11px; margin-top: 6px; }
+
+    /* ── Cards ────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 16px;
+    }
+    .card h2:first-child { margin-top: 0; }
+    .card-row { display: grid; grid-template-columns: 5fr 7fr; gap: 16px; }
+    @media (max-width: 980px) { .card-row { grid-template-columns: 1fr; } }
+
+    /* ── Tables ───────────────────────────────────────────────────────── */
+    table.metrics {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    table.metrics th {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--ink);
+      font-weight: 700;
+      color: var(--ink);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    table.metrics td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    table.metrics tr:last-child td { border-bottom: none; }
+    table.metrics td.num, table.metrics th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .delta-good { color: var(--g-green); font-weight: 700; }
+    .delta-bad { color: var(--g-red); font-weight: 700; }
+    .delta-neutral { color: var(--ink-soft); font-weight: 500; }
+
+    /* ── Pills ─────────────────────────────────────────────────────── */
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      border: 1.5px solid var(--ink);
+    }
+    .pill-good { background: var(--g-green-soft); color: var(--ink); }
+    .pill-mixed { background: var(--g-yellow-soft); color: var(--ink); }
+    .pill-bad { background: var(--g-red-soft); color: var(--ink); }
+    .pill-skipped { background: var(--bg); color: var(--ink-soft); border-color: var(--ink-soft); }
+
+    /* ── Heatmap ──────────────────────────────────────────────────────── */
+    .heatmap-wrap { overflow-x: auto; padding: 4px; }
+    table.heatmap { border-collapse: separate; border-spacing: 4px; font-size: 12px; }
+    table.heatmap th, table.heatmap td {
+      padding: 8px 10px;
+      text-align: center;
+      min-width: 80px;
+      border-radius: 8px;
+      border: 1.5px solid var(--ink);
+      background: var(--surface);
+    }
+    table.heatmap th {
+      background: var(--ink);
+      color: var(--bg);
+      font-weight: 700;
+    }
+    table.heatmap th.col-header {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      vertical-align: bottom;
+      height: 150px;
+      padding: 10px 6px;
+      max-width: 36px;
+    }
+    table.heatmap td.qid {
+      font-family: 'JetBrains Mono', monospace;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg);
+    }
+    table.heatmap td.cell {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    /* ── Per-question accordion ───────────────────────────────────────── */
+    .qa-item {
+      background: var(--surface);
+      border: var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .qa-summary {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+    .qa-summary::-webkit-details-marker { display: none; }
+    .qa-summary:hover { background: var(--g-yellow-soft); }
+    .qa-summary .chevron {
+      color: var(--ink);
+      transition: transform 150ms;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .qa-item[open] .qa-summary .chevron { transform: rotate(90deg); }
+    .qa-summary .qid {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--bg);
+      border: 1.5px solid var(--ink);
+      border-radius: var(--radius-pill);
+      padding: 3px 10px;
+    }
+    .qa-summary .prompt-preview {
+      flex: 1;
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .qa-detail {
+      padding: 18px;
+      border-top: 2px solid var(--ink);
+      background: var(--bg);
+    }
+    .qa-detail h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      margin: 0 0 6px;
+      font-weight: 800;
+    }
+    .qa-detail h4:not(:first-of-type) { margin-top: 16px; }
+    .qa-detail .text-block {
+      background: var(--surface);
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .qa-scores { display: flex; flex-wrap: wrap; gap: 8px; }
+    .qa-score {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .qa-score b { font-weight: 800; }
+
+    /* ── Verdict trees ────────────────────────────────────────────────── */
+    .metric-block {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .metric-block-summary {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      background: var(--bg);
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .metric-block-summary::-webkit-details-marker { display: none; }
+    .metric-block .chevron { font-weight: 900; transition: transform 150ms; }
+    .metric-block[open] .chevron { transform: rotate(90deg); }
+    .metric-rubric-count {
+      margin-left: auto;
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .metric-block-body { padding: 14px; }
+    .metric-explanation {
+      font-style: italic;
+      color: var(--ink);
+      background: var(--g-yellow-soft);
+      border: 1.5px solid var(--ink);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    @media (min-width: 1000px) { .verdict-grid { grid-template-columns: 1fr 1fr; } }
+    .verdict-item {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .verdict-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .verdict-sym {
+      font-weight: 900;
+      font-size: 16px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--ink);
+    }
+    .verdict-pass { background: var(--g-green-soft); color: var(--g-green); }
+    .verdict-fail { background: var(--g-red-soft); color: var(--g-red); }
+    .verdict-na { background: var(--bg); color: var(--ink-soft); }
+    .verdict-imp {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--ink);
+    }
+    .imp-high { background: var(--g-red-soft); }
+    .imp-medium { background: var(--g-yellow-soft); }
+    .imp-low { background: var(--g-green-soft); }
+    .verdict-type {
+      font-size: 10px;
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .verdict-rubric {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      line-height: 1.45;
+    }
+    .verdict-reasoning {
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      padding-top: 6px;
+      border-top: 1px dashed #ddd;
+    }
+
+    /* ── Iteration cards ──────────────────────────────────────────────── */
+    .iter-card {
+      background: var(--surface);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .iter-card.iter-current {
+      border-color: var(--g-blue);
+      box-shadow: 0 0 0 4px var(--g-blue-soft);
+    }
+    .iter-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .iter-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .iter-meta {
+      font-size: 11px;
+      color: var(--ink-soft);
+      font-variant-numeric: tabular-nums;
+    }
+    .iter-meta code {
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      margin-left: 6px;
+      font-size: 11px;
+    }
+    .iter-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 760px) { .iter-body { grid-template-columns: 1fr; } }
+    .iter-section-h {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .iter-metric {
+      font-size: 12px;
+      padding: 4px 0;
+      line-height: 1.5;
+    }
+    .iter-metric b { font-weight: 700; }
+
+    /* ── Per-question deep-dive blocks ────────────────────────────────── */
+    .conv-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .conv-turn {
+      border: 1.5px solid var(--ink);
+      border-radius: 12px;
+      padding: 10px 14px;
+      max-width: 90%;
+    }
+    .conv-turn.turn-user {
+      background: var(--g-blue-soft);
+      align-self: flex-start;
+    }
+    .conv-turn.turn-model {
+      background: var(--surface);
+      align-self: flex-end;
+    }
+    .conv-role {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      color: var(--ink-soft);
+      margin-bottom: 4px;
+    }
+    .conv-text {
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tool-item {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .tool-head {
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      list-style: none;
+      background: var(--bg);
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .tool-head::-webkit-details-marker { display: none; }
+    .tool-item:not([open]) .tool-head { border-bottom: none; }
+    .tool-body {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 760px) { .tool-body { grid-template-columns: 1fr; } }
+    .tool-section pre {
+      background: var(--ink);
+      color: #f8f7f2;
+      padding: 10px 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 11px;
+      line-height: 1.4;
+      max-height: 220px;
+      overflow-y: auto;
+      margin: 4px 0 0;
+    }
+    .tool-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      color: var(--ink-soft);
+    }
+    .state-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 760px) { .state-grid { grid-template-columns: 1fr; } }
+    .state-card {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .state-card code {
+      font-size: 12px;
+      background: var(--g-yellow-soft);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e5d8a0;
+    }
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .metric-cell {
+      background: var(--surface);
+      border: 1.5px solid var(--ink);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .metric-cell-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+    .metric-cell-value {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Markdown ─────────────────────────────────────────────────────── */
+    .md { font-size: 14px; line-height: 1.65; max-width: 880px; }
+    .md h1, .md h2, .md h3, .md h4 { font-weight: 800; letter-spacing: -0.015em; margin-top: 24px; margin-bottom: 8px; }
+    .md h1 { font-size: 24px; }
+    .md h2 { font-size: 18px; margin-top: 0; }
+    .md h2:not(:first-child) { margin-top: 28px; }
+    .md h3 { font-size: 15px; }
+    .md p { margin: 0 0 12px; }
+    .md ul, .md ol { margin: 0 0 12px; padding-left: 24px; }
+    .md li { margin-bottom: 4px; }
+    .md code { background: var(--g-yellow-soft); padding: 1px 6px; border-radius: 4px; font-size: 12px; border: 1px solid #e5d8a0; }
+    .md pre { background: var(--ink); color: #f8f7f2; padding: 14px 18px; border-radius: 10px; overflow-x: auto; font-size: 12px; line-height: 1.5; border: var(--border); }
+    .md pre code { background: transparent; padding: 0; color: inherit; border: none; }
+    .md blockquote { border-left: 3px solid var(--g-blue); padding-left: 14px; color: var(--ink-soft); margin: 0 0 12px; }
+    .md table { border-collapse: collapse; margin: 12px 0; }
+    .md th, .md td { border: 1.5px solid var(--ink); padding: 6px 10px; }
+    .md th { background: var(--bg); font-weight: 700; }
+
+    /* ── Empty state ──────────────────────────────────────────────────── */
+    .empty {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--ink-soft);
+      background: var(--bg);
+      border: 2px dashed var(--ink);
+      border-radius: var(--radius);
+    }
+    .error {
+      padding: 14px 18px;
+      background: var(--g-red-soft);
+      border: var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────── */
+    footer.report-footer {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 48px 48px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      text-align: center;
+    }
+    footer .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin: 0 1px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="report-header">
+  <!-- Decorative ornaments — DevFest typography references -->
+  <svg class="ornament asterisk" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2v8m0 4v8M4.93 4.93l5.66 5.66m2.82 2.82l5.66 5.66M2 12h8m4 0h8M4.93 19.07l5.66-5.66m2.82-2.82l5.66-5.66" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>
+  <svg class="ornament semicolon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <circle cx="12" cy="8" r="2.5"/>
+    <path d="M9 19c2-1 3-3 3-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  </svg>
+  <h1>
+    <span class="braces">{</span> Agent Evaluation <span class="braces">}</span>
+    <span class="agent-pill" id="agent-tag">—</span>
+  </h1>
+  <div class="subtitle" id="subtitle"></div>
+</header>
+
+<nav class="tabs">
+  <button data-tab="overview" class="active">📊 Overview</button>
+  <button data-tab="per-question">🔬 Per-Question <span class="count" id="pq-count"></span></button>
+  <button data-tab="iterations">📈 Iteration History</button>
+  <button data-tab="analysis">🤖 AI Analysis</button>
+</nav>
+
+<main>
+  <div id="js-error-box"></div>
+
+  <section id="overview" class="tab-content active">
+    <h2><span class="accent yellow"></span>At a glance</h2>
+    <div class="tiles" id="tiles"></div>
+
+    <div class="card-row">
+      <div class="card">
+        <h2><span class="accent blue"></span>LLM-judge metrics</h2>
+        <div id="radar-empty" class="empty" style="display:none">No LLM metrics scored.</div>
+        <div style="position:relative;height:300px"><canvas id="radar"></canvas></div>
+      </div>
+      <div class="card">
+        <h2><span class="accent green"></span>Score table</h2>
+        <table class="metrics" id="llm-table"></table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="accent red"></span>Deterministic metrics</h2>
+      <table class="metrics" id="det-table"></table>
+    </div>
+
+    <div class="card" id="per-source-card" style="display:none">
+      <h2><span class="accent yellow"></span>By source · simulation vs interaction</h2>
+      <div style="font-size:13px;color:#555;margin-bottom:10px">
+        Same metrics, split by how the rows were collected. Big gaps between
+        UserSim (multi-turn) and interact (single-turn) usually mean the
+        agent behaves differently across context lengths.
+      </div>
+      <table class="metrics" id="per-source-table"></table>
+    </div>
+  </section>
+
+  <section id="per-question" class="tab-content">
+    <h2><span class="accent blue"></span>Score heatmap</h2>
+    <div class="card">
+      <div id="heatmap-empty" class="empty" style="display:none">No per-question data available.</div>
+      <div class="heatmap-wrap"><table class="heatmap" id="heatmap"></table></div>
+    </div>
+
+    <h2><span class="accent green"></span>Per-question deep dive</h2>
+    <p style="color:#555;margin:0 0 12px;font-size:13px">
+      Click a question to expand: full conversation, tool calls with arguments + results,
+      agent state at end of turn, per-metric scores with rubric verdicts and reasoning.
+    </p>
+    <div id="verdicts-list">
+      <div class="empty">No per-question data available.</div>
+    </div>
+  </section>
+
+  <section id="iterations" class="tab-content">
+    <h2><span class="accent yellow"></span>Metrics over time</h2>
+    <div class="card">
+      <div style="margin-bottom: 12px; display: flex; justify-content: flex-end; align-items: center; gap: 8px;">
+        <label for="iterations-range-select" style="font-size: 12px; font-weight: 600; color: #555;">Time Range:</label>
+        <select id="iterations-range-select" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; font-family: inherit;">
+          <option value="15" selected>Last 15 runs (Default)</option>
+          <option value="30">Last 30 runs</option>
+          <option value="all">All runs (50+)</option>
+        </select>
+      </div>
+      <div id="iterations-chart-empty" class="empty" style="display:none">
+        Only one run so far — chart needs ≥2 iterations to draw a trend line.
+      </div>
+      <div style="position:relative;height:340px"><canvas id="iterations-chart"></canvas></div>
+    </div>
+
+    <h2><span class="accent green"></span>Iteration history</h2>
+    <div id="iterations-list">
+      <div class="empty">No iterations recorded yet.</div>
+    </div>
+  </section>
+
+  <section id="analysis" class="tab-content">
+    <h2><span class="accent red"></span>AI analysis</h2>
+    <div class="card md" id="gemini-md"></div>
+  </section>
+</main>
+
+<footer class="report-footer">
+  <span class="dot" style="background:#ea4335"></span>
+  <span class="dot" style="background:#fbbc04"></span>
+  <span class="dot" style="background:#34a853"></span>
+  <span class="dot" style="background:#4285f4"></span>
+  &nbsp;Generated by <code>agent-eval</code> · 2026-10-22 22:22
+</footer>
+
+<script id="report-data" type="application/json">{"meta": {"run_id": "baseline_fintech", "agent_name": "corporate_concierge_agent", "generated_at": "2026-10-22 22:22", "experiment_id": "eval-20261022_222137", "test_description": "Combined evaluation run: baseline_fintech", "interaction_datetime": "2026-10-22T22:21:37.613782", "run_type": "run", "git_commit": "", "git_branch": "", "git_dirty": false, "has_comparison": false, "baseline_run": null}, "tiles": [{"label": "Estimated Cost", "value": "$0.0050", "hint": "Per question on average", "color": "yellow"}, {"label": "Wall-clock", "value": "4.8s", "hint": "Average per question", "color": "blue"}, {"label": "Cache Hit Rate", "value": "0%", "hint": "Higher = cheaper", "color": "green"}, {"label": "Total Tokens", "value": "7,540", "hint": "Prompt + completion + thinking", "color": "red"}], "llm_metrics": [{"name": "general_quality", "score": "0.67", "score_normalized": 0.6666666666666666, "range": "0\u20131", "baseline": null, "delta_pct": null, "delta_direction": null, "skipped": false}, {"name": "trajectory_accuracy", "score": "1", "score_normalized": 1.0, "range": "0\u20131", "baseline": null, "delta_pct": null, "delta_direction": null, "skipped": false}, {"name": "corporate_policy_compliance", "score": "100%", "score_normalized": 1.0, "range": "0\u20131", "baseline": null, "delta_pct": null, "delta_direction": null, "skipped": false}], "deterministic_metrics": [{"name": "token_usage.llm_calls", "value": "4.67", "raw_value": 4.666666666666667, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "token_usage.total_tokens", "value": "7,540", "raw_value": 7540.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "token_usage.prompt_tokens", "value": "6,715", "raw_value": 6714.666666666667, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "token_usage.completion_tokens", "value": "553.33", "raw_value": 553.3333333333334, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "token_usage.cached_tokens", "value": "0", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "token_usage.estimated_cost_usd", "value": "$0.0050", "raw_value": 0.005017333333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "latency_metrics.total_latency_seconds", "value": "4.82s", "raw_value": 4.824133333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "latency_metrics.average_turn_latency_seconds", "value": "4.82s", "raw_value": 4.824133333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "latency_metrics.llm_latency_seconds", "value": "4.80s", "raw_value": 4.7951380776666666, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "latency_metrics.tool_latency_seconds", "value": "0.00s", "raw_value": 0.0008499853333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "latency_metrics.time_to_first_response_seconds", "value": "2.85s", "raw_value": 2.85158832, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "cache_efficiency.cache_hit_rate", "value": "0%", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "cache_efficiency.total_cached_tokens", "value": "0", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "cache_efficiency.total_fresh_prompt_tokens", "value": "3,357", "raw_value": 3357.3333333333335, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "cache_efficiency.total_input_tokens", "value": "3,357", "raw_value": 3357.3333333333335, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "thinking_metrics.reasoning_ratio", "value": "67%", "raw_value": 0.6695141279838651, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "thinking_metrics.total_thinking_tokens", "value": "272", "raw_value": 272.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "thinking_metrics.total_candidate_tokens", "value": "140.67", "raw_value": 140.66666666666666, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "thinking_metrics.total_output_tokens", "value": "412.67", "raw_value": 412.6666666666667, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "thinking_metrics.turns_with_thinking", "value": "2.33", "raw_value": 2.3333333333333335, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "tool_utilization.total_tool_calls", "value": "1.33", "raw_value": 1.3333333333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "tool_utilization.unique_tools_used", "value": "1.33", "raw_value": 1.3333333333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "tool_success_rate.tool_success_rate", "value": "100%", "raw_value": 1.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "tool_success_rate.total_tool_calls", "value": "1", "raw_value": 1.3333333333333333, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "tool_success_rate.failed_tool_calls", "value": "0%", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "grounding_utilization.total_grounding_chunks", "value": "0", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "grounding_utilization.total_grounded_responses", "value": "0", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "grounding_utilization.total_llm_responses", "value": "3.67", "raw_value": 3.6666666666666665, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "context_saturation.max_total_tokens", "value": "1748", "raw_value": 1748.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "agent_handoffs.total_handoffs", "value": "1", "raw_value": 1.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "agent_handoffs.unique_agents_count", "value": "1", "raw_value": 1.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "output_density.average_output_tokens", "value": "62.67", "raw_value": 62.666666666666664, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "output_density.total_output_tokens", "value": "140.67", "raw_value": 140.66666666666666, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": true}, {"name": "output_density.llm_calls_count", "value": "2.33", "raw_value": 2.3333333333333335, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "sandbox_usage.total_sandbox_ops", "value": "0", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}, {"name": "sandbox_usage.unique_ops_used", "value": "0", "raw_value": 0.0, "baseline": null, "delta_pct": null, "delta_direction": null, "lower_better": false}], "per_source": {"sources": []}, "per_question": {"questions": [{"id": "case_001_saldo_cust101", "raw_id": "case_001_saldo_cust101", "prompt_preview": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad\u2026", "source_type": "interaction"}, {"id": "case_002_vuelos_bog_mia", "raw_id": "case_002_vuelos_bog_mia", "prompt_preview": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de\u2026", "source_type": "interaction"}, {"id": "case_003_ruta_sin_vuelos_bog_nrt", "raw_id": "case_003_ruta_sin_vuelos_bog_nrt", "prompt_preview": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita\u2026", "source_type": "interaction"}], "metric_names": ["general_quality", "trajectory_accuracy", "corporate_policy_compliance"], "matrix": [{"id": "case_001_saldo_cust101", "label": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad\u2026", "raw_id": "case_001_saldo_cust101", "source_type": "interaction", "row": [1.0, 1.0, 1.0], "cells": ["1", "1", "100%"]}, {"id": "case_002_vuelos_bog_mia", "label": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de\u2026", "raw_id": "case_002_vuelos_bog_mia", "source_type": "interaction", "row": [1.0, 1.0, 1.0], "cells": ["1", "1", "100%"]}, {"id": "case_003_ruta_sin_vuelos_bog_nrt", "label": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita\u2026", "raw_id": "case_003_ruta_sin_vuelos_bog_nrt", "source_type": "interaction", "row": [0.0, 1.0, 1.0], "cells": ["0", "1", "100%"]}], "verdicts": [{"id": "case_001_saldo_cust101", "raw_id": "case_001_saldo_cust101", "source_type": "interaction", "prompt_preview": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad\u2026", "metrics": {"general_quality": {"score": 1.0, "explanation": "The response directly and completely answers the user's request by providing the exact account balance and available corporate card limit. The tone is highly professional, polite, and executive, conforming perfectly to the standards of enterprise banking and concierge services.", "verdicts": [], "error": ""}, "trajectory_accuracy": {"score": 1.0, "explanation": "The agent verified the user's identity and retrieved the account balance without taking any detours or calling irrelevant tools. The tools used (verify_identity and get_account_balance) are standard and appropriate for the request.", "verdicts": [], "error": ""}, "corporate_policy_compliance": {"score": 1.0, "explanation": "La respuesta cumple con todos los criterios de evaluaci\u00f3n. En cuanto a la 'claridad_ejecutiva', est\u00e1 redactada en un espa\u00f1ol profesional, formal, cort\u00e9s y estructurado de manera muy clara mediante el uso de vi\u00f1etas. Respecto a la 'exactitud_frente_a_herramientas', la informaci\u00f3n proporcionada responde directamente a la solicitud de la cliente (saldo en cuenta corriente y cupo de tarjeta corporativa), presentando los montos correspondientes de forma exacta en USD sin agregar datos innecesarios o inventados.", "verdicts": [], "error": ""}}, "deterministic": {"token_usage.llm_calls": 6, "token_usage.models_used": ["gemini-3.5-flash"], "token_usage.total_tokens": 9718, "token_usage.prompt_tokens": 8876, "token_usage.completion_tokens": 559, "token_usage.cached_tokens": 0, "token_usage.estimated_cost_usd": 0.006115, "latency_metrics.total_latency_seconds": 5.493, "latency_metrics.average_turn_latency_seconds": 5.493, "latency_metrics.llm_latency_seconds": 5.460298081, "latency_metrics.tool_latency_seconds": 0.00130055, "latency_metrics.time_to_first_response_seconds": 2.841098317, "cache_efficiency.cache_hit_rate": 0.0, "cache_efficiency.total_cached_tokens": 0, "cache_efficiency.total_fresh_prompt_tokens": 4438, "cache_efficiency.total_input_tokens": 4438, "thinking_metrics.reasoning_ratio": 0.672209026128266, "thinking_metrics.total_thinking_tokens": 283, "thinking_metrics.total_candidate_tokens": 138, "thinking_metrics.total_output_tokens": 421, "thinking_metrics.turns_with_thinking": 3, "tool_utilization.total_tool_calls": 2, "tool_utilization.unique_tools_used": 2, "tool_utilization.tool_counts.verify_identity": 1, "tool_utilization.tool_counts.get_account_balance": 1, "tool_success_rate.tool_success_rate": 1.0, "tool_success_rate.total_tool_calls": 2, "tool_success_rate.failed_tool_calls": 0, "tool_success_rate.failed_tools_list": [], "grounding_utilization.total_grounding_chunks": 0, "grounding_utilization.total_grounded_responses": 0, "grounding_utilization.total_llm_responses": 5, "context_saturation.max_total_tokens": 1768, "context_saturation.peak_usage_span": "call_llm", "agent_handoffs.total_handoffs": 1, "agent_handoffs.unique_agents_count": 1, "agent_handoffs.agents_invoked_list": ["corporate_concierge_agent"], "output_density.average_output_tokens": 46.0, "output_density.total_output_tokens": 138, "output_density.llm_calls_count": 3, "sandbox_usage.total_sandbox_ops": 0, "sandbox_usage.unique_ops_used": 0}, "conversation": [{"role": "user", "text": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?"}, {"role": "model", "text": "Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera."}], "final_response": "Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera.", "tool_calls": [{"name": "verify_identity", "call_id": "call_51094", "args": "{\"pin\": \"4821\", \"customer_id\": \"CUST-101\"}", "result": "{\"verified\": true, \"customer_id\": \"CUST-101\", \"customer_name\": \"Daniela Rodr\\u00edguez\", \"tier\": \"Platinum Executive\"}", "ok": true}, {"name": "get_account_balance", "call_id": "call_3210846", "args": "{\"customer_id\": \"CUST-101\"}", "result": "{\"customer_id\": \"CUST-101\", \"checking_balance_usd\": 18450.0, \"corporate_card_available_usd\": 5000.0, \"policy_max_flight_usd\": 2500.0, \"identity_verified_in_session\": true}", "ok": true}], "state_vars": {}, "agents_invoked": ["corporate_concierge_agent"], "turn_latencies": [{"turn": 1, "total_s": 5.493, "llm_s": 5.4601999999999995, "tool_s": 0.0013}], "trajectory": "['agent:corporate_concierge_agent', 'tool:verify_identity', 'tool:get_account_balance']", "system_instruction": "", "tool_declarations": [], "thinking": {"n_thoughts": 0, "sample": ""}}, {"id": "case_002_vuelos_bog_mia", "raw_id": "case_002_vuelos_bog_mia", "source_type": "interaction", "prompt_preview": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de\u2026", "metrics": {"general_quality": {"score": 1.0, "explanation": "The response is helpful, complete, and highly professional. It directly answers the user's query by providing specific flight options for GAirways on the requested date and route, including prices, cabin classes, and seat availability. The tone is executive, polite, and clear, and it appropriately mentions compliance with corporate travel policies and offers a clear next step for booking.", "verdicts": [], "error": ""}, "trajectory_accuracy": {"score": 1.0, "explanation": "The agent correctly chose the highly relevant tool `search_flights` to address the user's request for flight availability and pricing, without taking any detours.", "verdicts": [], "error": ""}, "corporate_policy_compliance": {"score": 1.0, "explanation": "La respuesta cumple con el criterio de claridad ejecutiva, estando redactada en un espa\u00f1ol profesional, claro y estructurado de manera excelente. Respecto a la exactitud frente a las herramientas, al no disponer de los logs de las herramientas en el prompt, se asume consistencia f\u00e1ctica ya que los datos presentados (vuelos GA-401 y GA-405, montos en USD de $890 y $420, y la pol\u00edtica de viajes de $2,500 USD) son realistas, espec\u00edficos y est\u00e1n perfectamente estructurados sin contradicciones visibles.", "verdicts": [], "error": ""}}, "deterministic": {"token_usage.llm_calls": 4, "token_usage.models_used": ["gemini-3.5-flash"], "token_usage.total_tokens": 6708, "token_usage.prompt_tokens": 5772, "token_usage.completion_tokens": 674, "token_usage.cached_tokens": 0, "token_usage.estimated_cost_usd": 0.004908, "latency_metrics.total_latency_seconds": 4.9293, "latency_metrics.average_turn_latency_seconds": 4.9293, "latency_metrics.llm_latency_seconds": 4.907373659, "latency_metrics.tool_latency_seconds": 0.000685162, "latency_metrics.time_to_first_response_seconds": 3.045789754, "cache_efficiency.cache_hit_rate": 0.0, "cache_efficiency.total_cached_tokens": 0, "cache_efficiency.total_fresh_prompt_tokens": 2886, "cache_efficiency.total_input_tokens": 2886, "thinking_metrics.reasoning_ratio": 0.5598290598290598, "thinking_metrics.total_thinking_tokens": 262, "thinking_metrics.total_candidate_tokens": 206, "thinking_metrics.total_output_tokens": 468, "thinking_metrics.turns_with_thinking": 2, "tool_utilization.total_tool_calls": 1, "tool_utilization.unique_tools_used": 1, "tool_utilization.tool_counts.search_flights": 1, "tool_success_rate.tool_success_rate": 1.0, "tool_success_rate.total_tool_calls": 1, "tool_success_rate.failed_tool_calls": 0, "tool_success_rate.failed_tools_list": [], "grounding_utilization.total_grounding_chunks": 0, "grounding_utilization.total_grounded_responses": 0, "grounding_utilization.total_llm_responses": 3, "context_saturation.max_total_tokens": 1846, "context_saturation.peak_usage_span": "call_llm", "agent_handoffs.total_handoffs": 1, "agent_handoffs.unique_agents_count": 1, "agent_handoffs.agents_invoked_list": ["corporate_concierge_agent"], "output_density.average_output_tokens": 103.0, "output_density.total_output_tokens": 206, "output_density.llm_calls_count": 2, "sandbox_usage.total_sandbox_ops": 0, "sandbox_usage.unique_ops_used": 0}, "conversation": [{"role": "user", "text": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?"}, {"role": "model", "text": "Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la reserva de alguno de ellos."}], "final_response": "Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la reserva de alguno de ellos.", "tool_calls": [{"name": "search_flights", "call_id": "call_2390304", "args": "{\"destination\": \"MIA\", \"departure_date\": \"2026-11-15\", \"origin\": \"BOG\"}", "result": "{\"origin\": \"BOG\", \"destination\": \"MIA\", \"departure_date\": \"2026-11-15\", \"flights\": [{\"flight_id\": \"GA-401\", \"origin\": \"BOG\", \"destination\": \"MIA\", \"departure_date\": \"2026-11-15\", \"airline\": \"GAirways\", \"class\": \"Business\", \"price_usd\": 890.0, \"seats_available\": 4}, {\"flight_id\": \"GA-405\", \"origin\": \"BOG\", \"destination\": \"MIA\", \"departure_date\": \"2026-11-15\", \"airline\": \"GAirways\", \"class\": \"Economy Plus\", \"price_usd\": 420.0, \"seats_available\": 9}]}", "ok": true}], "state_vars": {}, "agents_invoked": ["corporate_concierge_agent"], "turn_latencies": [{"turn": 1, "total_s": 4.9293, "llm_s": 4.9074, "tool_s": 0.0007}], "trajectory": "['agent:corporate_concierge_agent', 'tool:search_flights']", "system_instruction": "", "tool_declarations": [], "thinking": {"n_thoughts": 0, "sample": ""}}, {"id": "case_003_ruta_sin_vuelos_bog_nrt", "raw_id": "case_003_ruta_sin_vuelos_bog_nrt", "source_type": "interaction", "prompt_preview": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita\u2026", "metrics": {"general_quality": {"score": 0.0, "explanation": "The response fails the 'helpfulness_and_completeness' criterion. While it directly addresses the query by stating no flights were found, it lacks helpfulness and actionable details. A professional corporate concierge should explain why flights are unavailable (e.g., the date is too far in the future for airline schedules, or there are no direct flights between BOG and NRT) and offer alternative routing options (such as flights with connections) to assist the user effectively.", "verdicts": [], "error": ""}, "trajectory_accuracy": {"score": 1.0, "explanation": "The agent directly called the relevant tool 'search_flights' to address the user's request for flights from BOG to NRT without taking any detours or calling irrelevant tools.", "verdicts": [], "error": ""}, "corporate_policy_compliance": {"score": 1.0, "explanation": "La respuesta cumple con la claridad ejecutiva al estar redactada en espa\u00f1ol profesional, claro y directo. Asimismo, es exacta frente a la realidad del mercado y las herramientas al no inventar vuelos directos inexistentes para la ruta BOG-NRT, informando de manera ver\u00eddica y profesional que no se encontraron opciones disponibles.", "verdicts": [], "error": ""}}, "deterministic": {"token_usage.llm_calls": 4, "token_usage.models_used": ["gemini-3.5-flash"], "token_usage.total_tokens": 6194, "token_usage.prompt_tokens": 5496, "token_usage.completion_tokens": 427, "token_usage.cached_tokens": 0, "token_usage.estimated_cost_usd": 0.004029, "latency_metrics.total_latency_seconds": 4.0501, "latency_metrics.average_turn_latency_seconds": 4.0501, "latency_metrics.llm_latency_seconds": 4.017742493, "latency_metrics.tool_latency_seconds": 0.000564244, "latency_metrics.time_to_first_response_seconds": 2.667876889, "cache_efficiency.cache_hit_rate": 0.0, "cache_efficiency.total_cached_tokens": 0, "cache_efficiency.total_fresh_prompt_tokens": 2748, "cache_efficiency.total_input_tokens": 2748, "thinking_metrics.reasoning_ratio": 0.7765042979942693, "thinking_metrics.total_thinking_tokens": 271, "thinking_metrics.total_candidate_tokens": 78, "thinking_metrics.total_output_tokens": 349, "thinking_metrics.turns_with_thinking": 2, "tool_utilization.total_tool_calls": 1, "tool_utilization.unique_tools_used": 1, "tool_utilization.tool_counts.search_flights": 1, "tool_success_rate.tool_success_rate": 1.0, "tool_success_rate.total_tool_calls": 1, "tool_success_rate.failed_tool_calls": 0, "tool_success_rate.failed_tools_list": [], "grounding_utilization.total_grounding_chunks": 0, "grounding_utilization.total_grounded_responses": 0, "grounding_utilization.total_llm_responses": 3, "context_saturation.max_total_tokens": 1630, "context_saturation.peak_usage_span": "call_llm", "agent_handoffs.total_handoffs": 1, "agent_handoffs.unique_agents_count": 1, "agent_handoffs.agents_invoked_list": ["corporate_concierge_agent"], "output_density.average_output_tokens": 39.0, "output_density.total_output_tokens": 78, "output_density.llm_calls_count": 2, "sandbox_usage.total_sandbox_ops": 0, "sandbox_usage.unique_ops_used": 0}, "conversation": [{"role": "user", "text": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026."}, {"role": "model", "text": "No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026."}], "final_response": "No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.", "tool_calls": [{"name": "search_flights", "call_id": "call_3210927", "args": "{\"destination\": \"NRT\", \"departure_date\": \"2026-11-15\", \"origin\": \"BOG\"}", "result": "{\"origin\": \"BOG\", \"destination\": \"NRT\", \"departure_date\": \"2026-11-15\", \"flights\": []}", "ok": true}], "state_vars": {}, "agents_invoked": ["corporate_concierge_agent"], "turn_latencies": [{"turn": 1, "total_s": 4.0501, "llm_s": 4.0177, "tool_s": 0.0006}], "trajectory": "['agent:corporate_concierge_agent', 'tool:search_flights']", "system_instruction": "", "tool_declarations": [], "thinking": {"n_thoughts": 0, "sample": ""}}]}, "qa_log_md": "# Question-Answer Analysis Log\n\n**Generated:** 2026-10-22 22:21:37\n**Total Questions:** 3\n---## 1. Question: `case_001_saldo_cust101`\n\n| Property | Value |\n|----------|-------|\n| **Agents** | corporate_concierge_agent |\n| **Latency** | 5.49s |\n| **Metadata** | None |\n\n### Conversation\n\n**User Turn 1:**\n> Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?\n\n**Agent Turn 1:**\n  Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n  \n  A continuaci\u00f3n, le presento el estado de sus cuentas:\n  *   **Saldo en cuenta corriente:** $18,450 USD\n  *   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n  \n  Quedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera.\n\n\n### Final Response Summary\n\nEstimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera.\n\n### Agent Trajectory\n\n`agent:corporate_concierge_agent \u2192 tool:verify_identity \u2192 tool:get_account_balance`\n\n### Tool Calls\n\n| Tool | Arguments (key) | Result Summary |\n|------|-----------------|----------------|\n| `verify_identity` | pin, customer_id | success |\n| `get_account_balance` | customer_id | success |\n\n\n### Evaluation Metrics\n\n#### token_usage: **0.01**\n\nUsage: 6 LLM calls using ['gemini-3.5-flash']. Tokens: 9718 (8876p + 559c + 0ch). Cost: $0.006115\n\n#### latency_metrics: **5.49**\n\nTotal: 5.4930s. Avg Turn: 5.4930s. LLM: 5.4603s, Tools: 0.0013s. First Response: 2.8411s\n\n#### cache_efficiency: **0.00**\n\nCache Hit Rate: 0.00%. Cached Tokens: 0. Fresh Prompt Tokens: 4438.\n\n#### thinking_metrics: **0.67**\n\nReasoning Ratio: 67.22%. Thinking Tokens: 283. Standard Output Tokens: 138. Turns with Thinking: 3.\n\n#### tool_utilization: **2.00**\n\nTotal Tool Calls: 2. Unique Tools: 2. Breakdown: [verify_identity: 1, get_account_balance: 1]\n\n#### tool_success_rate: **1.00**\n\nSuccess Rate: 100.00%. Total Calls: 2. Failed Calls: 0. Failed Tools: []\n\n#### grounding_utilization: **0.00**\n\nTotal Citations (Chunks): 0. Grounded Responses: 0 / 5.\n\n#### context_saturation: **1768.00**\n\nMax Context Used: 1768 tokens. Peak occurred in: call_llm.\n\n#### agent_handoffs: **1.00**\n\nTotal Handoffs: 1. Unique Agents: 1. Agents: ['corporate_concierge_agent']\n\n#### output_density: **46.00**\n\nAvg Output Tokens: 46.00. Total Output Tokens: 138. LLM Calls: 3.\n\n#### sandbox_usage: **0.00**\n\nTotal Sandbox Ops: 0. Unique Ops: 0. Breakdown: []\n\n#### general_quality: **1.00**\n\nThe response directly and completely answers the user's request by providing the exact account balance and available corporate card limit. The tone is highly professional, polite, and executive, conforming perfectly to the standards of enterprise banking and concierge services.\n\n#### trajectory_accuracy: **1.00**\n\nThe agent verified the user's identity and retrieved the account balance without taking any detours or calling irrelevant tools. The tools used (verify_identity and get_account_balance) are standard and appropriate for the request.\n\n#### corporate_policy_compliance: **1.00**\n\nLa respuesta cumple con todos los criterios de evaluaci\u00f3n. En cuanto a la 'claridad_ejecutiva', est\u00e1 redactada en un espa\u00f1ol profesional, formal, cort\u00e9s y estructurado de manera muy clara mediante el uso de vi\u00f1etas. Respecto a la 'exactitud_frente_a_herramientas', la informaci\u00f3n proporcionada respon...\n\n\n---## 2. Question: `case_002_vuelos_bog_mia`\n\n| Property | Value |\n|----------|-------|\n| **Agents** | corporate_concierge_agent |\n| **Latency** | 4.93s |\n| **Metadata** | None |\n\n### Conversation\n\n**User Turn 1:**\n> Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?\n\n**Agent Turn 1:**\n  Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n  \n  1. **Vuelo GA-401**\n     - **Clase:** Business\n     - **Precio:** $890 USD\n     - **Asientos disponibles:** 4\n  \n  2. **Vuelo GA-405**\n     - **Clase:** Economy Plus\n     - **Precio:** $420 USD\n     - **Asientos disponibles:** 9\n  \n  Ambos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la reserva de alguno de ellos.\n\n\n### Final Response Summary\n\nPara el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la res...\n\n### Agent Trajectory\n\n`agent:corporate_concierge_agent \u2192 tool:search_flights`\n\n### Tool Calls\n\n| Tool | Arguments (key) | Result Summary |\n|------|-----------------|----------------|\n| `search_flights` | destination, departure_date, origin | success |\n\n\n### Evaluation Metrics\n\n#### token_usage: **0.00**\n\nUsage: 4 LLM calls using ['gemini-3.5-flash']. Tokens: 6708 (5772p + 674c + 0ch). Cost: $0.004908\n\n#### latency_metrics: **4.93**\n\nTotal: 4.9293s. Avg Turn: 4.9293s. LLM: 4.9074s, Tools: 0.0007s. First Response: 3.0458s\n\n#### cache_efficiency: **0.00**\n\nCache Hit Rate: 0.00%. Cached Tokens: 0. Fresh Prompt Tokens: 2886.\n\n#### thinking_metrics: **0.56**\n\nReasoning Ratio: 55.98%. Thinking Tokens: 262. Standard Output Tokens: 206. Turns with Thinking: 2.\n\n#### tool_utilization: **1.00**\n\nTotal Tool Calls: 1. Unique Tools: 1. Breakdown: [search_flights: 1]\n\n#### tool_success_rate: **1.00**\n\nSuccess Rate: 100.00%. Total Calls: 1. Failed Calls: 0. Failed Tools: []\n\n#### grounding_utilization: **0.00**\n\nTotal Citations (Chunks): 0. Grounded Responses: 0 / 3.\n\n#### context_saturation: **1846.00**\n\nMax Context Used: 1846 tokens. Peak occurred in: call_llm.\n\n#### agent_handoffs: **1.00**\n\nTotal Handoffs: 1. Unique Agents: 1. Agents: ['corporate_concierge_agent']\n\n#### output_density: **103.00**\n\nAvg Output Tokens: 103.00. Total Output Tokens: 206. LLM Calls: 2.\n\n#### sandbox_usage: **0.00**\n\nTotal Sandbox Ops: 0. Unique Ops: 0. Breakdown: []\n\n#### general_quality: **1.00**\n\nThe response is helpful, complete, and highly professional. It directly answers the user's query by providing specific flight options for GAirways on the requested date and route, including prices, cabin classes, and seat availability. The tone is executive, polite, and clear, and it appropriately m...\n\n#### trajectory_accuracy: **1.00**\n\nThe agent correctly chose the highly relevant tool `search_flights` to address the user's request for flight availability and pricing, without taking any detours.\n\n#### corporate_policy_compliance: **1.00**\n\nLa respuesta cumple con el criterio de claridad ejecutiva, estando redactada en un espa\u00f1ol profesional, claro y estructurado de manera excelente. Respecto a la exactitud frente a las herramientas, al no disponer de los logs de las herramientas en el prompt, se asume consistencia f\u00e1ctica ya que los d...\n\n\n---## 3. Question: `case_003_ruta_sin_vuelos_bog_nrt`\n\n| Property | Value |\n|----------|-------|\n| **Agents** | corporate_concierge_agent |\n| **Latency** | 4.05s |\n| **Metadata** | None |\n\n### Conversation\n\n**User Turn 1:**\n> Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.\n\n**Agent Turn 1:**\n  No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.\n\n\n### Final Response Summary\n\nNo se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.\n\n### Agent Trajectory\n\n`agent:corporate_concierge_agent \u2192 tool:search_flights`\n\n### Tool Calls\n\n| Tool | Arguments (key) | Result Summary |\n|------|-----------------|----------------|\n| `search_flights` | destination, departure_date, origin | success |\n\n\n### Evaluation Metrics\n\n#### token_usage: **0.00**\n\nUsage: 4 LLM calls using ['gemini-3.5-flash']. Tokens: 6194 (5496p + 427c + 0ch). Cost: $0.004029\n\n#### latency_metrics: **4.05**\n\nTotal: 4.0501s. Avg Turn: 4.0501s. LLM: 4.0177s, Tools: 0.0006s. First Response: 2.6679s\n\n#### cache_efficiency: **0.00**\n\nCache Hit Rate: 0.00%. Cached Tokens: 0. Fresh Prompt Tokens: 2748.\n\n#### thinking_metrics: **0.78**\n\nReasoning Ratio: 77.65%. Thinking Tokens: 271. Standard Output Tokens: 78. Turns with Thinking: 2.\n\n#### tool_utilization: **1.00**\n\nTotal Tool Calls: 1. Unique Tools: 1. Breakdown: [search_flights: 1]\n\n#### tool_success_rate: **1.00**\n\nSuccess Rate: 100.00%. Total Calls: 1. Failed Calls: 0. Failed Tools: []\n\n#### grounding_utilization: **0.00**\n\nTotal Citations (Chunks): 0. Grounded Responses: 0 / 3.\n\n#### context_saturation: **1630.00**\n\nMax Context Used: 1630 tokens. Peak occurred in: call_llm.\n\n#### agent_handoffs: **1.00**\n\nTotal Handoffs: 1. Unique Agents: 1. Agents: ['corporate_concierge_agent']\n\n#### output_density: **39.00**\n\nAvg Output Tokens: 39.00. Total Output Tokens: 78. LLM Calls: 2.\n\n#### sandbox_usage: **0.00**\n\nTotal Sandbox Ops: 0. Unique Ops: 0. Breakdown: []\n\n#### general_quality: **0.00**\n\nThe response fails the 'helpfulness_and_completeness' criterion. While it directly addresses the query by stating no flights were found, it lacks helpfulness and actionable details. A professional corporate concierge should explain why flights are unavailable (e.g., the date is too far in the future...\n\n#### trajectory_accuracy: **1.00**\n\nThe agent directly called the relevant tool 'search_flights' to address the user's request for flights from BOG to NRT without taking any detours or calling irrelevant tools.\n\n#### corporate_policy_compliance: **1.00**\n\nLa respuesta cumple con la claridad ejecutiva al estar redactada en espa\u00f1ol profesional, claro y directo. Asimismo, es exacta frente a la realidad del mercado y las herramientas al no inventar vuelos directos inexistentes para la ruta BOG-NRT, informando de manera ver\u00eddica y profesional que no se en...\n\n\n", "iterations": [{"run_id": "baseline_fintech", "datetime": "2026-10-22 22:21", "llm_metrics": {"general_quality": 0.6666666666666666, "trajectory_accuracy": 1.0, "corporate_policy_compliance": 1.0}, "det_metrics": {"token_usage.total_tokens": 7540.0, "token_usage.estimated_cost_usd": 0.005017333333333333, "latency_metrics.total_latency_seconds": 4.824133333333333, "cache_efficiency.cache_hit_rate": 0.0, "tool_utilization.total_tool_calls": 1.3333333333333333}, "git_commit": "", "git_branch": "", "is_current": true, "deltas": {}}], "comparison": {"deltas": [], "baseline_git": {}, "current_git": {}}, "gemini_analysis_md": "# Deep Technical Diagnosis: Corporate Concierge Agent Evaluation\n\n## 1. Executive Synthesis\nThe `corporate_concierge_agent` demonstrates exceptionally high reliability and strict adherence to corporate constraints, achieving a perfect `1.0` average in LLM-judged `trajectory_accuracy` and `corporate_policy_compliance`, alongside a `100%` deterministic `tool_success_rate`. However, a misalignment exists between the agent\u2019s strictly defined operational bounds and the expected \"helpfulness\" standard defined in the `general_quality` rubric, which pulled the average quality score down to `0.67`. Furthermore, infrastructural metrics indicate inefficiencies in context management, specifically a `0.0%` cache hit rate, leading to elevated token costs and latency.\n\nThis report synthesizes the evaluation metrics, links them to the underlying implementation in `agent.py`, and provides concrete optimization strategies using ADK Design Patterns.\n\n---\n\n## 2. Metric Diagnosis & Source Code Analysis\n\n### 2.1. Trajectory Accuracy & Tool Execution (High Performance)\n**Metrics Analyzed:** `trajectory_accuracy` (LLM-judged: 1.0), `tool_success_rate` (Deterministic: 1.0)\n\nThe agent excels at tool selection and sequencing. The deterministic `tool_success_rate` of `1.0` confirms that all tool invocations were syntactically correct and successfully processed without throwing Python exceptions. \n\nThis is corroborated by the LLM-judged `trajectory_accuracy`, which evaluates the logical path taken by the agent. In `case_001_saldo_cust101`, the agent correctly sequenced `verify_identity` before `get_account_balance`, aligning perfectly with Rule 1 of `_FIXED_INSTRUCTION` in `agent.py`: *\"Antes de llamar a `get_account_balance`... SIEMPRE debes haber verificado la identidad\"*. The LLM judge's explanation explicitly validates this: *\"The agent verified the user's identity and retrieved the account balance without taking any detours...\"*\n\n**Synthesis:** The functional boundaries established in `agent.py` via tools like `verify_identity` and `search_flights` are highly effective, resulting in zero hallucinations regarding tool choice.\n\n### 2.2. Quality vs. Policy Compliance Misalignment (The 0.0 Outlier)\n**Metrics Analyzed:** `general_quality` (LLM-judged: 0.67 average), `corporate_policy_compliance` (LLM-judged: 1.0)\n\nWhile cases 001 and 002 achieved perfect 1.0 scores across all LLM-judged metrics, `case_003_ruta_sin_vuelos_bog_nrt` exposed a critical conflict between the agent's system prompt and the `general_quality` rubric. \n\nIn this case, the user requests flights from BOG to NRT. The tool `search_flights` deterministically returns `[]`. The agent responds: *\"No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT)...\"* \n\n*   **Why it scored 1.0 on `corporate_policy_compliance`:** The LLM judge notes that the agent *\"es exacta frente a la realidad del mercado y las herramientas al no inventar vuelos directos inexistentes\"*. This maps directly to Rule 3 in `agent.py`'s `_FIXED_INSTRUCTION`: *\"CERO ALUCINACIONES ANTE LISTAS VAC\u00cdAS... NUNCA inventes vuelos, horarios ni precios.\"*\n*   **Why it scored 0.0 on `general_quality`:** The LLM judge expects proactive concierge behavior, stating: *\"While it directly addresses the query... it lacks helpfulness and actionable details. A professional corporate concierge should explain why flights are unavailable... and offer alternative routing options.\"*\n\n**Synthesis:** Because `general_quality` is an LLM-judged rubric based on semantic expectations of \"helpfulness\" rather than rigid code compliance, the agent was penalized for strictly following its instructions. The prompt prioritizes safety (avoiding hallucinations) at the cost of proactive customer service.\n\n### 2.3. Caching and Latency Inefficiencies\n**Metrics Analyzed:** `cache_efficiency.cache_hit_rate` (Deterministic: 0.0), `latency_metrics.average_turn_latency_seconds` (Deterministic: 4.82s)\n\nThe deterministic token counting reveals that the agent generated `3357.3` fresh prompt tokens on average, with a `0.0` cache hit rate. Consequently, `latency_metrics.llm_latency_seconds` sits at an average of `4.79s`, representing nearly 100% of the total latency (since tool execution latency is virtually zero at `0.0008s`).\n\n**Synthesis:** In `agent.py`, the massive `_FIXED_INSTRUCTION` block (which contains detailed operating procedures) is being passed into the dynamic `instruction` parameter of the `Agent` class. Because this prompt is injected as fresh context on every turn rather than utilizing a static system prefix, the Google Cloud infrastructure cannot leverage prefix caching. This leads to redundant token processing costs (`0.0050 USD` estimated cost) and elevated Time to First Token (TTFT).\n\n---\n\n## 3. Recommended Next Steps\n\nBased on the ADK Design Patterns reference, I recommend the following actionable optimizations for the development team.\n\n### Recommendation 1: Fix Instruction/Rubric Alignment for Ambiguous Scenarios\n*   **Optimization Pillar:** Offload / Prompt Engineering\n*   **ADK Pattern:** *Agent doesn't clarify ambiguous requests / Low general_quality due to rubric failures on clarification*\n*   **Action:** We must resolve the conflict between the strict non-hallucination instruction and the helpfulness rubric. Update `_FIXED_INSTRUCTION` in `agent.py` to instruct the agent to offer valid alternative strategies when a tool returns empty data, without hallucinating specific data.\n*   **Code Change:**\n    ```python\n    # In agent.py, update _FIXED_INSTRUCTION Rule 3:\n    _FIXED_INSTRUCTION = \"\"\"...\n    3. CERO ALUCINACIONES ANTE LISTAS VAC\u00cdAS: Si `search_flights` devuelve `\"flights\": []`, informa claramente que no hay vuelos directos. NUNCA inventes vuelos, horarios ni precios. SIN EMBARGO, debes actuar como un concierge proactivo: sugiere amablemente al usuario buscar opciones con escalas o verificar fechas alternativas.\n    ...\"\"\"\n    ```\n*   **Expected Metric Impact:** Should raise the `general_quality` score for edge-case scenarios (like `case_003`) from 0.0 to 1.0, pulling the overall average up to >= 0.90, without sacrificing `corporate_policy_compliance`.\n\n### Recommendation 2: Enable Prompt Caching for System Instructions\n*   **Optimization Pillar:** Cache\n*   **ADK Pattern:** *Low cache hit rate, high cost*\n*   **Action:** Move the heavy, static ruleset (`_FIXED_INSTRUCTION`) into the `global_instruction` parameter of the `Agent` definition. This ensures the LLM backend treats it as a static prefix, caching it across turns.\n*   **Code Change:**\n    ```python\n    # In agent.py, modify the Agent instantiation:\n    root_agent = Agent(\n        name=\"corporate_concierge_agent\",\n        model=os.environ.get(\"DEMO_AGENT_MODEL\", \"gemini-3.5-flash\"),\n        description=\"Concierge corporativo para consulta de saldos y viajes.\",\n        # Move the heavy static text to global_instruction to enable caching\n        global_instruction=(\n            _BUGGY_INSTRUCTION \n            if os.environ.get(\"DEMO_AGENT_MODE\") == \"buggy\" \n            else _FIXED_INSTRUCTION\n        ),\n        # Keep instruction for lightweight, dynamic per-session context if needed\n        instruction=\"Por favor atiende al siguiente usuario.\", \n        tools=[\n            verify_identity,\n            get_account_balance,\n            search_flights,\n            book_corporate_flight,\n            create_support_ticket,\n            get_support_ticket,\n        ],\n    )\n    ```\n*   **Expected Metric Impact:** Will increase `cache_efficiency.cache_hit_rate` from 0.0 to >80% on multi-turn conversations (like `case_001` which took 3 LLM calls). This will decrease `token_usage.estimated_cost_usd` and reduce `latency_metrics.total_latency_seconds` by minimizing prompt processing time.", "optimization_log_md": "# Optimization Log\n\nCumulative record of evaluation runs and metric changes.\nGenerated automatically by `agent-eval analyze`.\n\n\n## Iteration 1 \u2014 Baseline\n\n**Date:** 2026-10-22 22:22:19\n**Run:** baseline_fintech\n\n*Baseline run \u2014 no comparison available yet.*\n"}</script>
+<script>
+(function() {
+  // ── Helpers (defined first so everything below can use them safely) ──
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function showError(msg) {
+    const box = document.getElementById('js-error-box');
+    if (box) {
+      box.innerHTML = '<div class="error"><b>Report error:</b> ' +
+        escapeHtml(msg) + '<br><small>Open the browser console for the full stack.</small></div>';
+    }
+    console.error('[agent-eval report]', msg);
+  }
+  function safe(label, fn) {
+    // Wrap each render section so a single bad row doesn't kill the page.
+    try { fn(); } catch (e) {
+      console.error('[agent-eval report] section "' + label + '" failed:', e);
+      showError('Section "' + label + '" failed to render: ' + (e.message || e));
+    }
+  }
+  function $(sel) { return document.querySelector(sel); }
+  function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+
+  // ── Parse the embedded data ──────────────────────────────────────────
+  let data;
+  try {
+    const dataEl = document.getElementById('report-data');
+    if (!dataEl) throw new Error('report-data <script> tag missing');
+    data = JSON.parse(dataEl.textContent);
+  } catch (e) {
+    showError('Could not parse report data: ' + (e.message || e));
+    return;
+  }
+
+  // ── Header ───────────────────────────────────────────────────────────
+  safe('header', function() {
+    $('#agent-tag').textContent = (data.meta && data.meta.agent_name) || '—';
+    const m = data.meta || {};
+    const parts = [];
+    if (m.run_id) parts.push('Run: ' + m.run_id);
+    if (m.run_type) parts.push(m.run_type);
+    if (m.experiment_id) parts.push('Experiment: ' + m.experiment_id);
+    if (m.interaction_datetime) {
+      // Trim ISO seconds for readability — '2026-05-04T04:45:06.583922' → '2026-05-04 04:45'
+      const d = String(m.interaction_datetime).replace('T', ' ').slice(0, 16);
+      parts.push('Collected ' + d);
+    }
+    if (m.generated_at) parts.push('Report generated ' + m.generated_at);
+    if (m.git_commit) {
+      const g = m.git_commit + (m.git_branch ? ' on ' + m.git_branch : '') +
+                (m.git_dirty ? ' (dirty)' : '');
+      parts.push(g);
+    }
+    if (m.has_comparison && m.baseline_run) parts.push('Compared to: ' + m.baseline_run);
+    $('#subtitle').textContent = parts.join('  ·  ');
+    // Test description sits on its own row above the tiles when present.
+    if (m.test_description) {
+      const desc = document.createElement('div');
+      desc.style.cssText = 'margin:-6px 0 14px 0;padding:10px 14px;background:#fff8e1;border:2px solid var(--ink);border-radius:10px;font-size:13px;color:#333;font-weight:500';
+      desc.textContent = '📝 ' + m.test_description;
+      const tiles = $('#tiles');
+      if (tiles && tiles.parentNode) tiles.parentNode.insertBefore(desc, tiles);
+    }
+  });
+
+  // ── Tab switching (bound EARLY so it works even if later sections fail) ──
+  safe('tabs', function() {
+    $$('nav.tabs button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        $$('nav.tabs button').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        $$('section.tab-content').forEach(function(s) { s.classList.remove('active'); });
+        const target = document.getElementById(btn.dataset.tab);
+        if (target) target.classList.add('active');
+      });
+    });
+  });
+
+  // ── Tiles ────────────────────────────────────────────────────────────
+  safe('tiles', function() {
+    const tilesEl = $('#tiles');
+    (data.tiles || []).forEach(function(t) {
+      const el = document.createElement('div');
+      el.className = 'tile color-' + (t.color || 'blue');
+      el.innerHTML = '<div class="label">' + escapeHtml(t.label) + '</div>' +
+                     '<div class="value">' + escapeHtml(t.value) + '</div>' +
+                     '<div class="hint">' + escapeHtml(t.hint || '') + '</div>';
+      tilesEl.appendChild(el);
+    });
+  });
+
+  // ── LLM metrics table ────────────────────────────────────────────────
+  const hasComparison = !!(data.meta && data.meta.has_comparison);
+  safe('llm-table', function() {
+    const llmTable = $('#llm-table');
+    let header = '<tr><th>Metric</th><th class="num">Score</th><th class="num">Range</th>';
+    if (hasComparison) header += '<th class="num">Baseline</th><th class="num">Δ</th>';
+    header += '<th>Status</th></tr>';
+    llmTable.innerHTML = '<thead>' + header + '</thead><tbody></tbody>';
+    const tbody = llmTable.querySelector('tbody');
+    (data.llm_metrics || []).forEach(function(r) {
+      const tr = document.createElement('tr');
+      let html;
+      if (r.skipped) {
+        html = '<td>' + escapeHtml(r.name) + '</td>' +
+               '<td class="num"><span class="pill pill-skipped">SKIPPED</span></td>' +
+               '<td class="num">—</td>';
+        if (hasComparison) html += '<td class="num">—</td><td class="num">—</td>';
+        html += '<td><span class="pill pill-skipped">' + escapeHtml(r.reason || '') + '</span></td>';
+      } else {
+        const norm = r.score_normalized;
+        let pill = 'pill-skipped', label = '—';
+        if (norm != null) {
+          if (norm >= 0.7) { pill = 'pill-good'; label = 'Pass'; }
+          else if (norm >= 0.4) { pill = 'pill-mixed'; label = 'Mixed'; }
+          else { pill = 'pill-bad'; label = 'Low'; }
+        }
+        html = '<td><b>' + escapeHtml(r.name) + '</b></td>' +
+               '<td class="num">' + escapeHtml(r.score) + '</td>' +
+               '<td class="num">' + escapeHtml(r.range) + '</td>';
+        if (hasComparison) {
+          const dpct = r.delta_pct;
+          const dirCls = r.delta_direction === 'improvement' ? 'delta-good' :
+                         r.delta_direction === 'regression' ? 'delta-bad' : 'delta-neutral';
+          const dStr = dpct == null ? '—' : (dpct >= 0 ? '+' : '') + dpct.toFixed(1) + '%';
+          html += '<td class="num">' + escapeHtml(r.baseline || '—') + '</td>' +
+                  '<td class="num ' + dirCls + '">' + dStr + '</td>';
+        }
+        html += '<td><span class="pill ' + pill + '">' + label + '</span></td>';
+      }
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+    });
+  });
+
+  // ── Per-source side-by-side strip (simulation vs interaction) ────────
+  safe('per-source', function() {
+    const ps = data.per_source || { sources: [] };
+    const sources = (ps.sources || []).filter(function(s) {
+      return s.metrics && Object.keys(s.metrics).length;
+    });
+    if (sources.length < 2) return;  // single-source = nothing to compare.
+    const card = $('#per-source-card');
+    const table = $('#per-source-table');
+    if (!card || !table) return;
+    card.style.display = '';
+    // Union of all metric names across sources, sim-friendly order:
+    // headline LLM-judge first, then deterministic.
+    const allMetrics = new Set();
+    sources.forEach(function(s) {
+      Object.keys(s.metrics).forEach(function(k) { allMetrics.add(k); });
+    });
+    const metricList = Array.from(allMetrics);
+    let header = '<tr><th>Metric</th>';
+    sources.forEach(function(s) {
+      header += '<th class="num">' + escapeHtml(s.name) +
+                ' <span style="color:#999;font-weight:400">(n)</span></th>';
+    });
+    header += '</tr>';
+    let body = '';
+    metricList.forEach(function(mname) {
+      let row = '<tr><td>' + escapeHtml(mname) + '</td>';
+      sources.forEach(function(s) {
+        const m = s.metrics[mname];
+        if (!m || m.average == null) {
+          row += '<td class="num" style="color:#bbb">—</td>';
+        } else {
+          const v = m.average;
+          let display;
+          if (mname.indexOf('cost') >= 0) display = '$' + Number(v).toFixed(4);
+          else if (mname.indexOf('latency') >= 0 || mname.indexOf('seconds') >= 0) display = Number(v).toFixed(2) + 's';
+          else if (mname.indexOf('cache') >= 0 || mname.indexOf('reasoning') >= 0 || mname.indexOf('rate') >= 0) {
+            // 0–1 ratio metrics get %.
+            display = (v <= 1) ? (Number(v) * 100).toFixed(0) + '%' : Number(v).toFixed(2);
+          }
+          else if (typeof v === 'number') {
+            display = v >= 1000 ? Math.round(v).toLocaleString()
+                    : (v == Math.floor(v) ? String(v) : v.toFixed(2));
+          }
+          else display = String(v);
+          const cnt = m.count != null ? ' <span style="color:#999;font-weight:400">(' + m.count + ')</span>' : '';
+          row += '<td class="num">' + escapeHtml(display) + cnt + '</td>';
+        }
+      });
+      row += '</tr>';
+      body += row;
+    });
+    table.innerHTML = '<thead>' + header + '</thead><tbody>' + body + '</tbody>';
+  });
+
+  // ── Deterministic table ──────────────────────────────────────────────
+  safe('det-table', function() {
+    const detTable = $('#det-table');
+    let header = '<tr><th>Metric</th><th class="num">Value</th>';
+    if (hasComparison) header += '<th class="num">Baseline</th><th class="num">Δ</th>';
+    header += '</tr>';
+    detTable.innerHTML = '<thead>' + header + '</thead><tbody></tbody>';
+    const tbody = detTable.querySelector('tbody');
+    (data.deterministic_metrics || []).forEach(function(r) {
+      const tr = document.createElement('tr');
+      let html = '<td>' + escapeHtml(r.name) + '</td>' +
+                 '<td class="num">' + escapeHtml(r.value) + '</td>';
+      if (hasComparison) {
+        const dpct = r.delta_pct;
+        const dirCls = r.delta_direction === 'improvement' ? 'delta-good' :
+                       r.delta_direction === 'regression' ? 'delta-bad' : 'delta-neutral';
+        const dStr = dpct == null ? '—' : (dpct >= 0 ? '+' : '') + dpct.toFixed(1) + '%';
+        html += '<td class="num">' + escapeHtml(r.baseline || '—') + '</td>' +
+                '<td class="num ' + dirCls + '">' + dStr + '</td>';
+      }
+      tr.innerHTML = html;
+      tbody.appendChild(tr);
+    });
+  });
+
+  // ── Radar chart ──────────────────────────────────────────────────────
+  // Current run is the solid blue polygon. If there's a previous iteration
+  // in `data.iterations` (anything before the current one), draw it as a
+  // dashed gray polygon underneath so the user sees the baseline at a
+  // glance — same comparison story as the iteration history tab.
+  safe('radar', function() {
+    if (typeof Chart === 'undefined') {
+      $('#radar-empty').textContent = 'Chart.js failed to load (offline?). Score table on the right has the same data.';
+      $('#radar-empty').style.display = 'block';
+      return;
+    }
+    const radarCanvas = $('#radar');
+    const rows = (data.llm_metrics || [])
+      .filter(function(r) { return !r.skipped && r.score_normalized != null; });
+    const radarLabels = rows.map(function(r) { return r.name; });
+    const radarValues = rows.map(function(r) { return r.score_normalized; });
+    if (radarLabels.length === 0) {
+      $('#radar-empty').style.display = 'block';
+      radarCanvas.style.display = 'none';
+      return;
+    }
+    // Pick the iteration immediately before this run as the baseline.
+    // `data.iterations` is sorted oldest-first; find the entry flagged
+    // is_current and take the one before it (if any).
+    const its = data.iterations || [];
+    let baseline = null;
+    for (let i = 0; i < its.length; i++) {
+      if (its[i].is_current && i > 0) { baseline = its[i - 1]; break; }
+    }
+    // Fallback: if no entry is marked current (single-run setup), use the
+    // most recent iteration as long as its run_id differs from this one.
+    if (!baseline && its.length >= 2) {
+      const lastId = its[its.length - 1].run_id;
+      const myId = (data.meta && data.meta.run_id) || '';
+      if (lastId === myId) baseline = its[its.length - 2];
+      else baseline = its[its.length - 1];
+    }
+
+    const datasets = [];
+    if (baseline) {
+      // Map current radar labels onto baseline values; missing metrics
+      // fall back to the score we'd plot for the current run so the
+      // polygon stays closed (Chart.js skips nulls and breaks the shape).
+      const baseValues = radarLabels.map(function(label, i) {
+        // Match by metric display name; baseline keeps SDK-style keys.
+        const candidates = [label, label.replace(/ /g, '_').toLowerCase()];
+        for (const k of Object.keys(baseline.llm_metrics || {})) {
+          if (candidates.indexOf(k) >= 0) return baseline.llm_metrics[k];
+          // Rough match: strip non-alphanumerics on both sides.
+          const norm = function(s) { return String(s).replace(/[^a-z0-9]/gi, '').toLowerCase(); };
+          if (norm(k) === norm(label)) return baseline.llm_metrics[k];
+        }
+        return null;
+      });
+      datasets.push({
+        label: 'baseline · ' + (baseline.run_id || '—'),
+        data: baseValues,
+        backgroundColor: 'rgba(95, 99, 104, 0.10)',
+        borderColor: '#5f6368',
+        borderWidth: 1.5,
+        borderDash: [6, 4],
+        pointBackgroundColor: '#5f6368',
+        pointRadius: 3,
+      });
+    }
+    datasets.push({
+      label: (data.meta && data.meta.run_id) || 'current',
+      data: radarValues,
+      backgroundColor: 'rgba(66, 133, 244, 0.20)',
+      borderColor: '#4285f4',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#4285f4',
+      pointRadius: 4,
+    });
+
+    new Chart(radarCanvas, {
+      type: 'radar',
+      data: { labels: radarLabels, datasets: datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          r: { min: 0, max: 1, ticks: { stepSize: 0.2, font: { size: 10 } },
+               pointLabels: { font: { size: 11, weight: '600' } } }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 11, weight: '600' } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed.r;
+                return ctx.dataset.label + ': ' + (v == null ? '—' : v.toFixed(2));
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+
+  // ── Heatmap + per-question accordion ─────────────────────────────────
+  safe('heatmap', function() {
+    const pq = data.per_question || { questions: [], metric_names: [], matrix: [] };
+    const countEl = $('#pq-count');
+    if (countEl) countEl.textContent = pq.questions.length || '';
+    const heatmapEl = $('#heatmap');
+    if (!pq.questions.length || !pq.metric_names.length) {
+      $('#heatmap-empty').style.display = 'block';
+      return;
+    }
+    // Row label = friendly id + prompt preview. Hex eval_ids from ADK
+    // get renamed to "Sim #N" upstream so the heatmap reads cleanly.
+    let html = '<thead><tr><th>Question</th>';
+    pq.metric_names.forEach(function(m) {
+      html += '<th class="col-header">' + escapeHtml(m) + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    pq.matrix.forEach(function(row) {
+      const label = row.label || row.id;
+      const tag = row.source_type === 'simulation' ? 'sim' : 'turn';
+      html += '<tr><td class="qid" title="' + escapeHtml(row.raw_id || '') + '">' +
+                '<div style="font-weight:700">' + escapeHtml(row.id) + '</div>' +
+                '<div style="color:#555;font-weight:400;margin-top:2px">' + escapeHtml(label) + '</div>' +
+              '</td>';
+      row.row.forEach(function(val, i) {
+        const cellLabel = row.cells[i] != null ? row.cells[i] : '—';
+        const bg = colorForScore(val);
+        html += '<td class="cell" style="background:' + bg + '">' + escapeHtml(cellLabel) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    heatmapEl.innerHTML = html;
+  });
+
+  // Render question_answer_log.md as the rich per-question conversation view.
+  // Per-question DEEP DIVE — full conversation, tool calls with args+results,
+  // final state, agent trajectory, per-metric rubric verdicts. Replaces both
+  // the old QA log markdown render AND the rubric-only verdict cards. One
+  // collapsible card per question with internal subsections.
+  safe('verdicts', function() {
+    const pq = data.per_question || { verdicts: [] };
+    const verdicts = pq.verdicts || [];
+    const list = $('#verdicts-list');
+    if (!verdicts.length) return;
+    list.innerHTML = '';
+    verdicts.forEach(function(q) {
+      const item = document.createElement('details');
+      item.className = 'qa-item';
+      const tag = q.source_type === 'simulation' ? 'sim' : 'single-turn';
+      const det = q.deterministic || {};
+      const headerStats = [
+        det['token_usage.total_tokens'] != null ? Math.round(det['token_usage.total_tokens']).toLocaleString() + ' tok' : null,
+        det['latency_metrics.total_latency_seconds'] != null ? Number(det['latency_metrics.total_latency_seconds']).toFixed(1) + 's' : null,
+        det['tool_utilization.total_tool_calls'] != null ? det['tool_utilization.total_tool_calls'] + ' tools' : null,
+      ].filter(function(x) { return x; }).join(' · ');
+
+      item.innerHTML =
+        '<summary class="qa-summary">' +
+          '<span class="chevron">›</span>' +
+          '<span class="qid">' + escapeHtml(q.id) + '</span>' +
+          '<span class="prompt-preview">' + escapeHtml(q.prompt_preview || '') + '</span>' +
+          '<span style="font-size:11px;color:#555">[' + escapeHtml(tag) + ']</span>' +
+          (headerStats ? ' <span style="font-size:11px;color:#555;font-family:JetBrains Mono,monospace">' + escapeHtml(headerStats) + '</span>' : '') +
+        '</summary>' +
+        '<div class="qa-detail">' +
+          renderRunStats(q.deterministic) +
+          renderStateAndTrajectory(q.state_vars, q.agents_invoked, q.trajectory, q.turn_latencies, q.deterministic) +
+          renderConversation(q.conversation, q.final_response) +
+          renderToolCalls(q.tool_calls) +
+          renderThinking(q.thinking) +
+          renderAgentSpec(q.system_instruction, q.tool_declarations) +
+          renderMetricsBlock(q.metrics) +
+        '</div>';
+      list.appendChild(item);
+    });
+  });
+
+  function renderRunStats(det) {
+    if (!det || !Object.keys(det).length) return '';
+    // Compact metric strip. Filter to NUMERIC cells — list/dict values
+    // (models_used, agents_invoked_list, tool_counts) get rendered in
+    // the State & trajectory section instead, where they have proper
+    // typography. Showing them here as `[object Object]` was the bug.
+    const cells = [
+      ['Total tokens', det['token_usage.total_tokens'], 'n'],
+      ['Prompt tokens', det['token_usage.prompt_tokens'], 'n'],
+      ['Completion tokens', det['token_usage.completion_tokens'], 'n'],
+      ['Cached tokens', det['token_usage.cached_tokens'], 'n'],
+      ['Cost', det['token_usage.estimated_cost_usd'], 'cost'],
+      ['Wall-clock', det['latency_metrics.total_latency_seconds'], 's'],
+      ['Turn latency', det['latency_metrics.average_turn_latency_seconds'], 's'],
+      ['LLM time', det['latency_metrics.llm_latency_seconds'], 's'],
+      ['Tool time', det['latency_metrics.tool_latency_seconds'], 's'],
+      ['LLM calls', det['token_usage.llm_calls'], 'n'],
+      ['Tool calls', det['tool_utilization.total_tool_calls'], 'n'],
+      ['Cache hit', det['cache_efficiency.cache_hit_rate'], 'pct'],
+      ['Reasoning ratio', det['thinking_metrics.reasoning_ratio'], 'pct'],
+      ['Thinking tokens', det['thinking_metrics.total_thinking_tokens'], 'n'],
+      ['Tool success', det['tool_success_rate.tool_success_rate'], 'pct'],
+      ['Failed tools', det['tool_success_rate.failed_tool_calls'], 'n'],
+      ['Sub-agent handoffs', det['agent_handoffs.total_handoffs'], 'n'],
+      ['Max ctx tokens', det['context_saturation.max_total_tokens'], 'n'],
+    ].filter(function(c) {
+      return typeof c[1] === 'number' && !isNaN(c[1]);
+    });
+    if (!cells.length) return '';
+    let html = '<h4>📈 Run-time metrics</h4><div class="metric-strip">';
+    cells.forEach(function(c) {
+      let display;
+      if (c[2] === 'cost') display = '$' + Number(c[1]).toFixed(4);
+      else if (c[2] === 's') display = Number(c[1]).toFixed(2) + 's';
+      else if (c[2] === 'pct') display = (Number(c[1]) * 100).toFixed(0) + '%';
+      else if (c[1] >= 1000) display = c[1].toLocaleString();
+      else display = c[1] == Math.floor(c[1]) ? String(c[1]) : c[1].toFixed(2);
+      html += '<div class="metric-cell">' +
+                '<div class="metric-cell-label">' + escapeHtml(c[0]) + '</div>' +
+                '<div class="metric-cell-value">' + escapeHtml(display) + '</div>' +
+              '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderThinking(th) {
+    if (!th || !th.n_thoughts) return '';
+    return '<h4>💭 Reasoning trace</h4>' +
+      '<div class="text-block" style="font-size:12px">' +
+        '<div style="font-weight:600;margin-bottom:6px">' + th.n_thoughts +
+        ' thinking step' + (th.n_thoughts === 1 ? '' : 's') + '</div>' +
+        (th.sample ? '<div style="color:#555">Sample: ' + escapeHtml(th.sample) + '</div>' : '') +
+      '</div>';
+  }
+
+  function renderAgentSpec(systemInstruction, toolDecls) {
+    if (!systemInstruction && !(toolDecls && toolDecls.length)) return '';
+    let html = '<h4>📜 What the agent saw</h4><div class="state-grid">';
+    if (systemInstruction) {
+      html += '<div class="state-card" style="grid-column:1/-1">' +
+                '<div class="tool-label">System instruction (what the LLM was told)</div>' +
+                '<pre style="font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow-y:auto;background:var(--ink);color:#f8f7f2;padding:10px 12px;border-radius:8px;margin-top:6px">' +
+                  escapeHtml(systemInstruction) +
+                '</pre>' +
+              '</div>';
+    }
+    if (toolDecls && toolDecls.length) {
+      html += '<div class="state-card" style="grid-column:1/-1">' +
+                '<div class="tool-label">Tools available to the LLM (' + toolDecls.length + ')</div>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">' +
+                toolDecls.map(function(td) {
+                  // Python pre-flattens to {name, description}, but accept a
+                  // bare string fallback in case some agent emits its own shape.
+                  if (typeof td === 'string') return '<span class="qa-score"><code>' + escapeHtml(td) + '</code></span>';
+                  const name = (td && td.name) || '?';
+                  const desc = (td && td.description) || '';
+                  const tip = desc ? ' title="' + escapeHtml(desc) + '"' : '';
+                  return '<span class="qa-score"' + tip + '><code>' + escapeHtml(name) + '</code></span>';
+                }).join('') +
+                '</div>' +
+              '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderConversation(turns, finalResp) {
+    if ((!turns || !turns.length) && !finalResp) return '';
+    let html = '<h4>💬 Conversation</h4><div class="conv-thread">';
+    (turns || []).forEach(function(t) {
+      const cls = t.role === 'user' ? 'turn-user' : 'turn-model';
+      const tag = t.role === 'user' ? 'User' : 'Agent';
+      const style = t.text && t.text.length > 500 ? ' style="max-height: 250px; overflow-y: auto;"' : '';
+      html += '<div class="conv-turn ' + cls + '"' + style + '>' +
+                '<div class="conv-role">' + tag + '</div>' +
+                '<div class="conv-text">' + escapeHtml(t.text) + '</div>' +
+              '</div>';
+    });
+    html += '</div>';
+    if (finalResp) {
+      const respStyle = finalResp.length > 500 ? ' style="max-height: 250px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;"' : '';
+      html += '<h4>🎯 Final response</h4><div class="text-block"' + respStyle + '>' +
+              escapeHtml(finalResp) + '</div>';
+    }
+    return html;
+  }
+
+  function renderToolCalls(calls) {
+    if (!calls || !calls.length) return '';
+    const failures = calls.filter(function(c) { return c.ok === false; }).length;
+    const headerSuffix = failures
+      ? ' <span style="color:var(--g-red);font-weight:700">· ' + failures + ' failed</span>'
+      : '';
+    let html = '<h4>🛠 Tool calls (' + calls.length + ')' + headerSuffix + '</h4><div class="tool-list">';
+    calls.forEach(function(c, i) {
+      const okSym = c.ok === false ? '✗' : '✓';
+      const okCls = c.ok === false ? 'verdict-fail' : 'verdict-pass';
+      // Tool calls with status==error or error/error_message keys in their
+      // output_result auto-expand so the user sees the failure first.
+      const openAttr = c.ok === false ? ' open' : '';
+      html += '<details class="tool-item"' + openAttr + '>' +
+                '<summary class="tool-head">' +
+                  '<span class="verdict-sym ' + okCls + '">' + okSym + '</span>' +
+                  '<code><b>' + escapeHtml(c.name) + '</b></code>' +
+                  (c.call_id ? ' <span style="color:#888;font-size:10px;font-family:JetBrains Mono,monospace">' + escapeHtml(c.call_id) + '</span>' : '') +
+                '</summary>' +
+                '<div class="tool-body">' +
+                  '<div class="tool-section"><div class="tool-label">Args</div><pre><code>' +
+                    escapeHtml(c.args || '{}') +
+                  '</code></pre></div>' +
+                  '<div class="tool-section"><div class="tool-label">Result</div><pre><code>' +
+                    escapeHtml(c.result || '(empty)') +
+                  '</code></pre></div>' +
+                '</div>' +
+              '</details>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderStateAndTrajectory(state, agents, trajectory, latencies, det) {
+    const hasState = state && Object.keys(state).length;
+    const hasAgents = agents && agents.length;
+    const hasLat = latencies && latencies.length;
+    det = det || {};
+    // Surface the non-numeric det fields that don't fit the metric strip:
+    //   - models_used: ['gemini-3-flash-preview']
+    //   - tool_counts: aggregated as flat 'tool_utilization.tool_counts.<name>' = N
+    //   - agents_invoked_list: ['app']
+    //   - peak_usage_span: where context peaked
+    //   - failed_tools_list: relevant when tool_success_rate < 1
+    const models = det['token_usage.models_used'] || [];
+    const agentsList = det['agent_handoffs.agents_invoked_list'] || [];
+    const peakSpan = det['context_saturation.peak_usage_span'];
+    const failedTools = det['tool_success_rate.failed_tools_list'] || [];
+    // Reconstruct tool_counts dict from flattened keys.
+    const toolCounts = {};
+    Object.keys(det).forEach(function(k) {
+      const m = k.match(/^tool_utilization\.tool_counts\.(.+)$/);
+      if (m && typeof det[k] === 'number') toolCounts[m[1]] = det[k];
+    });
+    const hasModels = Array.isArray(models) && models.length;
+    const hasAgentsList = Array.isArray(agentsList) && agentsList.length;
+    const hasToolCounts = Object.keys(toolCounts).length > 0;
+    const hasFailedTools = Array.isArray(failedTools) && failedTools.length;
+    const hasPeak = !!peakSpan;
+    const hasAnyExtras = hasModels || hasAgentsList || hasToolCounts || hasFailedTools || hasPeak;
+    if (!hasState && !hasAgents && !hasLat && !trajectory && !hasAnyExtras) return '';
+    let html = '<h4>🧠 State &amp; trajectory</h4><div class="state-grid">';
+    if (trajectory) {
+      html += '<div class="state-card"><div class="tool-label">Agent path</div>' +
+              '<code>' + escapeHtml(trajectory) + '</code></div>';
+    }
+    if (hasAgents) {
+      html += '<div class="state-card"><div class="tool-label">Agents invoked (from trace)</div>' +
+              agents.map(function(a) { return '<span class="qa-score">' + escapeHtml(a) + '</span>'; }).join(' ') +
+              '</div>';
+    }
+    if (hasAgentsList) {
+      html += '<div class="state-card"><div class="tool-label">Agents invoked (handoff metric)</div>' +
+              agentsList.map(function(a) { return '<span class="qa-score">' + escapeHtml(a) + '</span>'; }).join(' ') +
+              '</div>';
+    }
+    if (hasModels) {
+      html += '<div class="state-card"><div class="tool-label">Models used</div>' +
+              models.map(function(m) { return '<span class="qa-score"><code>' + escapeHtml(String(m)) + '</code></span>'; }).join(' ') +
+              '</div>';
+    }
+    if (hasToolCounts) {
+      html += '<div class="state-card"><div class="tool-label">Tool call counts</div>' +
+              Object.entries(toolCounts)
+                .sort(function(a, b) { return b[1] - a[1]; })
+                .map(function(e) {
+                  return '<span class="qa-score"><code>' + escapeHtml(e[0]) + '</code> ×' + e[1] + '</span>';
+                }).join(' ') +
+              '</div>';
+    }
+    if (hasFailedTools) {
+      html += '<div class="state-card" style="border-color:var(--g-red)"><div class="tool-label">Failed tool calls</div>' +
+              failedTools.map(function(t) { return '<span class="qa-score" style="background:var(--g-red-soft)"><code>' + escapeHtml(safeStringify(t)) + '</code></span>'; }).join(' ') +
+              '</div>';
+    }
+    if (hasPeak) {
+      html += '<div class="state-card"><div class="tool-label">Context peak span</div>' +
+              '<code>' + escapeHtml(String(peakSpan)) + '</code></div>';
+    }
+    if (hasLat) {
+      html += '<div class="state-card" style="grid-column:1/-1; border-color:var(--g-blue); background:var(--g-blue-soft)"><div class="tool-label" style="font-weight:600; color:var(--g-blue)">⏱️ Per-Turn Wall-Clock Latency Breakdown</div>' +
+              '<table class="metrics" style="font-size:12px; width:100%; margin-top:6px;"><thead><tr><th style="text-align:left">Turn</th><th class="num" style="font-weight:600">Total</th><th class="num">LLM</th><th class="num" style="font-weight:600; color:var(--g-blue)">Tools</th></tr></thead><tbody>' +
+              latencies.map(function(t) {
+                return '<tr><td style="font-weight:500">' + t.turn + '</td>' +
+                  '<td class="num" style="font-weight:600">' + (t.total_s != null ? Number(t.total_s).toFixed(2) + 's' : '—') + '</td>' +
+                  '<td class="num">' + (t.llm_s != null ? Number(t.llm_s).toFixed(2) + 's' : '—') + '</td>' +
+                  '<td class="num" style="font-weight:600; color:var(--g-blue)">' + (t.tool_s != null ? Number(t.tool_s).toFixed(2) + 's' : '—') + '</td></tr>';
+              }).join('') +
+              '</tbody></table></div>';
+    }
+    if (hasState) {
+      html += '<div class="state-card" style="grid-column:1/-1"><div class="tool-label">Final session state</div>' +
+              '<table class="metrics" style="font-size:12px"><tbody>' +
+              Object.entries(state).map(function(e) {
+                const s = typeof e[1] === 'string' ? e[1] : JSON.stringify(e[1]);
+                const wrapped = s.length > 500 ? '<pre class="state-inspection" style="max-height: 250px; overflow-y: auto;">' + escapeHtml(s) + '</pre>' : escapeHtml(s);
+                return '<tr><td><code style="font-size:11px">' + escapeHtml(e[0]) + '</code></td>' +
+                       '<td>' + wrapped + '</td></tr>';
+              }).join('') +
+              '</tbody></table></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderMetricsBlock(metrics) {
+    if (!metrics || !Object.keys(metrics).length) return '';
+    return '<h4>📊 Per-metric scores &amp; rubric verdicts</h4>' +
+           renderMetricVerdicts(metrics);
+  }
+
+  // ── Iteration history — native render (no markdown) ─────────────────
+  // Trend line chart of LLM metrics over runs + per-iteration cards
+  // with delta deltas. Replaces the old marked.js render of OPT_LOG.md
+  // (markdown stays on disk for git/grep but isn't the source here).
+  let iterationsChartInst = null;
+  function renderIterationsView(limitVal) {
+    safe('iterations-chart', function() {
+      const allIts = data.iterations || [];
+      let its = allIts.slice();
+      if (limitVal !== 'all') {
+        const n = parseInt(limitVal, 10);
+        if (!isNaN(n) && n > 0 && its.length > n) {
+          its = its.slice(its.length - n);
+        }
+      }
+      if (iterationsChartInst) {
+        iterationsChartInst.destroy();
+        iterationsChartInst = null;
+      }
+      if (its.length < 2 || typeof Chart === 'undefined') {
+        $('#iterations-chart-empty').style.display = 'block';
+        if ($('#iterations-chart')) $('#iterations-chart').style.display = 'none';
+        return;
+      }
+      $('#iterations-chart-empty').style.display = 'none';
+      if ($('#iterations-chart')) $('#iterations-chart').style.display = 'block';
+      const labels = its.map(function(it) { return it.run_id; });
+      const metricNames = [];
+      its.forEach(function(it) {
+        Object.keys(it.llm_metrics || {}).forEach(function(n) {
+          if (metricNames.indexOf(n) < 0) metricNames.push(n);
+        });
+      });
+      const palette = ['#4285f4', '#ea4335', '#34a853', '#fbbc04',
+                       '#9334e6', '#00897b', '#f57c00', '#5e35b1'];
+      const datasets = metricNames.map(function(n, i) {
+        return {
+          label: n,
+          data: its.map(function(it) { return it.llm_metrics[n] != null ? it.llm_metrics[n] : null; }),
+          borderColor: palette[i % palette.length],
+          backgroundColor: palette[i % palette.length] + '20',
+          borderWidth: 2.5,
+          tension: 0.25,
+          spanGaps: true,
+          pointRadius: 4,
+        };
+      });
+      iterationsChartInst = new Chart($('#iterations-chart'), {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            y: { min: 0, max: 1, ticks: { stepSize: 0.2 } },
+            x: { ticks: { font: { size: 11, weight: '600' } } }
+          },
+          plugins: { legend: { position: 'bottom', labels: { font: { size: 11, weight: '600' } } } }
+        }
+      });
+    });
+
+    safe('iterations-list', function() {
+      const allIts = data.iterations || [];
+      let its = allIts.slice();
+      if (limitVal !== 'all') {
+        const n = parseInt(limitVal, 10);
+        if (!isNaN(n) && n > 0 && its.length > n) {
+          its = its.slice(its.length - n);
+        }
+      }
+      const list = $('#iterations-list');
+      if (!its.length) return;
+      // Newest first for the card list (the chart is left-to-right oldest-first).
+      const reversed = its.slice().reverse();
+    list.innerHTML = reversed.map(function(it) {
+      const isCurrent = it.is_current;
+      const llmRows = Object.entries(it.llm_metrics || {}).map(function(e) {
+        const n = e[0], v = e[1];
+        const dpct = (it.deltas || {})[n];
+        const score = (typeof v === 'number') ? v.toFixed(2) : '—';
+        let pillCls = 'pill-skipped';
+        if (typeof v === 'number') {
+          if (v >= 0.7) pillCls = 'pill-good';
+          else if (v >= 0.4) pillCls = 'pill-mixed';
+          else pillCls = 'pill-bad';
+        }
+        const dStr = (typeof dpct === 'number') ?
+          ' <span class="' + (dpct >= 0 ? 'delta-good' : 'delta-bad') + '">' +
+            (dpct >= 0 ? '+' : '') + dpct.toFixed(1) + '%</span>'
+          : '';
+        return '<div class="iter-metric">' +
+          '<span class="pill ' + pillCls + '">' + score + '</span>' +
+          ' <b>' + escapeHtml(n) + '</b>' + dStr +
+        '</div>';
+      }).join('');
+      const detRows = Object.entries(it.det_metrics || {}).map(function(e) {
+        const n = e[0], v = e[1];
+        const dpct = (it.deltas || {})[n];
+        const dStr = (typeof dpct === 'number') ?
+          ' <span class="' + (dpct >= 0 ? 'delta-bad' : 'delta-good') + '">' +
+            (dpct >= 0 ? '+' : '') + dpct.toFixed(1) + '%</span>'
+          : '';
+        // For det_metrics, lower is generally better (latency, cost,
+        // tokens), EXCEPT cache_hit_rate. Flip the sign there.
+        const lowerBad = n.indexOf('cache_hit_rate') >= 0;
+        let dirCls = '';
+        if (typeof dpct === 'number') {
+          dirCls = lowerBad ? (dpct >= 0 ? 'delta-good' : 'delta-bad') :
+                              (dpct >= 0 ? 'delta-bad' : 'delta-good');
+        }
+        const dStr2 = (typeof dpct === 'number') ?
+          ' <span class="' + dirCls + '">' + (dpct >= 0 ? '+' : '') + dpct.toFixed(1) + '%</span>'
+          : '';
+        return '<div class="iter-metric">' +
+          escapeHtml(n.split('.').pop()) + ': <b>' + formatVal(v, n) + '</b>' + dStr2 +
+        '</div>';
+      }).join('');
+      const gitInfo = it.git_commit ?
+        '<span class="iter-git"><code>' + escapeHtml(it.git_commit) + '</code>' +
+          (it.git_branch ? ' on ' + escapeHtml(it.git_branch) : '') + '</span>'
+        : '';
+      return '<div class="iter-card' + (isCurrent ? ' iter-current' : '') + '">' +
+        '<div class="iter-head">' +
+          '<div>' +
+            '<span class="iter-id">' + escapeHtml(it.run_id) + '</span>' +
+            (isCurrent ? ' <span class="pill pill-good">CURRENT</span>' : '') +
+          '</div>' +
+          '<div class="iter-meta">' + escapeHtml(it.datetime || '') + ' ' + gitInfo + '</div>' +
+        '</div>' +
+        '<div class="iter-body">' +
+          '<div class="iter-section"><div class="iter-section-h">LLM-judge</div>' + llmRows + '</div>' +
+          '<div class="iter-section"><div class="iter-section-h">Run-time</div>' + detRows + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  });
+  }
+
+  const rangeSel = $('#iterations-range-select');
+  if (rangeSel) {
+    rangeSel.addEventListener('change', function() {
+      renderIterationsView(this.value);
+    });
+  }
+  renderIterationsView(rangeSel ? rangeSel.value : '15');
+
+  safe('gemini-md', function() {
+    const gem = data.gemini_analysis_md || '';
+    const el = $('#gemini-md');
+    if (typeof marked === 'undefined') {
+      el.innerHTML = '<pre style="white-space:pre-wrap">' + escapeHtml(gem) + '</pre>';
+    } else {
+      marked.setOptions({ breaks: false, gfm: true });
+      el.innerHTML = gem ? marked.parse(gem)
+        : '<div class="empty">AI analysis not generated this run (use --skip-gemini to disable, or check for errors).</div>';
+    }
+  });
+
+  // ── Verdict rendering ────────────────────────────────────────────────
+  // Stringify any value safely — defends against [object Object] when a
+  // metric's "explanation" is actually a list/dict (different metrics
+  // have very different output shapes).
+  function safeStringify(v) {
+    if (v == null) return '';
+    if (typeof v === 'string') return v;
+    if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+    try {
+      return JSON.stringify(v, null, 2);
+    } catch (e) {
+      return String(v);
+    }
+  }
+
+  function renderMetricVerdicts(metrics) {
+    if (!metrics || !Object.keys(metrics).length) {
+      return '<div class="empty">No rubric verdicts for this question.</div>';
+    }
+    return Object.entries(metrics).map(function(entry) {
+      const mname = entry[0], m = entry[1] || {};
+      const score = m.score;
+      const isFailed = !!m.error || (score == null && !m.explanation && !m.verdicts);
+      const norm = (typeof score === 'number') ? Math.max(0, Math.min(1, score)) : null;
+      let pillCls = 'pill-skipped', pillLabel = '—';
+      if (isFailed) {
+        pillCls = 'pill-bad';
+        pillLabel = 'FAILED';
+      } else if (norm != null) {
+        if (norm >= 0.7) { pillCls = 'pill-good'; pillLabel = 'Pass · ' + score.toFixed(2); }
+        else if (norm >= 0.4) { pillCls = 'pill-mixed'; pillLabel = 'Mixed · ' + score.toFixed(2); }
+        else { pillCls = 'pill-bad'; pillLabel = 'Low · ' + score.toFixed(2); }
+      }
+      const verdictEntries = (Array.isArray(m.verdicts) ? m.verdicts : []).filter(function(v) {
+        return v && typeof v === 'object';
+      });
+
+      // Build the body: per-rubric verdicts, plus the explanation (which
+      // varies wildly across metrics — string, list of {response,score,
+      // explanation}, or absent).
+      let bodyHtml = '';
+      if (m.error) {
+        bodyHtml += '<div class="metric-explanation" style="background:var(--g-red-soft);border-color:var(--g-red)">' +
+                    '<b>Autorater error:</b> ' + escapeHtml(safeStringify(m.error)) +
+                    '</div>';
+      }
+      // Top-level explanation — ONLY when it's a string AND NOT a raw JSON string of rubrics.
+      if (typeof m.explanation === 'string' && m.explanation) {
+        const trimmed = m.explanation.trim();
+        const isJsonRubric = (trimmed.startsWith('[') || trimmed.startsWith('{')) && (trimmed.includes('"rubric"') || trimmed.includes('"verdict"') || trimmed.includes("'rubric'"));
+        if (!isJsonRubric) {
+          bodyHtml += '<div class="metric-explanation">' + escapeHtml(m.explanation) + '</div>';
+        }
+      }
+      // List-shape explanation = per-row sub-verdicts (e.g. hallucination
+      // returns a list of {response, score, explanation} per claim).
+      // Only render if verdictEntries did not already render it.
+      if (!verdictEntries.length && Array.isArray(m.explanation) && m.explanation.length) {
+        bodyHtml += '<div class="verdict-grid">' +
+          m.explanation.map(function(sub) {
+            if (!sub || typeof sub !== 'object') {
+              return '<div class="verdict-item"><div class="verdict-reasoning">' + escapeHtml(safeStringify(sub)) + '</div></div>';
+            }
+            let subScore = sub.score;
+            if (typeof subScore !== 'number' && sub.label) {
+              subScore = sub.label === 'supported' ? 1.0 : (sub.label === 'unsupported' ? 0.0 : null);
+            }
+            if (typeof subScore !== 'number' && sub.verdict != null) {
+              subScore = (sub.verdict === true || sub.verdict === 'true' || sub.verdict === 'pass' || sub.verdict === 'PASS') ? 1.0 : 0.0;
+            }
+            const responseVal = sub.rubric || sub.property || sub.name || sub.title || sub.response || sub.sentence;
+            const explanationVal = sub.reasoning || sub.explanation || sub.rationale || sub.detail;
+            const excerptVal = sub.excerpt || sub.supporting_excerpt;
+            const importanceTag = sub.importance ? '<span class="verdict-imp imp-' + escapeHtml(String(sub.importance).toLowerCase()) + '">' + escapeHtml(sub.importance) + '</span>' : '';
+
+            const subPass = (typeof subScore === 'number') ? subScore >= 0.5 : null;
+            const sym = subPass === true ? '✓' : subPass === false ? '✗' : (sub.label === 'no_rad' ? '·' : '—');
+            const cls = subPass === true ? 'verdict-pass' : subPass === false ? 'verdict-fail' : 'verdict-na';
+            const scoreStr = (typeof subScore === 'number') ? subScore.toFixed(2) : (sub.label ? sub.label.toUpperCase() : '');
+
+            return '<div class="verdict-item">' +
+              '<div class="verdict-head">' +
+                '<span class="verdict-sym ' + cls + '">' + sym + '</span>' +
+                (scoreStr ? '<span class="verdict-imp">' + escapeHtml(scoreStr) + '</span>' : '') +
+                importanceTag +
+              '</div>' +
+              (responseVal ? '<div class="verdict-rubric">' + escapeHtml(safeStringify(responseVal)) + '</div>' : '') +
+              (explanationVal ? '<div class="verdict-reasoning">' + escapeHtml(safeStringify(explanationVal)) + '</div>' : '') +
+              (excerptVal ? '<div class="verdict-reasoning" style="font-size:10px;color:var(--g-gray-dark)"><b>Excerpt:</b> ' + escapeHtml(safeStringify(excerptVal)) + '</div>' : '') +
+              '</div>';
+          }).join('') +
+          '</div>';
+      }
+      // Dict-shape explanation = single object — pretty-print as JSON.
+      if (m.explanation && typeof m.explanation === 'object' && !Array.isArray(m.explanation)) {
+        bodyHtml += '<pre style="background:var(--ink);color:#f8f7f2;padding:10px;border-radius:8px;font-size:11px;overflow-x:auto">' +
+                    escapeHtml(safeStringify(m.explanation)) + '</pre>';
+      }
+      // Per-rubric verdicts (custom_llm_judge metrics like tool_use_quality).
+      if (verdictEntries.length) {
+        bodyHtml += '<div class="verdict-grid">' +
+          verdictEntries.map(function(v) {
+            const verd = v.verdict;
+            // Some metrics' verdicts have NO `verdict` field — they're
+            // implicit pass-by-presence. Show '—' rather than ✗.
+            const verdSym = verd === true ? '✓' : verd === false ? '✗' : '·';
+            const verdCls = verd === true ? 'verdict-pass' : verd === false ? 'verdict-fail' : 'verdict-na';
+            const importanceTag = v.importance ? '<span class="verdict-imp imp-' + escapeHtml(String(v.importance).toLowerCase()) + '">' + escapeHtml(v.importance) + '</span>' : '';
+            const typeTag = v.type ? '<code class="verdict-type">' + escapeHtml(v.type) + '</code>' : '';
+            return '<div class="verdict-item">' +
+                '<div class="verdict-head">' +
+                  '<span class="verdict-sym ' + verdCls + '">' + verdSym + '</span>' +
+                  importanceTag + typeTag +
+                '</div>' +
+                (v.rubric ? '<div class="verdict-rubric">' + escapeHtml(safeStringify(v.rubric)) + '</div>' : '') +
+                (v.reasoning ? '<div class="verdict-reasoning">' + escapeHtml(safeStringify(v.reasoning)) + '</div>' : '') +
+              '</div>';
+          }).join('') +
+          '</div>';
+      }
+      // Final fallback for managed metrics with score-only output.
+      if (!bodyHtml) {
+        bodyHtml = '<div style="color:#555;font-size:12px">' +
+          (norm != null
+            ? 'Managed metric — score reported by Vertex without per-rubric breakdown. Open eval_summary.json for the raw output.'
+            : 'No autorater output captured (metric may have been skipped).') +
+          '</div>';
+      }
+
+      // Header subtitle: counts of what's available.
+      const counts = [];
+      if (verdictEntries.length) counts.push(verdictEntries.length + ' rubric' + (verdictEntries.length === 1 ? '' : 's'));
+      if (Array.isArray(m.explanation) && m.explanation.length) counts.push(m.explanation.length + ' sub-verdict' + (m.explanation.length === 1 ? '' : 's'));
+      if (m.error) counts.push('error');
+      const countStr = counts.length ? counts.join(' · ') : '';
+
+      return '<details class="metric-block" open>' +
+        '<summary class="metric-block-summary">' +
+          '<span class="chevron">›</span>' +
+          '<b>' + escapeHtml(mname) + '</b>' +
+          '<span class="pill ' + pillCls + '">' + pillLabel + '</span>' +
+          (countStr ? '<span class="metric-rubric-count">' + escapeHtml(countStr) + '</span>' : '') +
+        '</summary>' +
+        '<div class="metric-block-body">' + bodyHtml + '</div>' +
+      '</details>';
+    }).join('');
+  }
+
+  // ── Helpers used by the safe() blocks above ──────────────────────────
+  function colorForScore(v) {
+    if (v == null) return '#ffffff';
+    if (v >= 0.7) return 'rgba(52, 168, 83, ' + (0.20 + v * 0.40) + ')';
+    if (v >= 0.4) return 'rgba(251, 188, 4, ' + (0.30 + v * 0.30) + ')';
+    return 'rgba(234, 67, 53, ' + (0.30 + (1 - v) * 0.40) + ')';
+  }
+  function renderScoreChips(scores) {
+    if (!scores || !Object.keys(scores).length) return '<span class="qa-score">No LLM scores</span>';
+    return Object.entries(scores).map(function(entry) {
+      const name = entry[0], val = entry[1];
+      const v = (val && typeof val === 'object') ? val.score : val;
+      const display = v == null ? '—' : (typeof v === 'number' ? v.toFixed(2) : v);
+      return '<span class="qa-score"><b>' + escapeHtml(name) + ':</b> ' + escapeHtml(display) + '</span>';
+    }).join('');
+  }
+  function renderDetSection(det) {
+    if (!det || !Object.keys(det).length) return '';
+    const interesting = ['token_usage.total_tokens', 'token_usage.estimated_cost_usd',
+                         'latency_metrics.total_latency_seconds', 'tool_utilization.total_tool_calls'];
+    const rows = interesting
+      .filter(function(k) { return det[k] !== undefined; })
+      .map(function(k) {
+        return '<span class="qa-score"><b>' + escapeHtml(k.split('.').pop()) + ':</b> ' +
+               escapeHtml(formatVal(det[k], k)) + '</span>';
+      }).join('');
+    if (!rows) return '';
+    return '<h4>Run-time stats</h4><div class="qa-scores">' + rows + '</div>';
+  }
+  function formatVal(v, k) {
+    if (k.indexOf('cost') >= 0) return '$' + Number(v).toFixed(4);
+    if (k.indexOf('seconds') >= 0 || k.indexOf('latency') >= 0) return Number(v).toFixed(2) + 's';
+    if (typeof v === 'number') {
+      if (v >= 1000) return v.toLocaleString();
+      return v == Math.floor(v) ? String(v) : v.toFixed(2);
+    }
+    return String(v);
+  }
+})();
+</script>
+</body>
+</html>

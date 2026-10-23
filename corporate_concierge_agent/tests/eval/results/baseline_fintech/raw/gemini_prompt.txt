@@ -1,0 +1,1068 @@
+
+You are an expert AI evaluation analyst. Your task is to produce a deep technical diagnosis of an AI agent's performance for technical stakeholders.
+
+**Tone:** objective, analytical, and professional
+**Report Length:** comprehensive
+
+
+
+
+
+**CRITICAL INSTRUCTIONS:**
+1.  **Diagnose AND Recommend:** Your primary goal is to explain *why* the metrics are what they are. Then, provide actionable recommendations using the ADK Design Patterns reference below. Each recommendation must cite a specific pattern and include a code example.
+2.  **Synthesize, Don't Summarize:** Do not simply repeat the scores. Your value is in synthesizing insights by connecting the metric scores, the metric definitions, the source code, and the raw explanations.
+3.  **Reference Your Sources:** When you make a claim or analyze a metric, you MUST reference the specific source file (e.g., `metric_definitions.json`, `deterministic_metrics.py`, `agent.py`).
+4.  **Analyze Calculation Methods:** For each metric you discuss, you MUST explain how its calculation method (deterministic vs. LLM-judged) influences its interpretation.
+5.  **Cite Quantitative and Qualitative Evidence:** You MUST quote specific examples from the conversation logs (user inputs, tool calls, or agent responses) AND cite the corresponding metric scores to justify your findings. Don't just say "the agent failed"; say "The agent's score of 1.2 on `tool_usage_accuracy` is justified by question `q_billing_01`, where it failed to call `lookup_invoice` despite the user explicitly asking for it."
+6.  **If a developer focus is provided:** Dedicate the opening section of your report to the focus area before proceeding with the general analysis. Highlight metrics, code patterns, and evidence most relevant to the developer's priority.
+
+---
+
+**Context for Your Analysis**
+
+You are provided with the following context files to perform your diagnosis. Use them to connect the agent's behavior (the metrics) to its underlying implementation (the code).
+
+**1. Overall Performance Data:**
+*   **Evaluation Summary:** High-level average scores for all metrics. Use this to identify the most significant areas of success and failure.
+**Evaluation Summary**
+```json
+{
+  "experiment_id": "eval-20261022_222137",
+  "run_type": "run",
+  "test_description": "Combined evaluation run: baseline_fintech",
+  "interaction_datetime": "2026-10-22T22:21:37.613782",
+  "git_info": {
+    "commit": "",
+    "branch": "",
+    "dirty": false
+  },
+  "overall_summary": {
+    "deterministic_metrics": {
+      "token_usage.llm_calls": 4.666666666666667,
+      "token_usage.total_tokens": 7540.0,
+      "token_usage.prompt_tokens": 6714.666666666667,
+      "token_usage.completion_tokens": 553.3333333333334,
+      "token_usage.cached_tokens": 0.0,
+      "token_usage.estimated_cost_usd": 0.005017333333333333,
+      "latency_metrics.total_latency_seconds": 4.824133333333333,
+      "latency_metrics.average_turn_latency_seconds": 4.824133333333333,
+      "latency_metrics.llm_latency_seconds": 4.7951380776666666,
+      "latency_metrics.tool_latency_seconds": 0.0008499853333333333,
+      "latency_metrics.time_to_first_response_seconds": 2.85158832,
+      "cache_efficiency.cache_hit_rate": 0.0,
+      "cache_efficiency.total_cached_tokens": 0.0,
+      "cache_efficiency.total_fresh_prompt_tokens": 3357.3333333333335,
+      "cache_efficiency.total_input_tokens": 3357.3333333333335,
+      "thinking_metrics.reasoning_ratio": 0.6695141279838651,
+      "thinking_metrics.total_thinking_tokens": 272.0,
+      "thinking_metrics.total_candidate_tokens": 140.66666666666666,
+      "thinking_metrics.total_output_tokens": 412.6666666666667,
+      "thinking_metrics.turns_with_thinking": 2.3333333333333335,
+      "tool_utilization.total_tool_calls": 1.3333333333333333,
+      "tool_utilization.unique_tools_used": 1.3333333333333333,
+      "tool_success_rate.tool_success_rate": 1.0,
+      "tool_success_rate.total_tool_calls": 1.3333333333333333,
+      "tool_success_rate.failed_tool_calls": 0.0,
+      "grounding_utilization.total_grounding_chunks": 0.0,
+      "grounding_utilization.total_grounded_responses": 0.0,
+      "grounding_utilization.total_llm_responses": 3.6666666666666665,
+      "context_saturation.max_total_tokens": 1748.0,
+      "agent_handoffs.total_handoffs": 1.0,
+      "agent_handoffs.unique_agents_count": 1.0,
+      "output_density.average_output_tokens": 62.666666666666664,
+      "output_density.total_output_tokens": 140.66666666666666,
+      "output_density.llm_calls_count": 2.3333333333333335,
+      "sandbox_usage.total_sandbox_ops": 0.0,
+      "sandbox_usage.unique_ops_used": 0.0
+    },
+    "llm_based_metrics": {
+      "general_quality": {
+        "average": 0.6666666666666666,
+        "median": 1.0,
+        "p90": 1.0,
+        "p95": 1.0,
+        "p99": 1.0,
+        "score_range": {
+          "min": 0,
+          "max": 1,
+          "type": "rubric"
+        },
+        "threshold": 0.8
+      },
+      "trajectory_accuracy": {
+        "average": 1.0,
+        "median": 1.0,
+        "p90": 1.0,
+        "p95": 1.0,
+        "p99": 1.0,
+        "score_range": {
+          "min": 0,
+          "max": 1,
+          "type": "rubric"
+        },
+        "threshold": 0.8
+      },
+      "corporate_policy_compliance": {
+        "average": 1.0,
+        "median": 1.0,
+        "p90": 1.0,
+        "p95": 1.0,
+        "p99": 1.0,
+        "score_range": {
+          "min": 0,
+          "max": 1,
+          "type": "rubric"
+        },
+        "threshold": 0.8
+      }
+    }
+  },
+  "per_question_summary": [
+    {
+      "question_id": "case_001_saldo_cust101",
+      "runs": 1,
+      "deterministic_metrics": {
+        "token_usage": {
+          "llm_calls": 6,
+          "models_used": [
+            "gemini-3.5-flash"
+          ],
+          "total_tokens": 9718,
+          "prompt_tokens": 8876,
+          "completion_tokens": 559,
+          "cached_tokens": 0,
+          "estimated_cost_usd": 0.006115
+        },
+        "latency_metrics": {
+          "total_latency_seconds": 5.493,
+          "average_turn_latency_seconds": 5.493,
+          "llm_latency_seconds": 5.460298081,
+          "tool_latency_seconds": 0.00130055,
+          "time_to_first_response_seconds": 2.841098317
+        },
+        "cache_efficiency": {
+          "cache_hit_rate": 0.0,
+          "total_cached_tokens": 0,
+          "total_fresh_prompt_tokens": 4438,
+          "total_input_tokens": 4438
+        },
+        "thinking_metrics": {
+          "reasoning_ratio": 0.672209026128266,
+          "total_thinking_tokens": 283,
+          "total_candidate_tokens": 138,
+          "total_output_tokens": 421,
+          "turns_with_thinking": 3
+        },
+        "tool_utilization": {
+          "total_tool_calls": 2,
+          "unique_tools_used": 2,
+          "tool_counts": {
+            "verify_identity": 1,
+            "get_account_balance": 1
+          }
+        },
+        "tool_success_rate": {
+          "tool_success_rate": 1.0,
+          "total_tool_calls": 2,
+          "failed_tool_calls": 0,
+          "failed_tools_list": []
+        },
+        "grounding_utilization": {
+          "total_grounding_chunks": 0,
+          "total_grounded_responses": 0,
+          "total_llm_responses": 5
+        },
+        "context_saturation": {
+          "max_total_tokens": 1768,
+          "peak_usage_span": "call_llm"
+        },
+        "agent_handoffs": {
+          "total_handoffs": 1,
+          "unique_agents_count": 1,
+          "agents_invoked_list": [
+            "corporate_concierge_agent"
+          ]
+        },
+        "output_density": {
+          "average_output_tokens": 46.0,
+          "total_output_tokens": 138,
+          "llm_calls_count": 3
+        },
+        "sandbox_usage": {
+          "total_sandbox_ops": 0,
+          "unique_ops_used": 0,
+          "sandbox_tools_used": {}
+        }
+      },
+      "llm_metrics": {
+        "general_quality": {
+          "score": 1.0,
+          "explanation": "The response directly and completely answers the user's request by providing the exact account balance and available corporate card limit. The tone is highly professional, polite, and executive, conforming perfectly to the standards of enterprise banking and concierge services.",
+          "input": {
+            "reference": "{\"expected_behavior\": \"El agente invoca verify_identity('CUST-101', '4821') y luego get_account_balance('CUST-101'), e informa que el saldo en cuenta corriente es $18,450.00 USD y el cupo disponible en tarjeta corporativa es $5,000.00 USD (tope por vuelo $2,500.00 USD).\"}",
+            "prompt": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?",
+            "response": "Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera."
+          }
+        },
+        "trajectory_accuracy": {
+          "score": 1.0,
+          "explanation": "The agent verified the user's identity and retrieved the account balance without taking any detours or calling irrelevant tools. The tools used (verify_identity and get_account_balance) are standard and appropriate for the request.",
+          "input": {
+            "prompt": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?",
+            "response": "agent:corporate_concierge_agent\ntool:verify_identity\ntool:get_account_balance",
+            "reference": ""
+          }
+        },
+        "corporate_policy_compliance": {
+          "score": 1.0,
+          "explanation": "La respuesta cumple con todos los criterios de evaluaci\u00f3n. En cuanto a la 'claridad_ejecutiva', est\u00e1 redactada en un espa\u00f1ol profesional, formal, cort\u00e9s y estructurado de manera muy clara mediante el uso de vi\u00f1etas. Respecto a la 'exactitud_frente_a_herramientas', la informaci\u00f3n proporcionada responde directamente a la solicitud de la cliente (saldo en cuenta corriente y cupo de tarjeta corporativa), presentando los montos correspondientes de forma exacta en USD sin agregar datos innecesarios o inventados.",
+          "input": {
+            "prompt": "Hola, soy Daniela Rodr\u00edguez (cliente CUST-101) y mi PIN de seguridad es 4821. \u00bfMe puedes decir mi saldo en cuenta corriente y mi cupo disponible en la tarjeta corporativa?",
+            "response": "Estimada Daniela, su identidad ha sido verificada con \u00e9xito. \n\nA continuaci\u00f3n, le presento el estado de sus cuentas:\n*   **Saldo en cuenta corriente:** $18,450 USD\n*   **Cupo disponible en tarjeta corporativa:** $5,000 USD\n\nQuedo a su disposici\u00f3n para cualquier otra consulta o gesti\u00f3n de viajes que requiera.",
+            "reference": "El agente invoca verify_identity('CUST-101', '4821') y luego get_account_balance('CUST-101'), e informa que el saldo en cuenta corriente es $18,450.00 USD y el cupo disponible en tarjeta corporativa es $5,000.00 USD (tope por vuelo $2,500.00 USD)."
+          }
+        }
+      },
+      "source_type": "interaction"
+    },
+    {
+      "question_id": "case_002_vuelos_bog_mia",
+      "runs": 1,
+      "deterministic_metrics": {
+        "token_usage": {
+          "llm_calls": 4,
+          "models_used": [
+            "gemini-3.5-flash"
+          ],
+          "total_tokens": 6708,
+          "prompt_tokens": 5772,
+          "completion_tokens": 674,
+          "cached_tokens": 0,
+          "estimated_cost_usd": 0.004908
+        },
+        "latency_metrics": {
+          "total_latency_seconds": 4.9293,
+          "average_turn_latency_seconds": 4.9293,
+          "llm_latency_seconds": 4.907373659,
+          "tool_latency_seconds": 0.000685162,
+          "time_to_first_response_seconds": 3.045789754
+        },
+        "cache_efficiency": {
+          "cache_hit_rate": 0.0,
+          "total_cached_tokens": 0,
+          "total_fresh_prompt_tokens": 2886,
+          "total_input_tokens": 2886
+        },
+        "thinking_metrics": {
+          "reasoning_ratio": 0.5598290598290598,
+          "total_thinking_tokens": 262,
+          "total_candidate_tokens": 206,
+          "total_output_tokens": 468,
+          "turns_with_thinking": 2
+        },
+        "tool_utilization": {
+          "total_tool_calls": 1,
+          "unique_tools_used": 1,
+          "tool_counts": {
+            "search_flights": 1
+          }
+        },
+        "tool_success_rate": {
+          "tool_success_rate": 1.0,
+          "total_tool_calls": 1,
+          "failed_tool_calls": 0,
+          "failed_tools_list": []
+        },
+        "grounding_utilization": {
+          "total_grounding_chunks": 0,
+          "total_grounded_responses": 0,
+          "total_llm_responses": 3
+        },
+        "context_saturation": {
+          "max_total_tokens": 1846,
+          "peak_usage_span": "call_llm"
+        },
+        "agent_handoffs": {
+          "total_handoffs": 1,
+          "unique_agents_count": 1,
+          "agents_invoked_list": [
+            "corporate_concierge_agent"
+          ]
+        },
+        "output_density": {
+          "average_output_tokens": 103.0,
+          "total_output_tokens": 206,
+          "llm_calls_count": 2
+        },
+        "sandbox_usage": {
+          "total_sandbox_ops": 0,
+          "unique_ops_used": 0,
+          "sandbox_tools_used": {}
+        }
+      },
+      "llm_metrics": {
+        "general_quality": {
+          "score": 1.0,
+          "explanation": "The response is helpful, complete, and highly professional. It directly answers the user's query by providing specific flight options for GAirways on the requested date and route, including prices, cabin classes, and seat availability. The tone is executive, polite, and clear, and it appropriately mentions compliance with corporate travel policies and offers a clear next step for booking.",
+          "input": {
+            "reference": "{\"expected_behavior\": \"El agente invoca search_flights('BOG', 'MIA', '2026-11-15') e informa los dos vuelos disponibles: GA-401 en clase Business por $890.00 USD (4 asientos) y GA-405 en Economy Plus por $420.00 USD (9 asientos).\"}",
+            "prompt": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?",
+            "response": "Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la res... [truncated]"
+          }
+        },
+        "trajectory_accuracy": {
+          "score": 1.0,
+          "explanation": "The agent correctly chose the highly relevant tool `search_flights` to address the user's request for flight availability and pricing, without taking any detours.",
+          "input": {
+            "prompt": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?",
+            "response": "agent:corporate_concierge_agent\ntool:search_flights",
+            "reference": ""
+          }
+        },
+        "corporate_policy_compliance": {
+          "score": 1.0,
+          "explanation": "La respuesta cumple con el criterio de claridad ejecutiva, estando redactada en un espa\u00f1ol profesional, claro y estructurado de manera excelente. Respecto a la exactitud frente a las herramientas, al no disponer de los logs de las herramientas en el prompt, se asume consistencia f\u00e1ctica ya que los datos presentados (vuelos GA-401 y GA-405, montos en USD de $890 y $420, y la pol\u00edtica de viajes de $2,500 USD) son realistas, espec\u00edficos y est\u00e1n perfectamente estructurados sin contradicciones visibles.",
+          "input": {
+            "prompt": "Necesito viajar de Bogot\u00e1 (BOG) a Miami (MIA) el 15 de noviembre de 2026. \u00bfQu\u00e9 vuelos corporativos de GAirways hay disponibles y cu\u00e1les son sus precios?",
+            "response": "Para el 15 de noviembre de 2026, de Bogot\u00e1 (BOG) a Miami (MIA), tenemos disponibles los siguientes vuelos corporativos con GAirways:\n\n1. **Vuelo GA-401**\n   - **Clase:** Business\n   - **Precio:** $890 USD\n   - **Asientos disponibles:** 4\n\n2. **Vuelo GA-405**\n   - **Clase:** Economy Plus\n   - **Precio:** $420 USD\n   - **Asientos disponibles:** 9\n\nAmbos vuelos se encuentran dentro del l\u00edmite de la pol\u00edtica corporativa de viajes (m\u00e1ximo $2,500 USD). Por favor, ind\u00edqueme si desea proceder con la res... [truncated]",
+            "reference": "El agente invoca search_flights('BOG', 'MIA', '2026-11-15') e informa los dos vuelos disponibles: GA-401 en clase Business por $890.00 USD (4 asientos) y GA-405 en Economy Plus por $420.00 USD (9 asientos)."
+          }
+        }
+      },
+      "source_type": "interaction"
+    },
+    {
+      "question_id": "case_003_ruta_sin_vuelos_bog_nrt",
+      "runs": 1,
+      "deterministic_metrics": {
+        "token_usage": {
+          "llm_calls": 4,
+          "models_used": [
+            "gemini-3.5-flash"
+          ],
+          "total_tokens": 6194,
+          "prompt_tokens": 5496,
+          "completion_tokens": 427,
+          "cached_tokens": 0,
+          "estimated_cost_usd": 0.004029
+        },
+        "latency_metrics": {
+          "total_latency_seconds": 4.0501,
+          "average_turn_latency_seconds": 4.0501,
+          "llm_latency_seconds": 4.017742493,
+          "tool_latency_seconds": 0.000564244,
+          "time_to_first_response_seconds": 2.667876889
+        },
+        "cache_efficiency": {
+          "cache_hit_rate": 0.0,
+          "total_cached_tokens": 0,
+          "total_fresh_prompt_tokens": 2748,
+          "total_input_tokens": 2748
+        },
+        "thinking_metrics": {
+          "reasoning_ratio": 0.7765042979942693,
+          "total_thinking_tokens": 271,
+          "total_candidate_tokens": 78,
+          "total_output_tokens": 349,
+          "turns_with_thinking": 2
+        },
+        "tool_utilization": {
+          "total_tool_calls": 1,
+          "unique_tools_used": 1,
+          "tool_counts": {
+            "search_flights": 1
+          }
+        },
+        "tool_success_rate": {
+          "tool_success_rate": 1.0,
+          "total_tool_calls": 1,
+          "failed_tool_calls": 0,
+          "failed_tools_list": []
+        },
+        "grounding_utilization": {
+          "total_grounding_chunks": 0,
+          "total_grounded_responses": 0,
+          "total_llm_responses": 3
+        },
+        "context_saturation": {
+          "max_total_tokens": 1630,
+          "peak_usage_span": "call_llm"
+        },
+        "agent_handoffs": {
+          "total_handoffs": 1,
+          "unique_agents_count": 1,
+          "agents_invoked_list": [
+            "corporate_concierge_agent"
+          ]
+        },
+        "output_density": {
+          "average_output_tokens": 39.0,
+          "total_output_tokens": 78,
+          "llm_calls_count": 2
+        },
+        "sandbox_usage": {
+          "total_sandbox_ops": 0,
+          "unique_ops_used": 0,
+          "sandbox_tools_used": {}
+        }
+      },
+      "llm_metrics": {
+        "general_quality": {
+          "score": 0.0,
+          "explanation": "The response fails the 'helpfulness_and_completeness' criterion. While it directly addresses the query by stating no flights were found, it lacks helpfulness and actionable details. A professional corporate concierge should explain why flights are unavailable (e.g., the date is too far in the future for airline schedules, or there are no direct flights between BOG and NRT) and offer alternative routing options (such as flights with connections) to assist the user effectively.",
+          "input": {
+            "reference": "{\"expected_behavior\": \"El agente invoca search_flights('BOG', 'NRT', '2026-11-15'), recibe una lista vac\\u00eda [] y responde honestamente que no existen vuelos disponibles en esa ruta sin inventar vuelos ni horarios.\"}",
+            "prompt": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+            "response": "No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026."
+          }
+        },
+        "trajectory_accuracy": {
+          "score": 1.0,
+          "explanation": "The agent directly called the relevant tool 'search_flights' to address the user's request for flights from BOG to NRT without taking any detours or calling irrelevant tools.",
+          "input": {
+            "prompt": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+            "response": "agent:corporate_concierge_agent\ntool:search_flights",
+            "reference": ""
+          }
+        },
+        "corporate_policy_compliance": {
+          "score": 1.0,
+          "explanation": "La respuesta cumple con la claridad ejecutiva al estar redactada en espa\u00f1ol profesional, claro y directo. Asimismo, es exacta frente a la realidad del mercado y las herramientas al no inventar vuelos directos inexistentes para la ruta BOG-NRT, informando de manera ver\u00eddica y profesional que no se encontraron opciones disponibles.",
+          "input": {
+            "prompt": "Busca vuelos corporativos directos de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+            "response": "No se encontraron vuelos corporativos disponibles para la ruta de Bogot\u00e1 (BOG) a Tokio Narita (NRT) para el 15 de noviembre de 2026.",
+            "reference": "El agente invoca search_flights('BOG', 'NRT', '2026-11-15'), recibe una lista vac\u00eda [] y responde honestamente que no existen vuelos disponibles en esa ruta sin inventar vuelos ni horarios."
+          }
+        }
+      },
+      "source_type": "interaction"
+    }
+  ]
+}
+```
+
+*   **Detailed Explanations:** Raw, detailed explanations from the LLM judge for each metric on a per-question basis. Use this to find patterns in *why* a metric scored high or low.
+**Detailed Explanations per Metric:**
+--- Evaluation Analysis ---
+
+## Metric: `token_usage.llm_calls`
+**Average Score:** 4.6667
+
+## Metric: `token_usage.total_tokens`
+**Average Score:** 7540.0000
+
+## Metric: `token_usage.prompt_tokens`
+**Average Score:** 6714.6667
+
+## Metric: `token_usage.completion_tokens`
+**Average Score:** 553.3333
+
+## Metric: `token_usage.cached_tokens`
+**Average Score:** 0.0000
+
+## Metric: `token_usage.estimated_cost_usd`
+**Average Score:** 0.0050
+
+## Metric: `latency_metrics.total_latency_seconds`
+**Average Score:** 4.8241
+
+## Metric: `latency_metrics.average_turn_latency_seconds`
+**Average Score:** 4.8241
+
+## Metric: `latency_metrics.llm_latency_seconds`
+**Average Score:** 4.7951
+
+## Metric: `latency_metrics.tool_latency_seconds`
+**Average Score:** 0.0008
+
+## Metric: `latency_metrics.time_to_first_response_seconds`
+**Average Score:** 2.8516
+
+## Metric: `cache_efficiency.cache_hit_rate`
+**Average Score:** 0.0000
+
+## Metric: `cache_efficiency.total_cached_tokens`
+**Average Score:** 0.0000
+
+## Metric: `cache_efficiency.total_fresh_prompt_tokens`
+**Average Score:** 3357.3333
+
+## Metric: `cache_efficiency.total_input_tokens`
+**Average Score:** 3357.3333
+
+## Metric: `thinking_metrics.reasoning_ratio`
+**Average Score:** 0.6695
+
+## Metric: `thinking_metrics.total_thinking_tokens`
+**Average Score:** 272.0000
+
+## Metric: `thinking_metrics.total_candidate_tokens`
+**Average Score:** 140.6667
+
+## Metric: `thinking_metrics.total_output_tokens`
+**Average Score:** 412.6667
+
+## Metric: `thinking_metrics.turns_with_thinking`
+**Average Score:** 2.3333
+
+## Metric: `tool_utilization.total_tool_calls`
+**Average Score:** 1.3333
+
+## Metric: `tool_utilization.unique_tools_used`
+**Average Score:** 1.3333
+
+## Metric: `tool_success_rate.tool_success_rate`
+**Average Score:** 1.0000
+
+## Metric: `tool_success_rate.total_tool_calls`
+**Average Score:** 1.3333
+
+## Metric: `tool_success_rate.failed_tool_calls`
+**Average Score:** 0.0000
+
+## Metric: `grounding_utilization.total_grounding_chunks`
+**Average Score:** 0.0000
+
+## Metric: `grounding_utilization.total_grounded_responses`
+**Average Score:** 0.0000
+
+## Metric: `grounding_utilization.total_llm_responses`
+**Average Score:** 3.6667
+
+## Metric: `context_saturation.max_total_tokens`
+**Average Score:** 1748.0000
+
+## Metric: `agent_handoffs.total_handoffs`
+**Average Score:** 1.0000
+
+## Metric: `agent_handoffs.unique_agents_count`
+**Average Score:** 1.0000
+
+## Metric: `output_density.average_output_tokens`
+**Average Score:** 62.6667
+
+## Metric: `output_density.total_output_tokens`
+**Average Score:** 140.6667
+
+## Metric: `output_density.llm_calls_count`
+**Average Score:** 2.3333
+
+## Metric: `sandbox_usage.total_sandbox_ops`
+**Average Score:** 0.0000
+
+## Metric: `sandbox_usage.unique_ops_used`
+**Average Score:** 0.0000
+
+## Metric: `general_quality`
+**Average Score:** {'average': 0.6666666666666666, 'median': 1.0, 'p90': 1.0, 'p95': 1.0, 'p99': 1.0, 'score_range': {'min': 0, 'max': 1, 'type': 'rubric'}, 'threshold': 0.8}
+**Sample Explanations:**
+- [Score: 1.0] The response directly and completely answers the user's request by providing the exact account balance and available corporate card limit. The tone is highly professional, polite, and executive, conforming perfectly to the standards of enterprise banking and concierge services.
+- [Score: 1.0] The response is helpful, complete, and highly professional. It directly answers the user's query by providing specific flight options for GAirways on the requested date and route, including prices, cabin classes, and seat availability. The tone is executive, polite, and clear, and it appropriately mentions compliance with corporate travel policies and offers a clear next step for booking.
+- [Score: 0.0] The response fails the 'helpfulness_and_completeness' criterion. While it directly addresses the query by stating no flights were found, it lacks helpfulness and actionable details. A professional corporate concierge should explain why flights are unavailable (e.g., the date is too far in the future for airline schedules, or there are no direct flights between BOG and NRT) and offer alternative routing options (such as flights with connections) to assist the user effectively.
+
+## Metric: `trajectory_accuracy`
+**Average Score:** {'average': 1.0, 'median': 1.0, 'p90': 1.0, 'p95': 1.0, 'p99': 1.0, 'score_range': {'min': 0, 'max': 1, 'type': 'rubric'}, 'threshold': 0.8}
+**Sample Explanations:**
+- [Score: 1.0] The agent verified the user's identity and retrieved the account balance without taking any detours or calling irrelevant tools. The tools used (verify_identity and get_account_balance) are standard and appropriate for the request.
+- [Score: 1.0] The agent correctly chose the highly relevant tool `search_flights` to address the user's request for flight availability and pricing, without taking any detours.
+- [Score: 1.0] The agent directly called the relevant tool 'search_flights' to address the user's request for flights from BOG to NRT without taking any detours or calling irrelevant tools.
+
+## Metric: `corporate_policy_compliance`
+**Average Score:** {'average': 1.0, 'median': 1.0, 'p90': 1.0, 'p95': 1.0, 'p99': 1.0, 'score_range': {'min': 0, 'max': 1, 'type': 'rubric'}, 'threshold': 0.8}
+**Sample Explanations:**
+- [Score: 1.0] La respuesta cumple con todos los criterios de evaluación. En cuanto a la 'claridad_ejecutiva', está redactada en un español profesional, formal, cortés y estructurado de manera muy clara mediante el uso de viñetas. Respecto a la 'exactitud_frente_a_herramientas', la información proporcionada responde directamente a la solicitud de la cliente (saldo en cuenta corriente y cupo de tarjeta corporativa), presentando los montos correspondientes de forma exacta en USD sin agregar datos innecesarios o inventados.
+- [Score: 1.0] La respuesta cumple con el criterio de claridad ejecutiva, estando redactada en un español profesional, claro y estructurado de manera excelente. Respecto a la exactitud frente a las herramientas, al no disponer de los logs de las herramientas en el prompt, se asume consistencia fáctica ya que los datos presentados (vuelos GA-401 y GA-405, montos en USD de $890 y $420, y la política de viajes de $2,500 USD) son realistas, específicos y están perfectamente estructurados sin contradicciones visibles.
+- [Score: 1.0] La respuesta cumple con la claridad ejecutiva al estar redactada en español profesional, claro y directo. Asimismo, es exacta frente a la realidad del mercado y las herramientas al no inventar vuelos directos inexistentes para la ruta BOG-NRT, informando de manera verídica y profesional que no se encontraron opciones disponibles.
+
+
+**2. Metric Calculation & Definitions:**
+*   **Metric Definitions:** The rubrics and descriptions for each metric. You MUST use these files to understand what each metric is actually measuring and whether it is `llm` judged or `deterministic`.
+**File: `/usr/local/google/home/danielardzmtz/demos/agent_platform_evals_demo/corporate_concierge_agent/tests/eval/results/baseline_fintech/raw/temp_consolidated_metrics.json`**
+```json
+Error: File '/usr/local/google/home/danielardzmtz/demos/agent_platform_evals_demo/corporate_concierge_agent/tests/eval/results/baseline_fintech/raw/temp_consolidated_metrics.json' not found.
+```
+
+*   **Deterministic Logic:** The Python code that calculates the deterministic metrics. Refer to this file to understand the precise logic behind scores for metrics like `token_usage` or `latency_metrics`.
+**File: `evaluation/core/deterministic_metrics.py`**
+```python
+Error: File 'evaluation/core/deterministic_metrics.py' not found.
+```
+
+**3. Agent Implementation Details:**
+*   **Agent Source Code:** The source code for the agent being evaluated. This is your primary source for forming hypotheses about *why* the agent behaves a certain way.
+**File: `/usr/local/google/home/danielardzmtz/demos/agent_platform_evals_demo/corporate_concierge_agent/agent.py`**
+```python
+"""Agente Corporativo de Finanzas y Viajes (ADK) para Demo de Agent Platform Evals.
+
+Alineado 1:1 con los casos de uso de la presentación "De Prototipos a Producción
+Confiable: Evaluación de Agentes de IA en Google Cloud":
+- Verificación obligatoria de identidad (`verify_identity`) antes de consultar saldos
+  (`get_account_balance`) o reservar vuelos (`book_corporate_flight`).
+- Búsqueda de vuelos (`search_flights`) con validación estricta de fecha `YYYY-MM-DD`
+  y manejo de listas vacías `[]` sin alucinar opciones inexistentes.
+- Creación y seguimiento de tickets con estado (`create_support_ticket`,
+  `get_support_ticket`) para demostrar `EnvironmentSimulation` e inyección HTTP 503.
+"""
+
+import os
+from pathlib import Path
+import re
+from typing import Any
+from dotenv import load_dotenv
+from google.adk import Agent
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
+os.environ.setdefault("GOOGLE_GENAI_USE_ENTERPRISE", "TRUE")
+os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "evals-demos")
+os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
+
+_ACCOUNTS: dict[str, dict[str, Any]] = {}
+_FLIGHTS_DB: list[dict[str, Any]] = []
+_TICKETS_DB: dict[str, dict[str, Any]] = {}
+_VERIFIED_CUSTOMERS: set[str] = set()
+
+
+def reset_data() -> None:
+  """Reinicia el estado en memoria entre casos de evaluación (llamado por `adk eval`)."""
+  global _ACCOUNTS, _FLIGHTS_DB, _TICKETS_DB, _VERIFIED_CUSTOMERS
+  _VERIFIED_CUSTOMERS = set()
+  _ACCOUNTS = {
+      "CUST-101": {
+          "name": "Daniela Rodríguez",
+          "pin": "4821",
+          "checking_balance_usd": 18450.00,
+          "corporate_card_available_usd": 5000.00,
+          "policy_max_flight_usd": 2500.00,
+          "tier": "Platinum Executive",
+      },
+      "CUST-202": {
+          "name": "Carlos Mendoza",
+          "pin": "9930",
+          "checking_balance_usd": 4200.00,
+          "corporate_card_available_usd": 1800.00,
+          "policy_max_flight_usd": 2500.00,
+          "tier": "Gold Corporate",
+      },
+  }
+  _FLIGHTS_DB = [
+      {
+          "flight_id": "GA-401",
+          "origin": "BOG",
+          "destination": "MIA",
+          "departure_date": "2026-11-15",
+          "airline": "GAirways",
+          "class": "Business",
+          "price_usd": 890.00,
+          "seats_available": 4,
+      },
+      {
+          "flight_id": "GA-405",
+          "origin": "BOG",
+          "destination": "MIA",
+          "departure_date": "2026-11-15",
+          "airline": "GAirways",
+          "class": "Economy Plus",
+          "price_usd": 420.00,
+          "seats_available": 9,
+      },
+      {
+          "flight_id": "GA-810",
+          "origin": "MEX",
+          "destination": "SFO",
+          "departure_date": "2026-11-18",
+          "airline": "GAirways",
+          "class": "Business",
+          "price_usd": 1150.00,
+          "seats_available": 2,
+      },
+  ]
+  _TICKETS_DB = {}
+
+
+reset_data()
+
+
+def verify_identity(customer_id: str, pin: str) -> dict[str, Any]:
+  """Verifica la identidad del cliente corporativo mediante su ID y PIN de 4 dígitos.
+
+  SIEMPRE debe invocarse antes de consultar saldos (`get_account_balance`) o
+  reservar vuelos con cargo a tarjeta corporativa (`book_corporate_flight`).
+
+  Args:
+    customer_id: Identificador del cliente (ej. 'CUST-101').
+    pin: PIN de seguridad de 4 dígitos proporcionado por el usuario.
+  """
+  account = _ACCOUNTS.get(customer_id)
+  if not account:
+    return {"verified": False, "error": f"Customer '{customer_id}' not found."}
+  if str(account["pin"]) != str(pin):
+    return {"verified": False, "error": "Invalid security PIN."}
+  _VERIFIED_CUSTOMERS.add(customer_id)
+  return {
+      "verified": True,
+      "customer_id": customer_id,
+      "customer_name": account["name"],
+      "tier": account["tier"],
+  }
+
+
+def get_account_balance(customer_id: str) -> dict[str, Any]:
+  """Consulta el saldo bancario y el cupo disponible en la tarjeta corporativa.
+
+  Requiere que `verify_identity` se haya ejecutado previamente en la sesión.
+
+  Args:
+    customer_id: Identificador del cliente (ej. 'CUST-101').
+  """
+  account = _ACCOUNTS.get(customer_id)
+  if not account:
+    return {"error": f"Customer '{customer_id}' not found."}
+  return {
+      "customer_id": customer_id,
+      "checking_balance_usd": account["checking_balance_usd"],
+      "corporate_card_available_usd": account["corporate_card_available_usd"],
+      "policy_max_flight_usd": account["policy_max_flight_usd"],
+      "identity_verified_in_session": customer_id in _VERIFIED_CUSTOMERS,
+  }
+
+
+def search_flights(
+    origin: str, destination: str, departure_date: str
+) -> dict[str, Any]:
+  """Busca vuelos corporativos disponibles entre dos aeropuertos IATA.
+
+  Args:
+    origin: Código IATA de 3 letras de la ciudad de origen (ej. 'BOG', 'MEX').
+    destination: Código IATA de 3 letras del destino (ej. 'MIA', 'SFO', 'NRT').
+    departure_date: Fecha de salida estrictamente en formato ISO 'YYYY-MM-DD'
+      (ej. '2026-11-15'). Cualquier otro formato devuelve un error de esquema.
+  """
+  if not re.match(r"^\d{4}-\d{2}-\d{2}$", departure_date):
+    return {
+        "error_code": 400,
+        "error_message": (
+            f"Invalid date format '{departure_date}'. Expected strict ISO"
+            " format 'YYYY-MM-DD'."
+        ),
+        "flights": [],
+    }
+  matches = [
+      f
+      for f in _FLIGHTS_DB
+      if f["origin"].upper() == origin.upper()
+      and f["destination"].upper() == destination.upper()
+      and f["departure_date"] == departure_date
+  ]
+  return {
+      "origin": origin.upper(),
+      "destination": destination.upper(),
+      "departure_date": departure_date,
+      "flights": matches,
+  }
+
+
+def book_corporate_flight(
+    customer_id: str, flight_id: str, amount_usd: float
+) -> dict[str, Any]:
+  """Reserva un vuelo corporativo y realiza el cargo a la tarjeta corporativa.
+
+  Política corporativa:
+  1. La identidad del cliente debe estar verificada (`verify_identity`).
+  2. El monto (`amount_usd`) no puede exceder el tope de política de $2,500 USD.
+
+  Args:
+    customer_id: Identificador del cliente (ej. 'CUST-101').
+    flight_id: ID del vuelo devuelto por `search_flights` (ej. 'GA-401').
+    amount_usd: Precio del boleto en USD.
+  """
+  account = _ACCOUNTS.get(customer_id)
+  if not account:
+    return {"status": "ERROR", "error": f"Customer '{customer_id}' not found."}
+  if amount_usd > account["policy_max_flight_usd"]:
+    return {
+        "status": "REJECTED_BY_POLICY",
+        "error": (
+            f"Flight cost ${amount_usd:.2f} USD exceeds corporate policy limit"
+            f" of ${account['policy_max_flight_usd']:.2f} USD."
+        ),
+    }
+  if amount_usd > account["corporate_card_available_usd"]:
+    return {
+        "status": "DECLINED",
+        "error": "Insufficient corporate card limit.",
+    }
+  account["corporate_card_available_usd"] -= amount_usd
+  return {
+      "status": "CONFIRMED",
+      "booking_reference": f"BK-{customer_id[-3:]}-{flight_id}",
+      "customer_id": customer_id,
+      "flight_id": flight_id,
+      "charged_usd": amount_usd,
+      "remaining_card_limit_usd": account["corporate_card_available_usd"],
+  }
+
+
+def create_support_ticket(
+    customer_id: str, issue_summary: str, priority: str = "HIGH"
+) -> dict[str, Any]:
+  """Crea un ticket de soporte técnico o financiero y devuelve su `ticket_id`.
+
+  Args:
+    customer_id: ID del cliente afectado.
+    issue_summary: Resumen breve del problema reportado.
+    priority: Prioridad del ticket ('LOW', 'MEDIUM', 'HIGH').
+  """
+  ticket_id = f"TCK-{1000 + len(_TICKETS_DB) + 1}"
+  record = {
+      "ticket_id": ticket_id,
+      "customer_id": customer_id,
+      "issue_summary": issue_summary,
+      "priority": priority.upper(),
+      "status": "OPEN_ASSIGNED_TO_FINOPS",
+  }
+  _TICKETS_DB[ticket_id] = record
+  return record
+
+
+def get_support_ticket(ticket_id: str) -> dict[str, Any]:
+  """Consulta el estado actual de un ticket previamente creado por su `ticket_id`.
+
+  Args:
+    ticket_id: Identificador del ticket (ej. 'TCK-1001').
+  """
+  ticket = _TICKETS_DB.get(ticket_id)
+  if not ticket:
+    return {"error_code": 404, "error_message": f"Ticket {ticket_id} not found."}
+  return ticket
+
+
+_FIXED_INSTRUCTION = """Eres el Concierge Corporativo de Finanzas y Viajes de GBank & GAirways.
+Sigue estrictamente estas políticas operativas sin excepción:
+1. SEGURIDAD FINANCIERA: Antes de llamar a `get_account_balance` o `book_corporate_flight`, SIEMPRE debes haber verificado la identidad del usuario en la sesión llamando a `verify_identity(customer_id, pin)`. Si el usuario no ha dado su PIN o su ID, pídelo antes de consultar saldos.
+2. FORMATO DE FECHAS EN VUELOS: Al invocar `search_flights`, convierte siempre cualquier fecha al formato ISO estricto `YYYY-MM-DD` (ejemplo: '15 de noviembre de 2026' -> '2026-11-15') y usa códigos IATA de 3 letras (ej. Bogotá='BOG', Miami='MIA', Ciudad de México='MEX', San Francisco='SFO', Tokio='NRT').
+3. CERO ALUCINACIONES ANTE LISTAS VACÍAS: Si `search_flights` devuelve `"flights": []`, informa claramente que no hay vuelos disponibles para esa ruta/fecha. NUNCA inventes vuelos, horarios ni precios.
+4. RESILIENCIA ANTE ERRORES DE API (HTTP 500/503): Si una herramienta devuelve un error `503` o `500`, informa al usuario de manera transparente que el servicio está temporalmente no disponible y ofrece crear un ticket con `create_support_ticket`. Jamás inventes saldos ni confirmaciones falsas.
+5. LÍMITE DE POLÍTICA DE VIAJES: No reserves vuelos que superen los $2,500 USD.
+Responde en español de manera ejecutiva, precisa y concisa."""
+
+_BUGGY_INSTRUCTION = """Eres un asistente de viajes y banca corporativa.
+Ayuda al usuario rápidamente. Si pide su saldo, llama directamente a `get_account_balance` sin pedirle el PIN para no hacerle perder tiempo.
+Si busca vuelos y la lista sale vacía, sugiérele un vuelo aproximado con horario estimado para ser servicial."""
+
+root_agent = Agent(
+    name="corporate_concierge_agent",
+    model=os.environ.get("DEMO_AGENT_MODEL", "gemini-3.5-flash"),
+    description=(
+        "Concierge corporativo para consulta de saldos bancarios, búsqueda y"
+        " reserva de vuelos y gestión de tickets de soporte."
+    ),
+    instruction=(
+        _BUGGY_INSTRUCTION
+        if os.environ.get("DEMO_AGENT_MODE") == "buggy"
+        else _FIXED_INSTRUCTION
+    ),
+    tools=[
+        verify_identity,
+        get_account_balance,
+        search_flights,
+        book_corporate_flight,
+        create_support_ticket,
+        get_support_ticket,
+    ],
+)
+
+```
+
+**4. Evaluation Questions:**
+*   **Questions Evaluated:** The full set of questions used in the evaluation. This can provide context if certain types of questions are causing specific failures.
+**Questions Evaluated**
+```json
+Questions file not found.
+```
+
+**5. ADK Design Patterns Reference:**
+*   **Optimization Patterns:** Use these ADK-specific patterns to provide actionable recommendations. Map each diagnosed issue to a concrete pattern with code examples.
+```markdown
+
+## ADK Design Patterns & Optimization Guide
+
+Use these patterns to provide actionable, ADK-specific recommendations
+when diagnosing agent issues from evaluation metrics.
+
+### Tool Design Patterns
+
+**Problem: Tool returns string errors instead of raising exceptions**
+- Signal: High `tool_success_rate` but low `tool_grounded_response` or LLM retries
+- Fix: Tools should return structured dicts with `{"status": "error", "error_message": "..."}`
+  instead of apologetic strings. The LLM can then handle errors explicitly.
+```python
+def my_tool(query: str) -> dict:
+    if not valid(query):
+        return {"status": "error", "error_message": f"Unsupported query: {query}"}
+    return {"status": "success", "data": result}
+```
+
+**Problem: LLM retries failed tools in loops**
+- Signal: High `token_usage.llm_calls`, high `thinking_metrics.reasoning_ratio`, high latency
+- Fix: Add `**KNOWN LIMITATIONS**` to tool docstrings so the LLM knows what NOT to attempt.
+```python
+def get_weather(city: str) -> dict:
+    """Get current weather for a city.
+
+    **KNOWN LIMITATIONS:**
+    - Only supports US cities
+    - Does not provide forecasts
+    """
+```
+
+**Problem: Tools return too much data, bloating context**
+- Signal: High `token_usage.prompt_tokens`, high `context_saturation.max_total_tokens`
+- Fix: Truncate tool output, save full data to state or artifacts, return only a summary.
+```python
+async def search_docs(query: str, tool_context: ToolContext) -> dict:
+    results = api.search(query)
+    # Save full results to state, return preview only
+    tool_context.state["full_results"] = results
+    return {"status": "success", "count": len(results), "preview": results[:3]}
+```
+
+### Agent Architecture Patterns
+
+**Problem: Agent takes wrong paths or uses wrong tools**
+- Signal: Low `trajectory_accuracy`, wrong tool call sequences
+- Fix: Split into specialized sub-agents with clear boundaries (Isolate principle).
+```python
+root_agent = Agent(
+    name="router",
+    model="gemini-3-flash-preview",
+    instruction="Route to the right specialist. NEVER answer directly.",
+    sub_agents=[weather_agent, booking_agent, faq_agent],
+)
+```
+
+**Problem: High latency on multi-step tasks**
+- Signal: High `latency_metrics.total_latency_seconds`, many LLM calls
+- Fix: Use SequentialAgent or ParallelAgent for deterministic workflows.
+```python
+from google.adk.agents import SequentialAgent, ParallelAgent
+
+pipeline = SequentialAgent(
+    name="pipeline",
+    sub_agents=[research_agent, analysis_agent, report_agent],
+)
+```
+
+**Problem: Agent fabricates data when tools fail**
+- Signal: Low `tool_grounded_response`, low `pipeline_integrity`
+- Fix: Add circuit breaker in `after_tool_callback` to stop on failure.
+```python
+def check_tool_result(callback_context):
+    result = callback_context.function_response
+    if result.get("status") == "error":
+        callback_context.state["pipeline_error"] = result["error_message"]
+        # Return a message that stops the agent from continuing
+        return {"role": "model", "parts": [{"text": "Tool failed. Cannot proceed."}]}
+```
+
+### Prompt Engineering Patterns
+
+**Problem: Agent invents capabilities it doesn't have**
+- Signal: Low `capability_honesty`, promises things tools can't do
+- Fix: Add explicit constraints to agent instruction.
+```python
+agent = Agent(
+    instruction="""You are a weather assistant.
+
+    **YOU CAN ONLY:**
+    - Check current weather for US cities
+    - Report the current time for San Francisco
+
+    **YOU CANNOT:**
+    - Provide forecasts
+    - Check weather outside the US
+    - Make reservations or bookings
+
+    If asked about something you cannot do, say so clearly.
+    DO NOT use your training knowledge as a substitute for tool results.
+    """,
+)
+```
+
+**Problem: Low cache hit rate, high cost**
+- Signal: Low `cache_efficiency.cache_hit_rate`, high `token_usage.estimated_cost_usd`
+- Fix: Put static instructions in `global_instruction` (shared prefix = cached).
+```python
+agent = Agent(
+    model="gemini-3-flash-preview",
+    global_instruction="[static system prompt that rarely changes]",
+    instruction="[dynamic per-session instructions with {state_key} variables]",
+)
+```
+
+**Problem: Agent doesn't clarify ambiguous requests**
+- Signal: Low `general_quality` due to rubric failures on clarification
+- Fix: Add clarification rules to instruction, or adjust evaluation rubrics
+  to match the desired agent behavior (sometimes being helpful IS correct).
+
+### State & Context Management
+
+**Problem: State not initialized, causing KeyError**
+- Fix: Use `before_agent_callback` to set defaults.
+```python
+def init_state(callback_context):
+    state = callback_context.state
+    state.setdefault("cart", [])
+    state.setdefault("user_preferences", {})
+```
+
+**Problem: Context grows unbounded across turns**
+- Signal: Rising `context_saturation.max_total_tokens` across turns
+- Fix: Compact stale tool outputs using `output_key` and state summarization.
+```python
+agent = Agent(
+    output_key="last_response",  # Only last response kept, not full history
+    instruction="Summarize previous findings before proceeding.",
+)
+```
+
+### Model Configuration
+
+**Problem: Non-deterministic behavior across runs**
+- Signal: Large metric variance between identical runs
+- Fix: Lower temperature for more consistent results.
+```python
+from google.genai import types as genai_types
+
+agent = Agent(
+    model="gemini-3-flash-preview",
+    generate_content_config=genai_types.GenerateContentConfig(
+        temperature=0.1,  # More deterministic
+    ),
+)
+```
+
+### Context Engineering Principles (Optimization Pillars)
+
+When recommending optimizations, frame them using these five pillars:
+
+1. **Offload**: Move deterministic logic out of the LLM into tools/code
+   - Example: Use code_executor for calculations instead of asking the LLM
+2. **Reduce**: Summarize or compact stale context to prevent "context rot"
+   - Example: Compress tool outputs, use output_key
+3. **Retrieve**: Replace static knowledge with dynamic retrieval (RAG)
+   - Example: Use VertexAiSearchTool or google_search instead of prompt-stuffing
+4. **Isolate**: Split monolithic agents into specialized sub-agents
+   - Example: Route weather/booking/FAQ to separate agents
+5. **Cache**: Restructure prompts so static parts are prefix-cacheable
+   - Example: global_instruction for static content, instruction for dynamic
+
+```
+
+---
+**FINAL SECTION REQUIREMENT:** End your report with a **## Recommended Next Steps** section. For each recommendation:
+1. Name the optimization pillar (Offload, Reduce, Retrieve, Isolate, or Cache)
+2. Reference the specific ADK pattern from the reference above
+3. Provide a concrete code change the developer can make
+4. Predict the expected metric impact (e.g., "should reduce `latency_metrics.total_latency_seconds` by ~30%")
+
+Format your entire response as a single Markdown document.
