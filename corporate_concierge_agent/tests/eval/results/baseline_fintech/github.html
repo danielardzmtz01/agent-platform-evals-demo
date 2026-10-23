@@ -6,6 +6,16 @@
   <title>gbank-gairways / corporate-concierge-agent — Gemini Enterprise Agent Platform</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
+    :root {
+      --background: #0d1117;
+      --card: #161b22;
+      --sidebar: #010409;
+      --border: #30363d;
+      --foreground: #e6edf3;
+      --muted-foreground: #8b949e;
+      --primary: #2f81f7;
+    }
+
     .code-line:hover {
       background-color: rgba(59, 130, 246, 0.08);
     }
@@ -577,13 +587,13 @@
         <span class="text-xs font-bold text-[var(--foreground)]">📊 Reporte Interactivo de <code class="font-mono">agent-eval</code> CLI (Google Cloud Professional Services)</span>
         <span class="text-xs text-[var(--muted-foreground)] ml-2">Conectado a <code class="font-mono">evals-demos</code> · Autorater: <code class="font-mono">gemini-3.5-flash</code> · Diagnóstico: <code class="font-mono">gemini-3.1-pro-preview</code></span>
       </div>
-      <a href="http://danielardzmtz.c.googlers.com:8086/report.html" target="_blank" rel="noopener"
+      <a href="/report.html" target="_blank" rel="noopener"
          class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 transition">
         Abrir Reporte en Pestaña Completa &nearr;
       </a>
     </div>
     <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden" style="height: 760px;">
-      <iframe src="http://danielardzmtz.c.googlers.com:8086/report.html" class="w-full h-full border-0" title="agent-eval Interactive Report"></iframe>
+      <iframe src="/report.html" class="w-full h-full border-0" title="agent-eval Interactive Report"></iframe>
     </div>
   </div>
 
