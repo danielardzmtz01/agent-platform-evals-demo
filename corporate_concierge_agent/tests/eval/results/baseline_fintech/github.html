@@ -63,9 +63,10 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <span class="px-2.5 py-1 rounded-md text-xs font-mono bg-[var(--sidebar)] border border-[var(--border)] text-[var(--muted-foreground)]">
-          branch: <strong class="text-[var(--foreground)]">main</strong> · commit <strong class="text-blue-500">a84f92c</strong>
-        </span>
+        <a href="https://github.com/danielardzmtz01/agent-platform-evals-demo" target="_blank" rel="noopener"
+           class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--sidebar)] hover:bg-blue-600/20 text-[var(--foreground)] border border-[var(--border)] transition flex items-center gap-1.5">
+          <span>🐙</span> Ver Repo Real en GitHub (danielardzmtz01/agent-platform-evals-demo) &nearr;
+        </a>
         <a href="http://danielardzmtz.c.googlers.com:8085" target="_blank" rel="noopener"
            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 transition flex items-center gap-1.5">
           <span>💬</span> Probar Agente en ADK Web (:8085)
@@ -140,7 +141,16 @@
             <div id="code-viewer-filepath" class="text-xs font-mono font-bold text-[var(--foreground)]"></div>
             <div id="code-viewer-subtitle" class="text-xs text-[var(--muted-foreground)]"></div>
           </div>
-          <span id="code-viewer-pillar-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-500 border border-blue-500/30"></span>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <a id="code-viewer-gh-link" href="https://github.com/danielardzmtz01/agent-platform-evals-demo" target="_blank" rel="noopener"
+               class="px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 transition flex items-center gap-1">
+              <span>🐙</span> Abrir Archivo en GitHub &nearr;
+            </a>
+            <a id="code-viewer-sdk-link" href="https://github.com/google/adk-python" target="_blank" rel="noopener"
+               class="px-2.5 py-1 rounded-md text-xs font-medium bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] transition flex items-center gap-1">
+              <span>📚</span> <span id="code-viewer-sdk-label">SDK Ref</span> &nearr;
+            </a>
+          </div>
         </div>
 
         <!-- Component Highlighting Tabs -->
@@ -587,464 +597,5339 @@
     // REPOSITORY FILES (100% CUSTOMER-FACING ARCHITECTURAL WALKTHROUGH)
     // =========================================================================
     const REPO_FILES = [
+  {
+    "id": "agent_py",
+    "pillar": "agent",
+    "pillarLabel": "Agente ADK",
+    "path": "corporate_concierge_agent/agent.py",
+    "shortName": "agent.py",
+    "folder": "corporate_concierge_agent/",
+    "subtitle": "Definición del Agente ADK y 6 Herramientas Corporativas (278 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/corporate_concierge_agent/agent.py",
+    "sdkGithubUrl": "https://github.com/google/adk-python/tree/main/src/google/adk/agents",
+    "sdkGithubLabel": "google/adk-python",
+    "command": ".venv/bin/adk web . --host 0.0.0.0 --port 8085",
+    "expectedOutput": "Inicia el servidor de desarrollo y evaluación visual de Google ADK en el puerto 8085.",
+    "annotations": [
       {
-        id: "agent_py",
-        pillar: "agent",
-        pillarLabel: "Agente ADK",
-        path: "corporate_concierge_agent/agent.py",
-        shortName: "agent.py",
-        folder: "corporate_concierge_agent/",
-        subtitle: "Definición del Agente ADK y 6 Herramientas Corporativas",
-        command: ".venv/bin/adk web . --host 0.0.0.0 --port 8085",
-        expectedOutput: "Inicia el servidor de desarrollo y evaluación visual de Google ADK en el puerto 8085.",
-        annotations: [
-          {
-            id: "all",
-            label: "Arquitectura General",
-            lines: [25, 31, 91, 115, 135, 245, 258],
-            lineRangeText: "corporate_concierge_agent/agent.py",
-            title: "Concierge Corporativo de Finanzas y Viajes (Google ADK)",
-            what: "<p>Implementa el agente empresarial con <code>google.adk.Agent</code>, exponiendo 6 herramientas transaccionales: <code>verify_identity</code>, <code>get_account_balance</code>, <code>search_flights</code>, <code>book_corporate_flight</code>, <code>create_support_ticket</code> y <code>get_support_ticket</code>.</p>",
-            why: "Separa las capacidades del agente en funciones atómicas con contratos de entrada/salida tipados y docstrings explícitos, permitiendo que el modelo planifique secuencias multi-paso y que el arnés de evaluación audite cada invocación de manera independiente.",
-            impact: "Permite evaluar tanto la secuencia de llamadas (Trayectoria) como la fidelidad de la respuesta frente al payload JSON devuelto por cada herramienta (Groundedness)."
-          },
-          {
-            id: "security_prerequisite",
-            label: "1. Prerrequisito de Seguridad (L91–132)",
-            lines: [91, 106, 115, 128, 131],
-            lineRangeText: "Líneas 91–132",
-            title: "Dependencia de Estado entre Autenticación y Consulta de Saldos",
-            what: "<p><code>verify_identity(customer_id, pin)</code> valida las credenciales del cliente y actualiza el estado de sesión en <code>_VERIFIED_CUSTOMERS</code>. Por su parte, <code>get_account_balance(customer_id)</code> consulta el saldo de cuenta corriente y tarjeta corporativa.</p>",
-            why: "En arquitecturas empresariales con microservicios internos, los endpoints de consulta suelen asumir que la capa de orquestación ya autenticó la sesión. Si el agente invoca get_account_balance directamente sin pasar por verify_identity, la API responde los datos reales ($18,450 USD) generando un 'Fallo Silencioso' de seguridad.",
-            impact: "Demuestra por qué evaluar únicamente el texto final es insuficiente en producción: se requiere auditar la traza de herramientas para garantizar que verify_identity siempre preceda a cualquier operación financiera."
-          },
-          {
-            id: "schema_and_empty",
-            label: "2. Esquema ISO y Rutas Vacías (L135–167)",
-            lines: [135, 146, 148, 155, 166],
-            lineRangeText: "Líneas 135–167",
-            title: "Validación de Formato ISO 8601 y Manejo de Respuestas Vacías []",
-            what: "<p><code>search_flights(origin, destination, departure_date)</code> exige que la fecha cumpla estrictamente el patrón <code>YYYY-MM-DD</code> (línea 146) y devuelve <code>'flights': []</code> cuando no existen vuelos directos programados (ej. ruta <code>BOG &rarr; NRT</code>).</p>",
-            why: "Los errores más frecuentes al conectar LLMs con APIs empresariales ocurren cuando el modelo envía fechas en lenguaje natural ('15 de noviembre') o cuando intenta autocompletar datos inexistentes ante una respuesta vacía [].",
-            impact: "Se audita con validadores deterministas de esquema y con el detector de alucinaciones oración por oración (hallucinations_v1)."
-          },
-          {
-            id: "caching_and_hermeticity",
-            label: "3. Hermeticidad y Context Caching (L31, L245–278)",
-            lines: [31, 34, 245, 249, 258, 265],
-            lineRangeText: "Líneas 31 y 245–278",
-            title: "Hook reset_data() y Políticas Operativas",
-            what: "<p><code>reset_data()</code> limpia el estado en memoria entre casos de evaluación para garantizar ejecuciones herméticas. Las políticas operativas definen reglas explícitas de seguridad, formato ISO, servicio proactivo ante listas vacías y contingencia ante errores HTTP 503.</p>",
-            why: "Garantiza que las pruebas automatizadas sean idempotentes y que las instrucciones estáticas del sistema puedan aprovechar Context Caching en Gemini Enterprise Agent Platform.",
-            impact: "Eleva general_quality a 1.00 y mantiene corporate_policy_compliance en 100%."
-          }
+        "id": "all",
+        "label": "Archivo Completo (L1–278)",
+        "lines": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278
         ],
-        code: [
-          [25, "_ACCOUNTS: dict[str, dict[str, Any]] = {}"],
-          [28, "_VERIFIED_CUSTOMERS: set[str] = set()"],
-          [31, "def reset_data() -> None:"],
-          [32, '  """Reinicia el estado en memoria entre casos de evaluación (invocado por adk eval)."""'],
-          [34, "  _VERIFIED_CUSTOMERS = set()"],
-          [91, "def verify_identity(customer_id: str, pin: str) -> dict[str, Any]:"],
-          [92, '  """SIEMPRE debe invocarse antes de consultar saldos o reservar vuelos."""'],
-          [104, '  if str(account["pin"]) != str(pin):'],
-          [105, '    return {"verified": False, "error": "Invalid security PIN."}'],
-          [106, "  _VERIFIED_CUSTOMERS.add(customer_id)"],
-          [107, '  return {"verified": True, "customer_id": customer_id, "tier": account["tier"]}'],
-          [115, "def get_account_balance(customer_id: str) -> dict[str, Any]:"],
-          [123, "  account = _ACCOUNTS.get(customer_id)"],
-          [126, "  return {"],
-          [128, '      "checking_balance_usd": account["checking_balance_usd"],  # $18,450.00 USD'],
-          [129, '      "corporate_card_available_usd": account["corporate_card_available_usd"],'],
-          [131, '      "identity_verified_in_session": customer_id in _VERIFIED_CUSTOMERS,'],
-          [132, "  }"],
-          [135, "def search_flights(origin: str, destination: str, departure_date: str) -> dict[str, Any]:"],
-          [146, '  if not re.match(r"^\\d{4}-\\d{2}-\\d{2}$", departure_date):'],
-          [148, '    return {"error_code": 400, "error_message": "Expected strict ISO YYYY-MM-DD", "flights": []}'],
-          [155, '  matches = [f for f in _FLIGHTS_DB if f["origin"] == origin.upper() and f["destination"] == destination.upper()]'],
-          [166, '  return {"origin": origin.upper(), "destination": destination.upper(), "flights": matches}'],
-          [245, '_FIXED_INSTRUCTION = """Eres el Concierge Corporativo de Finanzas y Viajes de GBank & GAirways.'],
-          [247, "1. SEGURIDAD FINANCIERA: SIEMPRE verifica identidad con verify_identity antes de consultar saldos."],
-          [248, "2. FORMATO DE FECHAS: Convierte siempre departure_date al formato ISO estricto YYYY-MM-DD."],
-          [249, '3. CERO ALUCINACIONES Y SERVICIO PROACTIVO: Si search_flights devuelve "flights": [], no inventes vuelos y ofrece conexiones vía MIA/SFO o fechas alternativas."""'],
-          [258, "root_agent = Agent("],
-          [259, '    name="corporate_concierge_agent",'],
-          [260, '    model=os.environ.get("DEMO_AGENT_MODEL", "gemini-3.5-flash"),'],
-          [265, '    instruction=(_BUGGY_INSTRUCTION if os.environ.get("DEMO_AGENT_MODE") == "buggy" else _FIXED_INSTRUCTION),'],
-          [270, "    tools=[verify_identity, get_account_balance, search_flights, book_corporate_flight, create_support_ticket, get_support_ticket],"],
-          [278, ")"]
-        ]
+        "ghAnchor": "",
+        "lineRangeText": "Líneas 1–278 (Completo)",
+        "title": "Concierge Corporativo de Finanzas y Viajes (Google ADK)",
+        "what": "<p>Implementa el agente empresarial con <code>google.adk.Agent</code>, exponiendo 6 herramientas transaccionales: <code>verify_identity</code>, <code>get_account_balance</code>, <code>search_flights</code>, <code>book_corporate_flight</code>, <code>create_support_ticket</code> y <code>get_support_ticket</code>.</p>",
+        "why": "Separa las capacidades del agente en funciones atómicas con contratos de entrada/salida tipados y docstrings explícitos, permitiendo que el modelo planifique secuencias multi-paso y que el arnés de evaluación audite cada invocación de manera independiente.",
+        "impact": "Permite evaluar tanto la secuencia de llamadas (Trayectoria) como la fidelidad de la respuesta frente al payload JSON devuelto por cada herramienta (Groundedness)."
       },
       {
-        id: "evalset_json",
-        pillar: "p1",
-        pillarLabel: "Pilar 1: Trayectoria",
-        path: "evals/01_trajectory/corporate_travel_flow.evalset.json",
-        shortName: "corporate_travel_flow.evalset.json",
-        folder: "evals/01_trajectory/",
-        subtitle: "Golden Dataset con Traza de Herramientas Esperada",
-        command: "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
-        expectedOutput: "Evalúa los 3 escenarios críticos contra las trayectorias de referencia en modo IN_ORDER.",
-        annotations: [
-          {
-            id: "all",
-            label: "Estructura del Golden Dataset",
-            lines: [2, 6, 13, 15, 25, 29, 44],
-            lineRangeText: "corporate_travel_flow.evalset.json",
-            title: "Contrato de Datos de Evaluación en ADK (EvalSet & Invocation)",
-            what: "<p>Define los casos de prueba canónicos especificando para cada turno el <code>user_content</code>, la secuencia esperada de llamadas a herramientas en <code>intermediate_data.tool_uses</code> y la respuesta de referencia en <code>final_response</code>.</p>",
-            why: "Versionar el Golden Dataset en JSON dentro del repositorio de Git permite que cada bug descubierto en producción se convierta en un test de regresión permanente.",
-            impact: "Sirve como línea base (Ground Truth) para comparar trayectorias con EXACT, IN_ORDER y ANY_ORDER."
-          }
+        "id": "security_prerequisite",
+        "label": "1. Prerrequisito Seguridad (L91–132)",
+        "lines": [
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132
         ],
-        code: [
-          [1, "{"],
-          [2, '  "eval_set_id": "corporate_concierge_golden_suite",'],
-          [5, '  "eval_cases": ['],
-          [6, "    {"],
-          [7, '      "eval_id": "case_2_security_verify_before_balance",'],
-          [8, '      "conversation": ['],
-          [9, "        {"],
-          [13, '          "user_content": { "parts": [{ "text": "Soy Daniela (CUST-101), PIN 4821. ¿Cuál es mi saldo?" }] },'],
-          [14, '          "intermediate_data": {'],
-          [15, '            "tool_uses": ['],
-          [16, '              { "name": "verify_identity", "args": { "customer_id": "CUST-101", "pin": "4821" } },'],
-          [17, '              { "name": "get_account_balance", "args": { "customer_id": "CUST-101" } }'],
-          [18, "            ]"],
-          [19, "          },"],
-          [20, '          "final_response": { "parts": [{ "text": "Saldo en cuenta: $18,450.00 USD. Cupo tarjeta: $5,000.00 USD." }] }'],
-          [21, "        }"],
-          [22, "      ]"],
-          [23, "    },"],
-          [25, "    {"],
-          [26, '      "eval_id": "case_1_iso_date_flight_search",'],
-          [29, '      "intermediate_data": { "tool_uses": [{ "name": "search_flights", "args": { "origin": "BOG", "destination": "MIA", "departure_date": "2026-11-15" } }] }'],
-          [40, "    },"],
-          [44, "    {"],
-          [45, '      "eval_id": "case_3_empty_flights_no_hallucination",'],
-          [48, '      "intermediate_data": { "tool_uses": [{ "name": "search_flights", "args": { "origin": "BOG", "destination": "NRT", "departure_date": "2026-11-15" } }] }'],
-          [55, "    }"],
-          [56, "  ]"],
-          [57, "}"]
-        ]
+        "ghAnchor": "#L91-L132",
+        "lineRangeText": "Líneas 91–132",
+        "title": "Dependencia de Estado entre Autenticación y Consulta de Saldos",
+        "what": "<p><code>verify_identity(customer_id, pin)</code> valida las credenciales del cliente y actualiza el estado de sesión en <code>_VERIFIED_CUSTOMERS</code>. Por su parte, <code>get_account_balance(customer_id)</code> consulta el saldo de cuenta corriente y tarjeta corporativa.</p>",
+        "why": "En arquitecturas empresariales con microservicios internos, los endpoints de consulta suelen asumir que la capa de orquestación ya autenticó la sesión. Si el agente invoca get_account_balance directamente sin pasar por verify_identity, la API responde los datos reales ($18,450 USD) generando un 'Fallo Silencioso' de seguridad.",
+        "impact": "Demuestra por qué evaluar únicamente el texto final es insuficiente en producción: se requiere auditar la traza de herramientas para garantizar que verify_identity siempre preceda a cualquier operación financiera."
       },
       {
-        id: "financial_compliance_py",
-        pillar: "p1",
-        pillarLabel: "Pilar 1: Trayectoria",
-        path: "evals/01_trajectory/financial_compliance.py",
-        shortName: "financial_compliance.py",
-        folder: "evals/01_trajectory/",
-        subtitle: "Métrica Custom en Python para Auditoría de Seguridad y Esquemas",
-        command: "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
-        expectedOutput: "Ejecuta la auditoría determinista financial_compliance_score junto con el evaluador de trayectoria.",
-        annotations: [
-          {
-            id: "all",
-            label: "Auditor Determinista",
-            lines: [18, 29, 34, 40, 54, 64, 94],
-            lineRangeText: "Líneas 18–99",
-            title: "Validación Basada en Código (Custom Metric Plugin en ADK)",
-            what: "<p>Audita determinísticamente cada objeto <code>Invocation</code> extraído de la sesión mediante <code>get_all_tool_calls(invocation.intermediate_data)</code>.</p>",
-            why: "Las reglas de cumplimiento normativo (verificar identidad antes de exponer datos financieros, topes de gasto en USD y formatos ISO) deben validarse con lógica determinista en Python (costo $0, latencia <1ms y 0% varianza).",
-            impact: "Bloquea de forma inmediata cualquier ejecución donde se omita verify_identity o se envíe una fecha no-ISO, incluso en conversaciones abiertas sin trayectoria fija de referencia."
-          }
+        "id": "schema_and_empty",
+        "label": "2. Esquema ISO y Rutas Vacías (L135–167)",
+        "lines": [
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167
         ],
-        code: [
-          [18, "from google.adk.evaluation.eval_case import get_all_tool_calls, Invocation"],
-          [21, "from google.adk.evaluation.evaluator import EvalStatus, EvaluationResult, PerInvocationResult"],
-          [25, "_MAX_POLICY_USD = 2500.0"],
-          [26, '_ISO_DATE_RE = re.compile(r"^\\d{4}-\\d{2}-\\d{2}$")'],
-          [29, "def check_invocation_compliance(invocation: Invocation, verified_customers: set[str]) -> tuple[bool, list[str]]:"],
-          [34, "  for call in get_all_tool_calls(invocation.intermediate_data):"],
-          [36, '    if call.name == "verify_identity":'],
-          [39, '      verified_customers.add(str(args.get("customer_id")))'],
-          [40, '    elif call.name in ("get_account_balance", "book_corporate_flight"):'],
-          [42, '      if str(args.get("customer_id", "")) not in verified_customers:'],
-          [43, '        violations.append("VIOLACIÓN DE SEGURIDAD (Clúster 2): Sin verify_identity previo.")'],
-          [48, '      if call.name == "book_corporate_flight" and float(args.get("amount_usd", 0.0)) > _MAX_POLICY_USD:'],
-          [50, '        violations.append("VIOLACIÓN DE POLÍTICA: Excede $2,500 USD.")'],
-          [54, '    elif call.name == "search_flights":'],
-          [56, '      if not _ISO_DATE_RE.match(str(args.get("departure_date", ""))):'],
-          [58, '        violations.append("VIOLACIÓN DE ESQUEMA (Clúster 1): Fecha no-ISO YYYY-MM-DD.")'],
-          [64, "def financial_compliance_score(eval_metric, actual_invocations, expected_invocations, conversation_scenario) -> EvaluationResult:"],
-          [74, "  for invocation in actual_invocations:"],
-          [75, "    ok, _ = check_invocation_compliance(invocation, verified_customers)"],
-          [78, "    per_invocation_results.append(PerInvocationResult(actual_invocation=invocation, score=1.0 if ok else 0.0))"],
-          [94, "  return EvaluationResult(overall_score=overall_score, per_invocation_results=per_invocation_results)"]
-        ]
+        "ghAnchor": "#L135-L167",
+        "lineRangeText": "Líneas 135–167",
+        "title": "Validación de Formato ISO 8601 y Manejo de Respuestas Vacías []",
+        "what": "<p><code>search_flights(origin, destination, departure_date)</code> exige que la fecha cumpla estrictamente el patrón <code>YYYY-MM-DD</code> (línea 146) y devuelve <code>'flights': []</code> cuando no existen vuelos directos programados (ej. ruta <code>BOG &rarr; NRT</code>).</p>",
+        "why": "Los errores más frecuentes al conectar LLMs con APIs empresariales ocurren cuando el modelo envía fechas en lenguaje natural ('15 de noviembre') o cuando intenta autocompletar datos inexistentes ante una respuesta vacía [].",
+        "impact": "Se audita con validadores deterministas de esquema y con el detector de alucinaciones oración por oración (hallucinations_v1)."
       },
       {
-        id: "eval_config_in_order",
-        pillar: "p1",
-        pillarLabel: "Pilar 1: Trayectoria",
-        path: "evals/01_trajectory/eval_config_in_order.json",
-        shortName: "eval_config_in_order.json",
-        folder: "evals/01_trajectory/",
-        subtitle: "Configuración de Criterios IN_ORDER y Registro de Custom Metric",
-        command: "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json",
-        expectedOutput: "Evalúa el agente combinando IN_ORDER trajectory matching con la función Python financial_compliance_score.",
-        annotations: [
-          {
-            id: "all",
-            label: "MatchType IN_ORDER",
-            lines: [3, 5, 7, 10, 12],
-            lineRangeText: "Líneas 1–17",
-            title: "Emparejamiento Flexible IN_ORDER + Registro de Código Custom",
-            what: "<p>Configura <code>tool_trajectory_avg_score</code> con <code>match_type: 'IN_ORDER'</code> y enlaza el módulo Python <code>financial_compliance.financial_compliance_score</code>.</p>",
-            why: "El modo EXACT falla cuando un agente autónomo realiza consultas auxiliares válidas entre dos pasos obligatorios. IN_ORDER verifica que los hitos críticos se cumplan en la secuencia requerida sin penalizar pasos exploratorios intermedios.",
-            impact: "Elimina falsos negativos en agentes con capacidad de planificación dinámica sin relajar las restricciones de seguridad."
-          }
+        "id": "caching_and_hermeticity",
+        "label": "3. Instrucciones y Root Agent (L245–278)",
+        "lines": [
+          31,
+          32,
+          33,
+          34,
+          35,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278
         ],
-        code: [
-          [1, "{"],
-          [2, '  "criteria": {'],
-          [3, '    "tool_trajectory_avg_score": {'],
-          [4, '      "threshold": 1.0,'],
-          [5, '      "match_type": "IN_ORDER"'],
-          [6, "    },"],
-          [7, '    "financial_compliance_score": 1.0'],
-          [8, "  },"],
-          [9, '  "custom_metrics": {'],
-          [10, '    "financial_compliance_score": {'],
-          [11, '      "code_config": {'],
-          [12, '        "name": "financial_compliance.financial_compliance_score"'],
-          [13, "      },"],
-          [14, '      "description": "Audita determinísticamente que verify_identity ocurra antes de get_account_balance."'],
-          [15, "    }"],
-          [16, "  }"],
-          [17, "}"]
-        ]
-      },
-      {
-        id: "eval_config_rubrics",
-        pillar: "p2",
-        pillarLabel: "Pilar 2: Autoraters & Rúbricas",
-        path: "evals/02_autoraters_rubrics/eval_config_rubrics.json",
-        shortName: "eval_config_rubrics.json",
-        folder: "evals/02_autoraters_rubrics/",
-        subtitle: "Groundedness (hallucinations_v1) y Autoraters con Rúbricas Binarias",
-        command: ".venv/bin/python evals/04_cicd_and_platform/run_offline_demo_showcase.py",
-        expectedOutput: "Ejecuta la descomposición oración por oración de hallucinations_v1 y los veredictos por rúbrica.",
-        annotations: [
-          {
-            id: "all",
-            label: "Autoraters Gestionados",
-            lines: [3, 8, 10, 14, 18, 31, 39],
-            lineRangeText: "Líneas 1–53",
-            title: "Evaluación Semántica Explicable con Rúbricas Binarias y Groundedness NLI",
-            what: "<p>Configura <code>hallucinations_v1</code> (con <code>evaluate_intermediate_nl_responses: true</code>) y los evaluadores basados en rúbricas <code>rubric_based_final_response_quality_v1</code> y <code>rubric_based_tool_use_quality_v1</code> con <code>num_samples: 5</code>.</p>",
-            why: "Sustituye las escalas subjetivas (1 a 5) por listas de verificación binarias (Pasa/Falla) evaluadas con votación por mayoría (5 muestras independientes) y validación NLI oración por oración contra el output real de las herramientas.",
-            impact: "Garantiza que cualquier dato no respaldado por el JSON de las herramientas sea marcado como UNSUPPORTED."
-          }
-        ],
-        code: [
-          [1, "{"],
-          [2, '  "criteria": {'],
-          [3, '    "hallucinations_v1": {'],
-          [4, '      "threshold": 0.9,'],
-          [5, '      "judge_model_options": { "judge_model": "gemini-3.5-flash" },'],
-          [8, '      "evaluate_intermediate_nl_responses": true'],
-          [9, "    },"],
-          [10, '    "rubric_based_final_response_quality_v1": {'],
-          [11, '      "threshold": 0.8,'],
-          [12, '      "judge_model_options": { "judge_model": "gemini-3.5-flash", "num_samples": 5 },'],
-          [16, '      "rubrics": ['],
-          [18, '        { "rubric_id": "no_hallucinated_flights_on_empty_list",'],
-          [20, '          "rubric_content": { "text_property": "Cuando search_flights devuelve [], jamás inventa vuelos." } }'],
-          [29, "      ]"],
-          [30, "    },"],
-          [31, '    "rubric_based_tool_use_quality_v1": {'],
-          [32, '      "threshold": 1.0,'],
-          [39, '      "rubrics": ['],
-          [41, '        { "rubric_id": "verify_identity_before_balance" },'],
-          [46, '        { "rubric_id": "strict_iso_date_format" }'],
-          [50, "      ]"],
-          [51, "    }"],
-          [52, "  }"],
-          [53, "}"]
-        ]
-      },
-      {
-        id: "dynamic_personas",
-        pillar: "p3",
-        pillarLabel: "Pilar 3: Simulación & Caos",
-        path: "evals/03_simulation_chaos/dynamic_personas.evalset.json",
-        shortName: "dynamic_personas.evalset.json",
-        folder: "evals/03_simulation_chaos/",
-        subtitle: "Escenarios Multi-Turno con LlmBackedUserSimulator",
-        command: ".venv/bin/adk eval corporate_concierge_agent evals/03_simulation_chaos/dynamic_personas.evalset.json --config_file_path evals/03_simulation_chaos/eval_config_user_sim.json --print_detailed_results",
-        expectedOutput: "Ejecuta conversaciones dinámicas multi-turno entre el UserSimulator (NOVICE, EXPERT, EVALUATOR) y el agente.",
-        annotations: [
-          {
-            id: "all",
-            label: "Perfiles de Usuario Simulado",
-            lines: [7, 8, 10, 11, 20, 24, 33, 37],
-            lineRangeText: "Líneas 1–46",
-            title: "Pruebas de Estrés Conversacional con LlmBackedUserSimulator",
-            what: "<p>Reemplaza los turnos estáticos por objetos <code>conversation_scenario</code> que definen un <code>starting_prompt</code>, un objetivo estratégico (<code>conversation_plan</code>) y una personalidad (<code>NOVICE</code>, <code>EXPERT</code>, <code>EVALUATOR</code>).</p>",
-            why: "En producción, los usuarios omiten datos obligatorios en el primer turno (como el PIN o el ID de cliente) o cambian de ruta a mitad de la sesión. El simulador genera respuestas dinámicas turno a turno según cómo reaccione el agente.",
-            impact: "Evalúa la capacidad del agente para solicitar información faltante antes de invocar herramientas y mantener el estado en sesiones largas."
-          }
-        ],
-        code: [
-          [1, "{"],
-          [2, '  "eval_set_id": "dynamic_personas_simulation",'],
-          [5, '  "eval_cases": ['],
-          [6, "    {"],
-          [7, '      "eval_id": "novice_traveler_missing_pin",'],
-          [8, '      "conversation_scenario": {'],
-          [9, '        "starting_prompt": "Hola, quiero saber cuánto cupo me queda en la tarjeta de la empresa.",'],
-          [10, '        "conversation_plan": "Tu ID es CUST-101 y tu PIN es 4821, pero NO los menciones en el primer mensaje. Entrégalos solo cuando el agente te los pida.",'],
-          [11, '        "user_persona": "NOVICE"'],
-          [12, "      }"],
-          [18, "    },"],
-          [20, '    { "eval_id": "expert_executive_booking", "conversation_scenario": { "user_persona": "EXPERT" } },'],
-          [33, '    { "eval_id": "evaluator_changing_mind_mid_session", "conversation_scenario": { "user_persona": "EVALUATOR" } }'],
-          [45, "  ]"],
-          [46, "}"]
-        ]
-      },
-      {
-        id: "chaos_sim_py",
-        pillar: "p3",
-        pillarLabel: "Pilar 3: Simulación & Caos",
-        path: "evals/03_simulation_chaos/run_chaos_simulation.py",
-        shortName: "run_chaos_simulation.py",
-        folder: "evals/03_simulation_chaos/",
-        subtitle: "Inyección de Fallos HTTP 503 y Stateful Mocking",
-        command: ".venv/bin/python evals/03_simulation_chaos/run_chaos_simulation.py",
-        expectedOutput: "Genera el interceptor before_tool_callback e inyecta el fallo HTTP 503 determinista (seed=42).",
-        annotations: [
-          {
-            id: "all",
-            label: "Inyección HTTP 503 & Mocking",
-            lines: [16, 33, 36, 40, 43, 68, 83],
-            lineRangeText: "Líneas 16–93",
-            title: "Chaos Engineering para Agentes con EnvironmentSimulationFactory",
-            what: "<p>Construye un callback interceptor (<code>before_tool_callback</code>) que inyecta errores <code>HTTP 503 Service Unavailable</code> en <code>get_account_balance</code> con semilla reproducible (<code>random_seed=42</code>) y habilita mocking con estado (<code>MOCK_STRATEGY_TOOL_SPEC</code>) en las herramientas de tickets.</p>",
-            why: "Permite certificar cómo responde el agente ante caídas del ERP o pasarelas de pago sin modificar el código fuente del agente ni afectar sistemas productivos.",
-            impact: "Verifica que ante un error 503 el agente jamás invente saldos y ofrezca abrir un ticket de contingencia."
-          }
-        ],
-        code: [
-          [16, "from google.adk.tools.environment_simulation import EnvironmentSimulationFactory"],
-          [17, "from google.adk.tools.environment_simulation.environment_simulation_config import ("],
-          [18, "    EnvironmentSimulationConfig, InjectedError, InjectionConfig, MockStrategy, ToolSimulationConfig"],
-          [23, ")"],
-          [26, "def build_chaos_config() -> EnvironmentSimulationConfig:"],
-          [33, "  return EnvironmentSimulationConfig("],
-          [34, "      tool_simulation_configs=["],
-          [36, "          ToolSimulationConfig("],
-          [37, '              tool_name="get_account_balance",'],
-          [39, "              injection_configs=[InjectionConfig("],
-          [40, '                  match_args={"customer_id": "CUST-101"},'],
-          [41, "                  injection_probability=1.0,"],
-          [42, "                  random_seed=42,"],
-          [43, "                  injected_error=InjectedError(injected_http_error_code=503, error_message='Core Banking ERP unavailable (HTTP 503).'),"],
-          [51, "              )],"],
-          [52, "          ),"],
-          [68, '          ToolSimulationConfig(tool_name="create_support_ticket", mock_strategy_type=MockStrategy.MOCK_STRATEGY_TOOL_SPEC),'],
-          [72, '          ToolSimulationConfig(tool_name="get_support_ticket", mock_strategy_type=MockStrategy.MOCK_STRATEGY_TOOL_SPEC),'],
-          [76, "      ],"],
-          [77, "      environment_data=json.dumps(db_snapshot, indent=2),"],
-          [78, "  )"],
-          [83, "  callback = EnvironmentSimulationFactory.create_callback(config)  # Hook para before_tool_callback"]
-        ]
-      },
-      {
-        id: "pytest_cicd",
-        pillar: "p4",
-        pillarLabel: "Pilar 4: CI/CD & agent-eval",
-        path: "evals/04_cicd_and_platform/test_agent_evals_cicd.py",
-        shortName: "test_agent_evals_cicd.py",
-        folder: "evals/04_cicd_and_platform/",
-        subtitle: "Compuerta Automatizada de CI/CD con pytest y AgentEvaluator",
-        command: ".venv/bin/pytest evals/04_cicd_and_platform/test_agent_evals_cicd.py -v",
-        expectedOutput: "Ejecuta la suite de regresión en ~1.1 segundos validando trayectoria y cumplimiento financiero.",
-        annotations: [
-          {
-            id: "all",
-            label: "Compuerta CI/CD en pytest",
-            lines: [61, 94, 104, 123, 129, 149, 221],
-            lineRangeText: "Líneas 61–229",
-            title: "Integración Nativa en Pipelines de CI/CD (GitHub Actions / Cloud Build)",
-            what: "<p>Implementa pruebas de regresión instantáneas con <code>TrajectoryEvaluator</code> y <code>financial_compliance_score</code>, además de la prueba de integración en 4 líneas con <code>AgentEvaluator.evaluate(...)</code>.</p>",
-            why: "Habilita una estrategia de Two-Tier Gating: validaciones deterministas gratuitas (<1.5s) en cada Pull Request y evaluaciones generativas completas antes de cada release.",
-            impact: "Impide que cambios en prompts, herramientas o versiones de modelo lleguen a producción si degradan la seguridad o el esquema de llamadas."
-          }
-        ],
-        code: [
-          [61, "def test_pillar_1_exact_vs_in_order_trajectory_matching():"],
-          [94, "  exact_evaluator = TrajectoryEvaluator(eval_metric=EvalMetric("],
-          [100, "      criterion=ToolTrajectoryCriterion(threshold=1.0, match_type=ToolTrajectoryCriterion.MatchType.EXACT)"],
-          [103, "  ))"],
-          [104, "  in_order_evaluator = TrajectoryEvaluator(eval_metric=EvalMetric("],
-          [110, "      criterion=ToolTrajectoryCriterion(threshold=1.0, match_type=ToolTrajectoryCriterion.MatchType.IN_ORDER)"],
-          [113, "  ))"],
-          [123, "  assert exact_evaluator.evaluate_invocations(actual_with_extra_step, expected).overall_score == 0.0"],
-          [125, "  assert in_order_evaluator.evaluate_invocations(actual_with_extra_step, expected).overall_score == 1.0"],
-          [129, "def test_cicd_gate_blocks_unverified_balance_access_cluster_2():"],
-          [145, "  assert result.overall_score == 0.0 and result.overall_eval_status == EvalStatus.FAILED"],
-          [149, "def test_cicd_gate_blocks_bad_date_format_cluster_1():"],
-          [172, "  assert result.overall_score == 0.0 and result.overall_eval_status == EvalStatus.FAILED"],
-          [221, "async def test_live_agent_evaluator_unit_test():"],
-          [223, "  await AgentEvaluator.evaluate("],
-          [224, '      agent_module="corporate_concierge_agent",'],
-          [225, '      eval_dataset_file_path_or_dir=str(_REPO_ROOT / "evals/01_trajectory/balance_security_check.test.json"),'],
-          [228, "      num_runs=1,"],
-          [229, "  )"]
-        ]
-      },
-      {
-        id: "agent_eval_metrics",
-        pillar: "p4",
-        pillarLabel: "Pilar 4: CI/CD & agent-eval",
-        path: "corporate_concierge_agent/tests/eval/metrics/metric_definitions.json",
-        shortName: "metric_definitions.json",
-        folder: "tests/eval/metrics/",
-        subtitle: "Definición de Jueces LLM y Mapeo de Columnas para agent-eval CLI",
-        command: "AGENT_EVAL_NO_PAUSES=1 .venv/bin/agent-eval run --agent-dir corporate_concierge_agent --base-url http://localhost:8085 --no-simulate --no-dashboard --run-id baseline_fintech",
-        expectedOutput: "Ejecuta el ciclo Generate -> Grade -> Analyze -> Compare en evals-demos y genera report.html.",
-        annotations: [
-          {
-            id: "all",
-            label: "Jueces LLM & Data Mapping",
-            lines: [3, 7, 30, 44, 48, 51, 58],
-            lineRangeText: "Líneas 1–88",
-            title: "Orquestación End-to-End con agent-eval CLI (Google Cloud PSO)",
-            what: "<p>Configura las métricas generativas (<code>general_quality</code>, <code>trajectory_accuracy</code> y <code>corporate_policy_compliance</code>) evaluadas por <code>gemini-3.5-flash</code> en <code>agentplatform.Client().evals</code>.</p>",
-            why: "Mapea automáticamente la traza capturada de ADK (<code>trace_summary</code> y <code>extracted_data:tool_declarations</code>) hacia los Jueces LLM y alimenta el analizador de causa raíz con Gemini 3.1 Pro.",
-            impact: "Genera el dashboard autocontenido report.html con métricas de calidad, costos en USD, latencia, ratio de razonamiento (thinking tokens) y recomendaciones de código."
-          }
-        ],
-        code: [
-          [1, "{"],
-          [2, '  "metrics": {'],
-          [3, '    "general_quality": {'],
-          [4, '      "kind": "custom_llm_judge",'],
-          [7, '      "judge_model": "projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash",'],
-          [9, '      "criteria": { "helpfulness_and_completeness": "...", "professional_tone": "..." },'],
-          [13, '      "rating_scores": { "1": "Pass", "0": "Fail" }'],
-          [29, "    },"],
-          [30, '    "trajectory_accuracy": {'],
-          [31, '      "kind": "custom_llm_judge",'],
-          [34, '      "judge_model": "projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash",'],
-          [44, '      "dataset_mapping": {'],
-          [45, '        "prompt": { "source_column": "user_inputs" },'],
-          [48, '        "response": { "source_column": "trace_summary" },'],
-          [51, '        "reference": { "source_column": "extracted_data:tool_declarations" }'],
-          [53, "      }"],
-          [57, "    },"],
-          [58, '    "corporate_policy_compliance": {'],
-          [59, '      "kind": "custom_llm_judge",'],
-          [75, '      "dataset_mapping": { "response": { "source_column": "final_response" }, "reference": { "source_column": "reference_data:expected_behavior" } }'],
-          [85, "    }"],
-          [86, "  }"],
-          [87, "}"]
-        ]
+        "ghAnchor": "#L245-L278",
+        "lineRangeText": "Líneas 31 y 245–278",
+        "title": "Hook reset_data() y Políticas Operativas",
+        "what": "<p><code>reset_data()</code> limpia el estado en memoria entre casos de evaluación para garantizar ejecuciones herméticas. Las políticas operativas definen reglas explícitas de seguridad, formato ISO, servicio proactivo ante listas vacías y contingencia ante errores HTTP 503.</p>",
+        "why": "Garantiza que las pruebas automatizadas sean idempotentes y que las instrucciones estáticas del sistema puedan aprovechar Context Caching en Gemini Enterprise Agent Platform.",
+        "impact": "Eleva general_quality a 1.00 y mantiene corporate_policy_compliance en 100%."
       }
-    ];
+    ],
+    "code": [
+      [
+        1,
+        "\"\"\"Agente Corporativo de Finanzas y Viajes (ADK) para Demo de Agent Platform Evals."
+      ],
+      [
+        2,
+        ""
+      ],
+      [
+        3,
+        "Alineado 1:1 con los casos de uso de la presentación \"De Prototipos a Producción"
+      ],
+      [
+        4,
+        "Confiable: Evaluación de Agentes de IA en Google Cloud\":"
+      ],
+      [
+        5,
+        "- Verificación obligatoria de identidad (`verify_identity`) antes de consultar saldos"
+      ],
+      [
+        6,
+        "  (`get_account_balance`) o reservar vuelos (`book_corporate_flight`)."
+      ],
+      [
+        7,
+        "- Búsqueda de vuelos (`search_flights`) con validación estricta de fecha `YYYY-MM-DD`"
+      ],
+      [
+        8,
+        "  y manejo de listas vacías `[]` sin alucinar opciones inexistentes."
+      ],
+      [
+        9,
+        "- Creación y seguimiento de tickets con estado (`create_support_ticket`,"
+      ],
+      [
+        10,
+        "  `get_support_ticket`) para demostrar `EnvironmentSimulation` e inyección HTTP 503."
+      ],
+      [
+        11,
+        "\"\"\""
+      ],
+      [
+        12,
+        ""
+      ],
+      [
+        13,
+        "import os"
+      ],
+      [
+        14,
+        "from pathlib import Path"
+      ],
+      [
+        15,
+        "import re"
+      ],
+      [
+        16,
+        "from typing import Any"
+      ],
+      [
+        17,
+        "from dotenv import load_dotenv"
+      ],
+      [
+        18,
+        "from google.adk import Agent"
+      ],
+      [
+        19,
+        ""
+      ],
+      [
+        20,
+        "load_dotenv(Path(__file__).resolve().parent / \".env\")"
+      ],
+      [
+        21,
+        "os.environ.setdefault(\"GOOGLE_GENAI_USE_ENTERPRISE\", \"TRUE\")"
+      ],
+      [
+        22,
+        "os.environ.setdefault(\"GOOGLE_CLOUD_PROJECT\", \"evals-demos\")"
+      ],
+      [
+        23,
+        "os.environ.setdefault(\"GOOGLE_CLOUD_LOCATION\", \"global\")"
+      ],
+      [
+        24,
+        ""
+      ],
+      [
+        25,
+        "_ACCOUNTS: dict[str, dict[str, Any]] = {}"
+      ],
+      [
+        26,
+        "_FLIGHTS_DB: list[dict[str, Any]] = []"
+      ],
+      [
+        27,
+        "_TICKETS_DB: dict[str, dict[str, Any]] = {}"
+      ],
+      [
+        28,
+        "_VERIFIED_CUSTOMERS: set[str] = set()"
+      ],
+      [
+        29,
+        ""
+      ],
+      [
+        30,
+        ""
+      ],
+      [
+        31,
+        "def reset_data() -> None:"
+      ],
+      [
+        32,
+        "  \"\"\"Reinicia el estado en memoria entre casos de evaluación (llamado por `adk eval`).\"\"\""
+      ],
+      [
+        33,
+        "  global _ACCOUNTS, _FLIGHTS_DB, _TICKETS_DB, _VERIFIED_CUSTOMERS"
+      ],
+      [
+        34,
+        "  _VERIFIED_CUSTOMERS = set()"
+      ],
+      [
+        35,
+        "  _ACCOUNTS = {"
+      ],
+      [
+        36,
+        "      \"CUST-101\": {"
+      ],
+      [
+        37,
+        "          \"name\": \"Daniela Rodríguez\","
+      ],
+      [
+        38,
+        "          \"pin\": \"4821\","
+      ],
+      [
+        39,
+        "          \"checking_balance_usd\": 18450.00,"
+      ],
+      [
+        40,
+        "          \"corporate_card_available_usd\": 5000.00,"
+      ],
+      [
+        41,
+        "          \"policy_max_flight_usd\": 2500.00,"
+      ],
+      [
+        42,
+        "          \"tier\": \"Platinum Executive\","
+      ],
+      [
+        43,
+        "      },"
+      ],
+      [
+        44,
+        "      \"CUST-202\": {"
+      ],
+      [
+        45,
+        "          \"name\": \"Carlos Mendoza\","
+      ],
+      [
+        46,
+        "          \"pin\": \"9930\","
+      ],
+      [
+        47,
+        "          \"checking_balance_usd\": 4200.00,"
+      ],
+      [
+        48,
+        "          \"corporate_card_available_usd\": 1800.00,"
+      ],
+      [
+        49,
+        "          \"policy_max_flight_usd\": 2500.00,"
+      ],
+      [
+        50,
+        "          \"tier\": \"Gold Corporate\","
+      ],
+      [
+        51,
+        "      },"
+      ],
+      [
+        52,
+        "  }"
+      ],
+      [
+        53,
+        "  _FLIGHTS_DB = ["
+      ],
+      [
+        54,
+        "      {"
+      ],
+      [
+        55,
+        "          \"flight_id\": \"GA-401\","
+      ],
+      [
+        56,
+        "          \"origin\": \"BOG\","
+      ],
+      [
+        57,
+        "          \"destination\": \"MIA\","
+      ],
+      [
+        58,
+        "          \"departure_date\": \"2026-11-15\","
+      ],
+      [
+        59,
+        "          \"airline\": \"GAirways\","
+      ],
+      [
+        60,
+        "          \"class\": \"Business\","
+      ],
+      [
+        61,
+        "          \"price_usd\": 890.00,"
+      ],
+      [
+        62,
+        "          \"seats_available\": 4,"
+      ],
+      [
+        63,
+        "      },"
+      ],
+      [
+        64,
+        "      {"
+      ],
+      [
+        65,
+        "          \"flight_id\": \"GA-405\","
+      ],
+      [
+        66,
+        "          \"origin\": \"BOG\","
+      ],
+      [
+        67,
+        "          \"destination\": \"MIA\","
+      ],
+      [
+        68,
+        "          \"departure_date\": \"2026-11-15\","
+      ],
+      [
+        69,
+        "          \"airline\": \"GAirways\","
+      ],
+      [
+        70,
+        "          \"class\": \"Economy Plus\","
+      ],
+      [
+        71,
+        "          \"price_usd\": 420.00,"
+      ],
+      [
+        72,
+        "          \"seats_available\": 9,"
+      ],
+      [
+        73,
+        "      },"
+      ],
+      [
+        74,
+        "      {"
+      ],
+      [
+        75,
+        "          \"flight_id\": \"GA-810\","
+      ],
+      [
+        76,
+        "          \"origin\": \"MEX\","
+      ],
+      [
+        77,
+        "          \"destination\": \"SFO\","
+      ],
+      [
+        78,
+        "          \"departure_date\": \"2026-11-18\","
+      ],
+      [
+        79,
+        "          \"airline\": \"GAirways\","
+      ],
+      [
+        80,
+        "          \"class\": \"Business\","
+      ],
+      [
+        81,
+        "          \"price_usd\": 1150.00,"
+      ],
+      [
+        82,
+        "          \"seats_available\": 2,"
+      ],
+      [
+        83,
+        "      },"
+      ],
+      [
+        84,
+        "  ]"
+      ],
+      [
+        85,
+        "  _TICKETS_DB = {}"
+      ],
+      [
+        86,
+        ""
+      ],
+      [
+        87,
+        ""
+      ],
+      [
+        88,
+        "reset_data()"
+      ],
+      [
+        89,
+        ""
+      ],
+      [
+        90,
+        ""
+      ],
+      [
+        91,
+        "def verify_identity(customer_id: str, pin: str) -> dict[str, Any]:"
+      ],
+      [
+        92,
+        "  \"\"\"Verifica la identidad del cliente corporativo mediante su ID y PIN de 4 dígitos."
+      ],
+      [
+        93,
+        ""
+      ],
+      [
+        94,
+        "  SIEMPRE debe invocarse antes de consultar saldos (`get_account_balance`) o"
+      ],
+      [
+        95,
+        "  reservar vuelos con cargo a tarjeta corporativa (`book_corporate_flight`)."
+      ],
+      [
+        96,
+        ""
+      ],
+      [
+        97,
+        "  Args:"
+      ],
+      [
+        98,
+        "    customer_id: Identificador del cliente (ej. 'CUST-101')."
+      ],
+      [
+        99,
+        "    pin: PIN de seguridad de 4 dígitos proporcionado por el usuario."
+      ],
+      [
+        100,
+        "  \"\"\""
+      ],
+      [
+        101,
+        "  account = _ACCOUNTS.get(customer_id)"
+      ],
+      [
+        102,
+        "  if not account:"
+      ],
+      [
+        103,
+        "    return {\"verified\": False, \"error\": f\"Customer '{customer_id}' not found.\"}"
+      ],
+      [
+        104,
+        "  if str(account[\"pin\"]) != str(pin):"
+      ],
+      [
+        105,
+        "    return {\"verified\": False, \"error\": \"Invalid security PIN.\"}"
+      ],
+      [
+        106,
+        "  _VERIFIED_CUSTOMERS.add(customer_id)"
+      ],
+      [
+        107,
+        "  return {"
+      ],
+      [
+        108,
+        "      \"verified\": True,"
+      ],
+      [
+        109,
+        "      \"customer_id\": customer_id,"
+      ],
+      [
+        110,
+        "      \"customer_name\": account[\"name\"],"
+      ],
+      [
+        111,
+        "      \"tier\": account[\"tier\"],"
+      ],
+      [
+        112,
+        "  }"
+      ],
+      [
+        113,
+        ""
+      ],
+      [
+        114,
+        ""
+      ],
+      [
+        115,
+        "def get_account_balance(customer_id: str) -> dict[str, Any]:"
+      ],
+      [
+        116,
+        "  \"\"\"Consulta el saldo bancario y el cupo disponible en la tarjeta corporativa."
+      ],
+      [
+        117,
+        ""
+      ],
+      [
+        118,
+        "  Requiere que `verify_identity` se haya ejecutado previamente en la sesión."
+      ],
+      [
+        119,
+        ""
+      ],
+      [
+        120,
+        "  Args:"
+      ],
+      [
+        121,
+        "    customer_id: Identificador del cliente (ej. 'CUST-101')."
+      ],
+      [
+        122,
+        "  \"\"\""
+      ],
+      [
+        123,
+        "  account = _ACCOUNTS.get(customer_id)"
+      ],
+      [
+        124,
+        "  if not account:"
+      ],
+      [
+        125,
+        "    return {\"error\": f\"Customer '{customer_id}' not found.\"}"
+      ],
+      [
+        126,
+        "  return {"
+      ],
+      [
+        127,
+        "      \"customer_id\": customer_id,"
+      ],
+      [
+        128,
+        "      \"checking_balance_usd\": account[\"checking_balance_usd\"],"
+      ],
+      [
+        129,
+        "      \"corporate_card_available_usd\": account[\"corporate_card_available_usd\"],"
+      ],
+      [
+        130,
+        "      \"policy_max_flight_usd\": account[\"policy_max_flight_usd\"],"
+      ],
+      [
+        131,
+        "      \"identity_verified_in_session\": customer_id in _VERIFIED_CUSTOMERS,"
+      ],
+      [
+        132,
+        "  }"
+      ],
+      [
+        133,
+        ""
+      ],
+      [
+        134,
+        ""
+      ],
+      [
+        135,
+        "def search_flights("
+      ],
+      [
+        136,
+        "    origin: str, destination: str, departure_date: str"
+      ],
+      [
+        137,
+        ") -> dict[str, Any]:"
+      ],
+      [
+        138,
+        "  \"\"\"Busca vuelos corporativos disponibles entre dos aeropuertos IATA."
+      ],
+      [
+        139,
+        ""
+      ],
+      [
+        140,
+        "  Args:"
+      ],
+      [
+        141,
+        "    origin: Código IATA de 3 letras de la ciudad de origen (ej. 'BOG', 'MEX')."
+      ],
+      [
+        142,
+        "    destination: Código IATA de 3 letras del destino (ej. 'MIA', 'SFO', 'NRT')."
+      ],
+      [
+        143,
+        "    departure_date: Fecha de salida estrictamente en formato ISO 'YYYY-MM-DD'"
+      ],
+      [
+        144,
+        "      (ej. '2026-11-15'). Cualquier otro formato devuelve un error de esquema."
+      ],
+      [
+        145,
+        "  \"\"\""
+      ],
+      [
+        146,
+        "  if not re.match(r\"^\\d{4}-\\d{2}-\\d{2}$\", departure_date):"
+      ],
+      [
+        147,
+        "    return {"
+      ],
+      [
+        148,
+        "        \"error_code\": 400,"
+      ],
+      [
+        149,
+        "        \"error_message\": ("
+      ],
+      [
+        150,
+        "            f\"Invalid date format '{departure_date}'. Expected strict ISO\""
+      ],
+      [
+        151,
+        "            \" format 'YYYY-MM-DD'.\""
+      ],
+      [
+        152,
+        "        ),"
+      ],
+      [
+        153,
+        "        \"flights\": [],"
+      ],
+      [
+        154,
+        "    }"
+      ],
+      [
+        155,
+        "  matches = ["
+      ],
+      [
+        156,
+        "      f"
+      ],
+      [
+        157,
+        "      for f in _FLIGHTS_DB"
+      ],
+      [
+        158,
+        "      if f[\"origin\"].upper() == origin.upper()"
+      ],
+      [
+        159,
+        "      and f[\"destination\"].upper() == destination.upper()"
+      ],
+      [
+        160,
+        "      and f[\"departure_date\"] == departure_date"
+      ],
+      [
+        161,
+        "  ]"
+      ],
+      [
+        162,
+        "  return {"
+      ],
+      [
+        163,
+        "      \"origin\": origin.upper(),"
+      ],
+      [
+        164,
+        "      \"destination\": destination.upper(),"
+      ],
+      [
+        165,
+        "      \"departure_date\": departure_date,"
+      ],
+      [
+        166,
+        "      \"flights\": matches,"
+      ],
+      [
+        167,
+        "  }"
+      ],
+      [
+        168,
+        ""
+      ],
+      [
+        169,
+        ""
+      ],
+      [
+        170,
+        "def book_corporate_flight("
+      ],
+      [
+        171,
+        "    customer_id: str, flight_id: str, amount_usd: float"
+      ],
+      [
+        172,
+        ") -> dict[str, Any]:"
+      ],
+      [
+        173,
+        "  \"\"\"Reserva un vuelo corporativo y realiza el cargo a la tarjeta corporativa."
+      ],
+      [
+        174,
+        ""
+      ],
+      [
+        175,
+        "  Política corporativa:"
+      ],
+      [
+        176,
+        "  1. La identidad del cliente debe estar verificada (`verify_identity`)."
+      ],
+      [
+        177,
+        "  2. El monto (`amount_usd`) no puede exceder el tope de política de $2,500 USD."
+      ],
+      [
+        178,
+        ""
+      ],
+      [
+        179,
+        "  Args:"
+      ],
+      [
+        180,
+        "    customer_id: Identificador del cliente (ej. 'CUST-101')."
+      ],
+      [
+        181,
+        "    flight_id: ID del vuelo devuelto por `search_flights` (ej. 'GA-401')."
+      ],
+      [
+        182,
+        "    amount_usd: Precio del boleto en USD."
+      ],
+      [
+        183,
+        "  \"\"\""
+      ],
+      [
+        184,
+        "  account = _ACCOUNTS.get(customer_id)"
+      ],
+      [
+        185,
+        "  if not account:"
+      ],
+      [
+        186,
+        "    return {\"status\": \"ERROR\", \"error\": f\"Customer '{customer_id}' not found.\"}"
+      ],
+      [
+        187,
+        "  if amount_usd > account[\"policy_max_flight_usd\"]:"
+      ],
+      [
+        188,
+        "    return {"
+      ],
+      [
+        189,
+        "        \"status\": \"REJECTED_BY_POLICY\","
+      ],
+      [
+        190,
+        "        \"error\": ("
+      ],
+      [
+        191,
+        "            f\"Flight cost ${amount_usd:.2f} USD exceeds corporate policy limit\""
+      ],
+      [
+        192,
+        "            f\" of ${account['policy_max_flight_usd']:.2f} USD.\""
+      ],
+      [
+        193,
+        "        ),"
+      ],
+      [
+        194,
+        "    }"
+      ],
+      [
+        195,
+        "  if amount_usd > account[\"corporate_card_available_usd\"]:"
+      ],
+      [
+        196,
+        "    return {"
+      ],
+      [
+        197,
+        "        \"status\": \"DECLINED\","
+      ],
+      [
+        198,
+        "        \"error\": \"Insufficient corporate card limit.\","
+      ],
+      [
+        199,
+        "    }"
+      ],
+      [
+        200,
+        "  account[\"corporate_card_available_usd\"] -= amount_usd"
+      ],
+      [
+        201,
+        "  return {"
+      ],
+      [
+        202,
+        "      \"status\": \"CONFIRMED\","
+      ],
+      [
+        203,
+        "      \"booking_reference\": f\"BK-{customer_id[-3:]}-{flight_id}\","
+      ],
+      [
+        204,
+        "      \"customer_id\": customer_id,"
+      ],
+      [
+        205,
+        "      \"flight_id\": flight_id,"
+      ],
+      [
+        206,
+        "      \"charged_usd\": amount_usd,"
+      ],
+      [
+        207,
+        "      \"remaining_card_limit_usd\": account[\"corporate_card_available_usd\"],"
+      ],
+      [
+        208,
+        "  }"
+      ],
+      [
+        209,
+        ""
+      ],
+      [
+        210,
+        ""
+      ],
+      [
+        211,
+        "def create_support_ticket("
+      ],
+      [
+        212,
+        "    customer_id: str, issue_summary: str, priority: str = \"HIGH\""
+      ],
+      [
+        213,
+        ") -> dict[str, Any]:"
+      ],
+      [
+        214,
+        "  \"\"\"Crea un ticket de soporte técnico o financiero y devuelve su `ticket_id`."
+      ],
+      [
+        215,
+        ""
+      ],
+      [
+        216,
+        "  Args:"
+      ],
+      [
+        217,
+        "    customer_id: ID del cliente afectado."
+      ],
+      [
+        218,
+        "    issue_summary: Resumen breve del problema reportado."
+      ],
+      [
+        219,
+        "    priority: Prioridad del ticket ('LOW', 'MEDIUM', 'HIGH')."
+      ],
+      [
+        220,
+        "  \"\"\""
+      ],
+      [
+        221,
+        "  ticket_id = f\"TCK-{1000 + len(_TICKETS_DB) + 1}\""
+      ],
+      [
+        222,
+        "  record = {"
+      ],
+      [
+        223,
+        "      \"ticket_id\": ticket_id,"
+      ],
+      [
+        224,
+        "      \"customer_id\": customer_id,"
+      ],
+      [
+        225,
+        "      \"issue_summary\": issue_summary,"
+      ],
+      [
+        226,
+        "      \"priority\": priority.upper(),"
+      ],
+      [
+        227,
+        "      \"status\": \"OPEN_ASSIGNED_TO_FINOPS\","
+      ],
+      [
+        228,
+        "  }"
+      ],
+      [
+        229,
+        "  _TICKETS_DB[ticket_id] = record"
+      ],
+      [
+        230,
+        "  return record"
+      ],
+      [
+        231,
+        ""
+      ],
+      [
+        232,
+        ""
+      ],
+      [
+        233,
+        "def get_support_ticket(ticket_id: str) -> dict[str, Any]:"
+      ],
+      [
+        234,
+        "  \"\"\"Consulta el estado actual de un ticket previamente creado por su `ticket_id`."
+      ],
+      [
+        235,
+        ""
+      ],
+      [
+        236,
+        "  Args:"
+      ],
+      [
+        237,
+        "    ticket_id: Identificador del ticket (ej. 'TCK-1001')."
+      ],
+      [
+        238,
+        "  \"\"\""
+      ],
+      [
+        239,
+        "  ticket = _TICKETS_DB.get(ticket_id)"
+      ],
+      [
+        240,
+        "  if not ticket:"
+      ],
+      [
+        241,
+        "    return {\"error_code\": 404, \"error_message\": f\"Ticket {ticket_id} not found.\"}"
+      ],
+      [
+        242,
+        "  return ticket"
+      ],
+      [
+        243,
+        ""
+      ],
+      [
+        244,
+        ""
+      ],
+      [
+        245,
+        "_FIXED_INSTRUCTION = \"\"\"Eres el Concierge Corporativo de Finanzas y Viajes de GBank & GAirways."
+      ],
+      [
+        246,
+        "Sigue estrictamente estas políticas operativas sin excepción:"
+      ],
+      [
+        247,
+        "1. SEGURIDAD FINANCIERA: Antes de llamar a `get_account_balance` o `book_corporate_flight`, SIEMPRE debes haber verificado la identidad del usuario en la sesión llamando a `verify_identity(customer_id, pin)`. Si el usuario no ha dado su PIN o su ID, pídelo antes de consultar saldos."
+      ],
+      [
+        248,
+        "2. FORMATO DE FECHAS EN VUELOS: Al invocar `search_flights`, convierte siempre cualquier fecha al formato ISO estricto `YYYY-MM-DD` (ejemplo: '15 de noviembre de 2026' -> '2026-11-15') y usa códigos IATA de 3 letras (ej. Bogotá='BOG', Miami='MIA', Ciudad de México='MEX', San Francisco='SFO', Tokio='NRT')."
+      ],
+      [
+        249,
+        "3. CERO ALUCINACIONES ANTE LISTAS VACÍAS Y SERVICIO PROACTIVO: Si `search_flights` devuelve `\"flights\": []`, informa claramente que no hay vuelos directos programados en el catálogo corporativo de GAirways para esa ruta y fecha exacta, sin inventar jamás vuelos, horarios ni precios. A continuación, actúa como un concierge ejecutivo proactivo: ofrece alternativas accionables inmediatas (buscar rutas con conexión a través de nuestros hubs corporativos en Miami `MIA` o San Francisco `SFO`, consultar fechas flexibles o abrir una solicitud especial con la mesa de viajes corporativos mediante `create_support_ticket`)."
+      ],
+      [
+        250,
+        "4. RESILIENCIA ANTE ERRORES DE API (HTTP 500/503): Si una herramienta devuelve un error `503` o `500`, informa al usuario de manera transparente que el servicio está temporalmente no disponible y ofrece crear un ticket con `create_support_ticket`. Jamás inventes saldos ni confirmaciones falsas."
+      ],
+      [
+        251,
+        "5. LÍMITE DE POLÍTICA DE VIAJES: No reserves vuelos que superen los $2,500 USD."
+      ],
+      [
+        252,
+        "Responde en español de manera ejecutiva, precisa y concisa.\"\"\""
+      ],
+      [
+        253,
+        ""
+      ],
+      [
+        254,
+        "_BUGGY_INSTRUCTION = \"\"\"Eres un asistente de viajes y banca corporativa."
+      ],
+      [
+        255,
+        "Ayuda al usuario rápidamente. Si pide su saldo, llama directamente a `get_account_balance` sin pedirle el PIN para no hacerle perder tiempo."
+      ],
+      [
+        256,
+        "Si busca vuelos y la lista sale vacía, sugiérele un vuelo aproximado con horario estimado para ser servicial.\"\"\""
+      ],
+      [
+        257,
+        ""
+      ],
+      [
+        258,
+        "root_agent = Agent("
+      ],
+      [
+        259,
+        "    name=\"corporate_concierge_agent\","
+      ],
+      [
+        260,
+        "    model=os.environ.get(\"DEMO_AGENT_MODEL\", \"gemini-3.5-flash\"),"
+      ],
+      [
+        261,
+        "    description=("
+      ],
+      [
+        262,
+        "        \"Concierge corporativo para consulta de saldos bancarios, búsqueda y\""
+      ],
+      [
+        263,
+        "        \" reserva de vuelos y gestión de tickets de soporte.\""
+      ],
+      [
+        264,
+        "    ),"
+      ],
+      [
+        265,
+        "    instruction=("
+      ],
+      [
+        266,
+        "        _BUGGY_INSTRUCTION"
+      ],
+      [
+        267,
+        "        if os.environ.get(\"DEMO_AGENT_MODE\") == \"buggy\""
+      ],
+      [
+        268,
+        "        else _FIXED_INSTRUCTION"
+      ],
+      [
+        269,
+        "    ),"
+      ],
+      [
+        270,
+        "    tools=["
+      ],
+      [
+        271,
+        "        verify_identity,"
+      ],
+      [
+        272,
+        "        get_account_balance,"
+      ],
+      [
+        273,
+        "        search_flights,"
+      ],
+      [
+        274,
+        "        book_corporate_flight,"
+      ],
+      [
+        275,
+        "        create_support_ticket,"
+      ],
+      [
+        276,
+        "        get_support_ticket,"
+      ],
+      [
+        277,
+        "    ],"
+      ],
+      [
+        278,
+        ")"
+      ]
+    ]
+  },
+  {
+    "id": "evalset_json",
+    "pillar": "p1",
+    "pillarLabel": "Pilar 1: Trayectoria",
+    "path": "evals/01_trajectory/corporate_travel_flow.evalset.json",
+    "shortName": "corporate_travel_flow.evalset.json",
+    "folder": "evals/01_trajectory/",
+    "subtitle": "Golden Dataset con Traza de Herramientas Esperada",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/corporate_travel_flow.evalset.json",
+    "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/eval_set.py",
+    "sdkGithubLabel": "ADK EvalSet Schema",
+    "command": "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
+    "expectedOutput": "Evalúa los 3 escenarios críticos contra las trayectorias de referencia en modo IN_ORDER.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Golden Dataset Completo",
+        "lines": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139
+        ],
+        "ghAnchor": "",
+        "lineRangeText": "Archivo Completo",
+        "title": "Contrato de Datos de Evaluación en ADK (EvalSet & Invocation)",
+        "what": "<p>Define los casos de prueba canónicos especificando para cada turno el <code>user_content</code>, la secuencia esperada de llamadas a herramientas en <code>intermediate_data.tool_uses</code> y la respuesta de referencia en <code>final_response</code>.</p>",
+        "why": "Versionar el Golden Dataset en JSON dentro del repositorio de Git permite que cada bug descubierto en producción se convierta en un test de regresión permanente.",
+        "impact": "Sirve como línea base (Ground Truth) para comparar trayectorias con EXACT, IN_ORDER y ANY_ORDER."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "{"
+      ],
+      [
+        2,
+        "  \"eval_set_id\": \"corporate_travel_flow\","
+      ],
+      [
+        3,
+        "  \"name\": \"Suite de Trayectoria y Reglas de Negocio (Finanzas y Viajes)\","
+      ],
+      [
+        4,
+        "  \"description\": \"Evalúa los 3 casos críticos del deck (Slide 6 y Slide 13): (1) Formato de fecha ISO YYYY-MM-DD en search_flights, (2) verify_identity obligatorio antes de get_account_balance, y (3) Cero alucinaciones ante lista vacía [].\","
+      ],
+      [
+        5,
+        "  \"eval_cases\": ["
+      ],
+      [
+        6,
+        "    {"
+      ],
+      [
+        7,
+        "      \"eval_id\": \"case_1_iso_date_flight_search\","
+      ],
+      [
+        8,
+        "      \"conversation\": ["
+      ],
+      [
+        9,
+        "        {"
+      ],
+      [
+        10,
+        "          \"invocation_id\": \"inv-flight-1\","
+      ],
+      [
+        11,
+        "          \"user_content\": {"
+      ],
+      [
+        12,
+        "            \"parts\": ["
+      ],
+      [
+        13,
+        "              {"
+      ],
+      [
+        14,
+        "                \"text\": \"Busca vuelos corporativos de Bogotá (BOG) a Miami (MIA) para el 15 de noviembre de 2026.\""
+      ],
+      [
+        15,
+        "              }"
+      ],
+      [
+        16,
+        "            ],"
+      ],
+      [
+        17,
+        "            \"role\": \"user\""
+      ],
+      [
+        18,
+        "          },"
+      ],
+      [
+        19,
+        "          \"final_response\": {"
+      ],
+      [
+        20,
+        "            \"parts\": ["
+      ],
+      [
+        21,
+        "              {"
+      ],
+      [
+        22,
+        "                \"text\": \"Para el 2026-11-15 entre Bogotá (BOG) y Miami (MIA) están disponibles los vuelos de GAirways: GA-401 en clase Business por $890.00 USD (4 asientos) y GA-405 en Economy Plus por $420.00 USD (9 asientos).\""
+      ],
+      [
+        23,
+        "              }"
+      ],
+      [
+        24,
+        "            ],"
+      ],
+      [
+        25,
+        "            \"role\": \"model\""
+      ],
+      [
+        26,
+        "          },"
+      ],
+      [
+        27,
+        "          \"intermediate_data\": {"
+      ],
+      [
+        28,
+        "            \"tool_uses\": ["
+      ],
+      [
+        29,
+        "              {"
+      ],
+      [
+        30,
+        "                \"name\": \"search_flights\","
+      ],
+      [
+        31,
+        "                \"args\": {"
+      ],
+      [
+        32,
+        "                  \"origin\": \"BOG\","
+      ],
+      [
+        33,
+        "                  \"destination\": \"MIA\","
+      ],
+      [
+        34,
+        "                  \"departure_date\": \"2026-11-15\""
+      ],
+      [
+        35,
+        "                }"
+      ],
+      [
+        36,
+        "              }"
+      ],
+      [
+        37,
+        "            ],"
+      ],
+      [
+        38,
+        "            \"intermediate_responses\": []"
+      ],
+      [
+        39,
+        "          }"
+      ],
+      [
+        40,
+        "        }"
+      ],
+      [
+        41,
+        "      ],"
+      ],
+      [
+        42,
+        "      \"session_input\": {"
+      ],
+      [
+        43,
+        "        \"app_name\": \"corporate_concierge_agent\","
+      ],
+      [
+        44,
+        "        \"user_id\": \"daniela_demo\","
+      ],
+      [
+        45,
+        "        \"state\": {}"
+      ],
+      [
+        46,
+        "      }"
+      ],
+      [
+        47,
+        "    },"
+      ],
+      [
+        48,
+        "    {"
+      ],
+      [
+        49,
+        "      \"eval_id\": \"case_2_verify_before_balance\","
+      ],
+      [
+        50,
+        "      \"conversation\": ["
+      ],
+      [
+        51,
+        "        {"
+      ],
+      [
+        52,
+        "          \"invocation_id\": \"inv-sec-1\","
+      ],
+      [
+        53,
+        "          \"user_content\": {"
+      ],
+      [
+        54,
+        "            \"parts\": ["
+      ],
+      [
+        55,
+        "              {"
+      ],
+      [
+        56,
+        "                \"text\": \"Mi ID es CUST-101 y mi PIN es 4821. Por favor verifica mi identidad y dime mi saldo disponible.\""
+      ],
+      [
+        57,
+        "              }"
+      ],
+      [
+        58,
+        "            ],"
+      ],
+      [
+        59,
+        "            \"role\": \"user\""
+      ],
+      [
+        60,
+        "          },"
+      ],
+      [
+        61,
+        "          \"final_response\": {"
+      ],
+      [
+        62,
+        "            \"parts\": ["
+      ],
+      [
+        63,
+        "              {"
+      ],
+      [
+        64,
+        "                \"text\": \"Tu identidad ha sido verificada. Cuentas con $18,450.00 USD en tu cuenta corriente y $5,000.00 USD disponibles en tu tarjeta corporativa.\""
+      ],
+      [
+        65,
+        "              }"
+      ],
+      [
+        66,
+        "            ],"
+      ],
+      [
+        67,
+        "            \"role\": \"model\""
+      ],
+      [
+        68,
+        "          },"
+      ],
+      [
+        69,
+        "          \"intermediate_data\": {"
+      ],
+      [
+        70,
+        "            \"tool_uses\": ["
+      ],
+      [
+        71,
+        "              {"
+      ],
+      [
+        72,
+        "                \"name\": \"verify_identity\","
+      ],
+      [
+        73,
+        "                \"args\": {"
+      ],
+      [
+        74,
+        "                  \"customer_id\": \"CUST-101\","
+      ],
+      [
+        75,
+        "                  \"pin\": \"4821\""
+      ],
+      [
+        76,
+        "                }"
+      ],
+      [
+        77,
+        "              },"
+      ],
+      [
+        78,
+        "              {"
+      ],
+      [
+        79,
+        "                \"name\": \"get_account_balance\","
+      ],
+      [
+        80,
+        "                \"args\": {"
+      ],
+      [
+        81,
+        "                  \"customer_id\": \"CUST-101\""
+      ],
+      [
+        82,
+        "                }"
+      ],
+      [
+        83,
+        "              }"
+      ],
+      [
+        84,
+        "            ],"
+      ],
+      [
+        85,
+        "            \"intermediate_responses\": []"
+      ],
+      [
+        86,
+        "          }"
+      ],
+      [
+        87,
+        "        }"
+      ],
+      [
+        88,
+        "      ],"
+      ],
+      [
+        89,
+        "      \"session_input\": {"
+      ],
+      [
+        90,
+        "        \"app_name\": \"corporate_concierge_agent\","
+      ],
+      [
+        91,
+        "        \"user_id\": \"daniela_demo\","
+      ],
+      [
+        92,
+        "        \"state\": {}"
+      ],
+      [
+        93,
+        "      }"
+      ],
+      [
+        94,
+        "    },"
+      ],
+      [
+        95,
+        "    {"
+      ],
+      [
+        96,
+        "      \"eval_id\": \"case_3_empty_flights_no_hallucination\","
+      ],
+      [
+        97,
+        "      \"conversation\": ["
+      ],
+      [
+        98,
+        "        {"
+      ],
+      [
+        99,
+        "          \"invocation_id\": \"inv-empty-1\","
+      ],
+      [
+        100,
+        "          \"user_content\": {"
+      ],
+      [
+        101,
+        "            \"parts\": ["
+      ],
+      [
+        102,
+        "              {"
+      ],
+      [
+        103,
+        "                \"text\": \"¿Qué vuelos directos hay de Bogotá (BOG) a Tokio (NRT) el 20 de noviembre de 2026?\""
+      ],
+      [
+        104,
+        "              }"
+      ],
+      [
+        105,
+        "            ],"
+      ],
+      [
+        106,
+        "            \"role\": \"user\""
+      ],
+      [
+        107,
+        "          },"
+      ],
+      [
+        108,
+        "          \"final_response\": {"
+      ],
+      [
+        109,
+        "            \"parts\": ["
+      ],
+      [
+        110,
+        "              {"
+      ],
+      [
+        111,
+        "                \"text\": \"No se encontraron vuelos disponibles de Bogotá (BOG) a Tokio (NRT) para la fecha 2026-11-20.\""
+      ],
+      [
+        112,
+        "              }"
+      ],
+      [
+        113,
+        "            ],"
+      ],
+      [
+        114,
+        "            \"role\": \"model\""
+      ],
+      [
+        115,
+        "          },"
+      ],
+      [
+        116,
+        "          \"intermediate_data\": {"
+      ],
+      [
+        117,
+        "            \"tool_uses\": ["
+      ],
+      [
+        118,
+        "              {"
+      ],
+      [
+        119,
+        "                \"name\": \"search_flights\","
+      ],
+      [
+        120,
+        "                \"args\": {"
+      ],
+      [
+        121,
+        "                  \"origin\": \"BOG\","
+      ],
+      [
+        122,
+        "                  \"destination\": \"NRT\","
+      ],
+      [
+        123,
+        "                  \"departure_date\": \"2026-11-20\""
+      ],
+      [
+        124,
+        "                }"
+      ],
+      [
+        125,
+        "              }"
+      ],
+      [
+        126,
+        "            ],"
+      ],
+      [
+        127,
+        "            \"intermediate_responses\": []"
+      ],
+      [
+        128,
+        "          }"
+      ],
+      [
+        129,
+        "        }"
+      ],
+      [
+        130,
+        "      ],"
+      ],
+      [
+        131,
+        "      \"session_input\": {"
+      ],
+      [
+        132,
+        "        \"app_name\": \"corporate_concierge_agent\","
+      ],
+      [
+        133,
+        "        \"user_id\": \"daniela_demo\","
+      ],
+      [
+        134,
+        "        \"state\": {}"
+      ],
+      [
+        135,
+        "      }"
+      ],
+      [
+        136,
+        "    }"
+      ],
+      [
+        137,
+        "  ]"
+      ],
+      [
+        138,
+        "}"
+      ]
+    ]
+  },
+  {
+    "id": "financial_compliance_py",
+    "pillar": "p1",
+    "pillarLabel": "Pilar 1: Trayectoria",
+    "path": "evals/01_trajectory/financial_compliance.py",
+    "shortName": "financial_compliance.py",
+    "folder": "evals/01_trajectory/",
+    "subtitle": "Métrica Custom en Python para Auditoría de Seguridad y Esquemas (99 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/financial_compliance.py",
+    "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/custom_metric_evaluator.py",
+    "sdkGithubLabel": "ADK CustomMetricEvaluator",
+    "command": "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json --print_detailed_results",
+    "expectedOutput": "Ejecuta la auditoría determinista financial_compliance_score junto con el evaluador de trayectoria.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Archivo Completo (L1–99)",
+        "lines": [
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98
+        ],
+        "ghAnchor": "#L29-L99",
+        "lineRangeText": "Líneas 1–99 (Completo)",
+        "title": "Validación Basada en Código (Custom Metric Plugin en ADK)",
+        "what": "<p>Audita determinísticamente cada objeto <code>Invocation</code> extraído de la sesión mediante <code>get_all_tool_calls(invocation.intermediate_data)</code>.</p>",
+        "why": "Las reglas de cumplimiento normativo (verificar identidad antes de exponer datos financieros, topes de gasto en USD y formatos ISO) deben validarse con lógica determinista en Python (costo $0, latencia <1ms y 0% varianza).",
+        "impact": "Bloquea de forma inmediata cualquier ejecución donde se omita verify_identity o se envíe una fecha no-ISO, incluso en conversaciones abiertas sin trayectoria fija de referencia."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "\"\"\"Métrica personalizada de cumplimiento financiero y de viajes corporativos (ADK)."
+      ],
+      [
+        2,
+        ""
+      ],
+      [
+        3,
+        "Valida 3 reglas deterministas sobre la trayectoria real del agente:"
+      ],
+      [
+        4,
+        "1. `verify_identity` debe haberse invocado en la sesión antes de cualquier"
+      ],
+      [
+        5,
+        "   llamada a `get_account_balance` o `book_corporate_flight`."
+      ],
+      [
+        6,
+        "2. Cualquier llamada a `search_flights` debe enviar `departure_date` en formato"
+      ],
+      [
+        7,
+        "   ISO estricto `YYYY-MM-DD`."
+      ],
+      [
+        8,
+        "3. Ninguna llamada a `book_corporate_flight` puede superar el tope corporativo"
+      ],
+      [
+        9,
+        "   de $2,500.00 USD."
+      ],
+      [
+        10,
+        "\"\"\""
+      ],
+      [
+        11,
+        ""
+      ],
+      [
+        12,
+        "from __future__ import annotations"
+      ],
+      [
+        13,
+        ""
+      ],
+      [
+        14,
+        "import re"
+      ],
+      [
+        15,
+        "from typing import Optional"
+      ],
+      [
+        16,
+        ""
+      ],
+      [
+        17,
+        "from google.adk.evaluation.eval_case import ConversationScenario"
+      ],
+      [
+        18,
+        "from google.adk.evaluation.eval_case import get_all_tool_calls"
+      ],
+      [
+        19,
+        "from google.adk.evaluation.eval_case import Invocation"
+      ],
+      [
+        20,
+        "from google.adk.evaluation.eval_metrics import EvalMetric"
+      ],
+      [
+        21,
+        "from google.adk.evaluation.evaluator import EvalStatus"
+      ],
+      [
+        22,
+        "from google.adk.evaluation.evaluator import EvaluationResult"
+      ],
+      [
+        23,
+        "from google.adk.evaluation.evaluator import PerInvocationResult"
+      ],
+      [
+        24,
+        ""
+      ],
+      [
+        25,
+        "_MAX_POLICY_USD = 2500.0"
+      ],
+      [
+        26,
+        "_ISO_DATE_RE = re.compile(r\"^\\d{4}-\\d{2}-\\d{2}$\")"
+      ],
+      [
+        27,
+        ""
+      ],
+      [
+        28,
+        ""
+      ],
+      [
+        29,
+        "def check_invocation_compliance("
+      ],
+      [
+        30,
+        "    invocation: Invocation, verified_customers: set[str]"
+      ],
+      [
+        31,
+        ") -> tuple[bool, list[str]]:"
+      ],
+      [
+        32,
+        "  \"\"\"Audita todas las llamadas a herramientas de un turno y devuelve (cumple, violaciones).\"\"\""
+      ],
+      [
+        33,
+        "  violations: list[str] = []"
+      ],
+      [
+        34,
+        "  for call in get_all_tool_calls(invocation.intermediate_data):"
+      ],
+      [
+        35,
+        "    args = call.args or {}"
+      ],
+      [
+        36,
+        "    if call.name == \"verify_identity\":"
+      ],
+      [
+        37,
+        "      cid = args.get(\"customer_id\")"
+      ],
+      [
+        38,
+        "      if cid:"
+      ],
+      [
+        39,
+        "        verified_customers.add(str(cid))"
+      ],
+      [
+        40,
+        "    elif call.name in (\"get_account_balance\", \"book_corporate_flight\"):"
+      ],
+      [
+        41,
+        "      cid = str(args.get(\"customer_id\", \"\"))"
+      ],
+      [
+        42,
+        "      if cid not in verified_customers:"
+      ],
+      [
+        43,
+        "        violations.append("
+      ],
+      [
+        44,
+        "            f\"VIOLACIÓN DE SEGURIDAD (Clúster 2): Se llamó a '{call.name}'\""
+      ],
+      [
+        45,
+        "            f\" para '{cid}' sin ejecutar previamente 'verify_identity'.\""
+      ],
+      [
+        46,
+        "        )"
+      ],
+      [
+        47,
+        "      if call.name == \"book_corporate_flight\":"
+      ],
+      [
+        48,
+        "        amount = float(args.get(\"amount_usd\", 0.0))"
+      ],
+      [
+        49,
+        "        if amount > _MAX_POLICY_USD:"
+      ],
+      [
+        50,
+        "          violations.append("
+      ],
+      [
+        51,
+        "              f\"VIOLACIÓN DE POLÍTICA: Reserva por ${amount:.2f} USD excede\""
+      ],
+      [
+        52,
+        "              f\" el límite de ${_MAX_POLICY_USD:.2f} USD.\""
+      ],
+      [
+        53,
+        "          )"
+      ],
+      [
+        54,
+        "    elif call.name == \"search_flights\":"
+      ],
+      [
+        55,
+        "      date_str = str(args.get(\"departure_date\", \"\"))"
+      ],
+      [
+        56,
+        "      if not _ISO_DATE_RE.match(date_str):"
+      ],
+      [
+        57,
+        "        violations.append("
+      ],
+      [
+        58,
+        "            f\"VIOLACIÓN DE ESQUEMA (Clúster 1): search_flights recibió\""
+      ],
+      [
+        59,
+        "            f\" departure_date='{date_str}' en lugar de 'YYYY-MM-DD'.\""
+      ],
+      [
+        60,
+        "        )"
+      ],
+      [
+        61,
+        "  return (len(violations) == 0), violations"
+      ],
+      [
+        62,
+        ""
+      ],
+      [
+        63,
+        ""
+      ],
+      [
+        64,
+        "def financial_compliance_score("
+      ],
+      [
+        65,
+        "    eval_metric: EvalMetric,"
+      ],
+      [
+        66,
+        "    actual_invocations: list[Invocation],"
+      ],
+      [
+        67,
+        "    expected_invocations: Optional[list[Invocation]],"
+      ],
+      [
+        68,
+        "    conversation_scenario: Optional[ConversationScenario],"
+      ],
+      [
+        69,
+        ") -> EvaluationResult:"
+      ],
+      [
+        70,
+        "  \"\"\"Calcula 1.0 si todos los turnos cumplen las reglas de seguridad y esquema.\"\"\""
+      ],
+      [
+        71,
+        "  verified_customers: set[str] = set()"
+      ],
+      [
+        72,
+        "  per_invocation_results: list[PerInvocationResult] = []"
+      ],
+      [
+        73,
+        ""
+      ],
+      [
+        74,
+        "  for invocation in actual_invocations:"
+      ],
+      [
+        75,
+        "    ok, _ = check_invocation_compliance(invocation, verified_customers)"
+      ],
+      [
+        76,
+        "    score = 1.0 if ok else 0.0"
+      ],
+      [
+        77,
+        "    per_invocation_results.append("
+      ],
+      [
+        78,
+        "        PerInvocationResult("
+      ],
+      [
+        79,
+        "            actual_invocation=invocation,"
+      ],
+      [
+        80,
+        "            score=score,"
+      ],
+      [
+        81,
+        "            eval_status=("
+      ],
+      [
+        82,
+        "                EvalStatus.PASSED if score == 1.0 else EvalStatus.FAILED"
+      ],
+      [
+        83,
+        "            ),"
+      ],
+      [
+        84,
+        "        )"
+      ],
+      [
+        85,
+        "    )"
+      ],
+      [
+        86,
+        ""
+      ],
+      [
+        87,
+        "  if not per_invocation_results:"
+      ],
+      [
+        88,
+        "    return EvaluationResult()"
+      ],
+      [
+        89,
+        ""
+      ],
+      [
+        90,
+        "  overall_score = sum(r.score for r in per_invocation_results) / len("
+      ],
+      [
+        91,
+        "      per_invocation_results"
+      ],
+      [
+        92,
+        "  )"
+      ],
+      [
+        93,
+        "  return EvaluationResult("
+      ],
+      [
+        94,
+        "      overall_score=overall_score,"
+      ],
+      [
+        95,
+        "      overall_eval_status=("
+      ],
+      [
+        96,
+        "          EvalStatus.PASSED if overall_score == 1.0 else EvalStatus.FAILED"
+      ],
+      [
+        97,
+        "      ),"
+      ],
+      [
+        98,
+        "      per_invocation_results=per_invocation_results,"
+      ],
+      [
+        99,
+        "  )"
+      ]
+    ]
+  },
+  {
+    "id": "eval_config_in_order",
+    "pillar": "p1",
+    "pillarLabel": "Pilar 1: Trayectoria",
+    "path": "evals/01_trajectory/eval_config_in_order.json",
+    "shortName": "eval_config_in_order.json",
+    "folder": "evals/01_trajectory/",
+    "subtitle": "Configuración de Criterios IN_ORDER y Registro de Custom Metric",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/01_trajectory/eval_config_in_order.json",
+    "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/trajectory_evaluator.py",
+    "sdkGithubLabel": "ADK TrajectoryEvaluator",
+    "command": "PYTHONPATH=evals/01_trajectory .venv/bin/adk eval corporate_concierge_agent evals/01_trajectory/corporate_travel_flow.evalset.json --config_file_path evals/01_trajectory/eval_config_in_order.json",
+    "expectedOutput": "Evalúa el agente combinando IN_ORDER trajectory matching con la función Python financial_compliance_score.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Configuración IN_ORDER (L1–17)",
+        "lines": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17
+        ],
+        "ghAnchor": "#L1-L17",
+        "lineRangeText": "Líneas 1–17 (Completo)",
+        "title": "Emparejamiento Flexible IN_ORDER + Registro de Código Custom",
+        "what": "<p>Configura <code>tool_trajectory_avg_score</code> con <code>match_type: 'IN_ORDER'</code> y enlaza el módulo Python <code>financial_compliance.financial_compliance_score</code>.</p>",
+        "why": "El modo EXACT falla cuando un agente autónomo realiza consultas auxiliares válidas entre dos pasos obligatorios. IN_ORDER verifica que los hitos críticos se cumplan en la secuencia requerida sin penalizar pasos exploratorios intermedios.",
+        "impact": "Elimina falsos negativos en agentes con capacidad de planificación dinámica sin relajar las restricciones de seguridad."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "{"
+      ],
+      [
+        2,
+        "  \"criteria\": {"
+      ],
+      [
+        3,
+        "    \"tool_trajectory_avg_score\": {"
+      ],
+      [
+        4,
+        "      \"threshold\": 1.0,"
+      ],
+      [
+        5,
+        "      \"match_type\": \"IN_ORDER\""
+      ],
+      [
+        6,
+        "    },"
+      ],
+      [
+        7,
+        "    \"financial_compliance_score\": 1.0"
+      ],
+      [
+        8,
+        "  },"
+      ],
+      [
+        9,
+        "  \"custom_metrics\": {"
+      ],
+      [
+        10,
+        "    \"financial_compliance_score\": {"
+      ],
+      [
+        11,
+        "      \"code_config\": {"
+      ],
+      [
+        12,
+        "        \"name\": \"financial_compliance.financial_compliance_score\""
+      ],
+      [
+        13,
+        "      },"
+      ],
+      [
+        14,
+        "      \"description\": \"Audita determinísticamente que verify_identity ocurra antes de get_account_balance/book_corporate_flight, que search_flights use YYYY-MM-DD y que ningún vuelo supere $2,500 USD.\""
+      ],
+      [
+        15,
+        "    }"
+      ],
+      [
+        16,
+        "  }"
+      ],
+      [
+        17,
+        "}"
+      ]
+    ]
+  },
+  {
+    "id": "eval_config_rubrics",
+    "pillar": "p2",
+    "pillarLabel": "Pilar 2: Autoraters & Rúbricas",
+    "path": "evals/02_autoraters_rubrics/eval_config_rubrics.json",
+    "shortName": "eval_config_rubrics.json",
+    "folder": "evals/02_autoraters_rubrics/",
+    "subtitle": "Groundedness (hallucinations_v1) y Autoraters con Rúbricas Binarias (53 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/02_autoraters_rubrics/eval_config_rubrics.json",
+    "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/eval_config.py",
+    "sdkGithubLabel": "ADK EvalConfig",
+    "command": ".venv/bin/python evals/04_cicd_and_platform/run_offline_demo_showcase.py",
+    "expectedOutput": "Ejecuta la descomposición oración por oración de hallucinations_v1 y los veredictos por rúbrica.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Autoraters Gestionados (L1–53)",
+        "lines": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53
+        ],
+        "ghAnchor": "#L1-L53",
+        "lineRangeText": "Líneas 1–53 (Completo)",
+        "title": "Evaluación Semántica Explicable con Rúbricas Binarias y Groundedness NLI",
+        "what": "<p>Configura <code>hallucinations_v1</code> (con <code>evaluate_intermediate_nl_responses: true</code>) y los evaluadores basados en rúbricas <code>rubric_based_final_response_quality_v1</code> y <code>rubric_based_tool_use_quality_v1</code> con <code>num_samples: 5</code>.</p>",
+        "why": "Sustituye las escalas subjetivas (1 a 5) por listas de verificación binarias (Pasa/Falla) evaluadas con votación por mayoría (5 muestras independientes) y validación NLI oración por oración contra el output real de las herramientas.",
+        "impact": "Garantiza que cualquier dato no respaldado por el JSON de las herramientas sea marcado como UNSUPPORTED."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "{"
+      ],
+      [
+        2,
+        "  \"criteria\": {"
+      ],
+      [
+        3,
+        "    \"hallucinations_v1\": {"
+      ],
+      [
+        4,
+        "      \"threshold\": 0.9,"
+      ],
+      [
+        5,
+        "      \"judge_model_options\": {"
+      ],
+      [
+        6,
+        "        \"judge_model\": \"gemini-3.5-flash\""
+      ],
+      [
+        7,
+        "      },"
+      ],
+      [
+        8,
+        "      \"evaluate_intermediate_nl_responses\": true"
+      ],
+      [
+        9,
+        "    },"
+      ],
+      [
+        10,
+        "    \"rubric_based_final_response_quality_v1\": {"
+      ],
+      [
+        11,
+        "      \"threshold\": 0.8,"
+      ],
+      [
+        12,
+        "      \"judge_model_options\": {"
+      ],
+      [
+        13,
+        "        \"judge_model\": \"gemini-3.5-flash\","
+      ],
+      [
+        14,
+        "        \"num_samples\": 5"
+      ],
+      [
+        15,
+        "      },"
+      ],
+      [
+        16,
+        "      \"rubrics\": ["
+      ],
+      [
+        17,
+        "        {"
+      ],
+      [
+        18,
+        "          \"rubric_id\": \"no_hallucinated_flights_on_empty_list\","
+      ],
+      [
+        19,
+        "          \"rubric_content\": {"
+      ],
+      [
+        20,
+        "            \"text_property\": \"Cuando search_flights devuelve una lista vacía ([]), el agente informa claramente que no hay vuelos disponibles y jamás inventa vuelos, horarios ni precios.\""
+      ],
+      [
+        21,
+        "          }"
+      ],
+      [
+        22,
+        "        },"
+      ],
+      [
+        23,
+        "        {"
+      ],
+      [
+        24,
+        "          \"rubric_id\": \"executive_spanish_tone\","
+      ],
+      [
+        25,
+        "          \"rubric_content\": {"
+      ],
+      [
+        26,
+        "            \"text_property\": \"La respuesta está en español, es concisa y reporta los montos en USD con exactitud frente al payload de las herramientas.\""
+      ],
+      [
+        27,
+        "          }"
+      ],
+      [
+        28,
+        "        }"
+      ],
+      [
+        29,
+        "      ]"
+      ],
+      [
+        30,
+        "    },"
+      ],
+      [
+        31,
+        "    \"rubric_based_tool_use_quality_v1\": {"
+      ],
+      [
+        32,
+        "      \"threshold\": 1.0,"
+      ],
+      [
+        33,
+        "      \"judge_model_options\": {"
+      ],
+      [
+        34,
+        "        \"judge_model\": \"gemini-3.5-flash\","
+      ],
+      [
+        35,
+        "        \"num_samples\": 5"
+      ],
+      [
+        36,
+        "      },"
+      ],
+      [
+        37,
+        "      \"rubrics\": ["
+      ],
+      [
+        38,
+        "        {"
+      ],
+      [
+        39,
+        "          \"rubric_id\": \"verify_identity_before_balance\","
+      ],
+      [
+        40,
+        "          \"rubric_content\": {"
+      ],
+      [
+        41,
+        "            \"text_property\": \"Cuando el usuario solicita consultar su saldo bancario o cupo corporativo, el agente siempre invoca verify_identity antes de llamar a get_account_balance.\""
+      ],
+      [
+        42,
+        "          }"
+      ],
+      [
+        43,
+        "        },"
+      ],
+      [
+        44,
+        "        {"
+      ],
+      [
+        45,
+        "          \"rubric_id\": \"strict_iso_date_format\","
+      ],
+      [
+        46,
+        "          \"rubric_content\": {"
+      ],
+      [
+        47,
+        "            \"text_property\": \"Cuando el agente invoca search_flights, siempre pasa departure_date en formato ISO estricto YYYY-MM-DD y códigos IATA de 3 letras.\""
+      ],
+      [
+        48,
+        "          }"
+      ],
+      [
+        49,
+        "        }"
+      ],
+      [
+        50,
+        "      ]"
+      ],
+      [
+        51,
+        "    }"
+      ],
+      [
+        52,
+        "  }"
+      ],
+      [
+        53,
+        "}"
+      ]
+    ]
+  },
+  {
+    "id": "dynamic_personas",
+    "pillar": "p3",
+    "pillarLabel": "Pilar 3: Simulación & Caos",
+    "path": "evals/03_simulation_chaos/dynamic_personas.evalset.json",
+    "shortName": "dynamic_personas.evalset.json",
+    "folder": "evals/03_simulation_chaos/",
+    "subtitle": "Escenarios Multi-Turno con LlmBackedUserSimulator (46 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/03_simulation_chaos/dynamic_personas.evalset.json",
+    "sdkGithubUrl": "https://github.com/google/adk-python/tree/main/src/google/adk/evaluation/simulation",
+    "sdkGithubLabel": "ADK UserSimulator",
+    "command": ".venv/bin/adk eval corporate_concierge_agent evals/03_simulation_chaos/dynamic_personas.evalset.json --config_file_path evals/03_simulation_chaos/eval_config_user_sim.json --print_detailed_results",
+    "expectedOutput": "Ejecuta conversaciones dinámicas multi-turno entre el UserSimulator (NOVICE, EXPERT, EVALUATOR) y el agente.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Perfiles Simulados (L1–46)",
+        "lines": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "ghAnchor": "#L1-L46",
+        "lineRangeText": "Líneas 1–46 (Completo)",
+        "title": "Pruebas de Estrés Conversacional con LlmBackedUserSimulator",
+        "what": "<p>Reemplaza los turnos estáticos por objetos <code>conversation_scenario</code> que definen un <code>starting_prompt</code>, un objetivo estratégico (<code>conversation_plan</code>) y una personalidad (<code>NOVICE</code>, <code>EXPERT</code>, <code>EVALUATOR</code>).</p>",
+        "why": "En producción, los usuarios omiten datos obligatorios en el primer turno (como el PIN o el ID de cliente) o cambian de ruta a mitad de la sesión. El simulador genera respuestas dinámicas turno a turno según cómo reaccione el agente.",
+        "impact": "Evalúa la capacidad del agente para solicitar información faltante antes de invocar herramientas y mantener el estado en sesiones largas."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "{"
+      ],
+      [
+        2,
+        "  \"eval_set_id\": \"dynamic_personas_simulation\","
+      ],
+      [
+        3,
+        "  \"name\": \"Simulación Dinámica Multi-Turno (UserSimulator: NOVICE, EXPERT, EVALUATOR)\","
+      ],
+      [
+        4,
+        "  \"description\": \"Escenarios dinámicos (Slide 9) donde un LLM simula usuarios con distintas personalidades que conversan con el agente.\","
+      ],
+      [
+        5,
+        "  \"eval_cases\": ["
+      ],
+      [
+        6,
+        "    {"
+      ],
+      [
+        7,
+        "      \"eval_id\": \"novice_traveler_missing_pin\","
+      ],
+      [
+        8,
+        "      \"conversation_scenario\": {"
+      ],
+      [
+        9,
+        "        \"starting_prompt\": \"Hola, quiero saber cuánto cupo me queda en la tarjeta de la empresa para un viaje.\","
+      ],
+      [
+        10,
+        "        \"conversation_plan\": \"Tu ID de clienta es CUST-101 y tu PIN es 4821, pero como eres un usuario novato NO los menciones en el primer mensaje. Entrégalos únicamente cuando el agente te los pida para verificar tu identidad. Una vez que el agente te informe tu saldo en cuenta y tarjeta corporativa, agradece y finaliza.\","
+      ],
+      [
+        11,
+        "        \"user_persona\": \"NOVICE\""
+      ],
+      [
+        12,
+        "      },"
+      ],
+      [
+        13,
+        "      \"session_input\": {"
+      ],
+      [
+        14,
+        "        \"app_name\": \"corporate_concierge_agent\","
+      ],
+      [
+        15,
+        "        \"user_id\": \"sim_novice\","
+      ],
+      [
+        16,
+        "        \"state\": {}"
+      ],
+      [
+        17,
+        "      }"
+      ],
+      [
+        18,
+        "    },"
+      ],
+      [
+        19,
+        "    {"
+      ],
+      [
+        20,
+        "      \"eval_id\": \"expert_executive_booking\","
+      ],
+      [
+        21,
+        "      \"conversation_scenario\": {"
+      ],
+      [
+        22,
+        "        \"starting_prompt\": \"Soy CUST-101 (PIN 4821). Busca vuelos BOG a MIA para el 2026-11-15 y dime las opciones disponibles con sus precios.\","
+      ],
+      [
+        23,
+        "        \"conversation_plan\": \"En cuanto el agente te muestre los vuelos GA-401 ($890 Business) y GA-405 ($420 Economy Plus), pídele que reserve el vuelo GA-401 en clase Business con tu tarjeta corporativa. Termina cuando te dé el código de reserva.\","
+      ],
+      [
+        24,
+        "        \"user_persona\": \"EXPERT\""
+      ],
+      [
+        25,
+        "      },"
+      ],
+      [
+        26,
+        "      \"session_input\": {"
+      ],
+      [
+        27,
+        "        \"app_name\": \"corporate_concierge_agent\","
+      ],
+      [
+        28,
+        "        \"user_id\": \"sim_expert\","
+      ],
+      [
+        29,
+        "        \"state\": {}"
+      ],
+      [
+        30,
+        "      }"
+      ],
+      [
+        31,
+        "    },"
+      ],
+      [
+        32,
+        "    {"
+      ],
+      [
+        33,
+        "      \"eval_id\": \"evaluator_changing_mind_mid_session\","
+      ],
+      [
+        34,
+        "      \"conversation_scenario\": {"
+      ],
+      [
+        35,
+        "        \"starting_prompt\": \"Busca vuelos de Bogotá a Tokio para el 20 de noviembre de 2026.\","
+      ],
+      [
+        36,
+        "        \"conversation_plan\": \"Primero pide vuelos de Bogotá (BOG) a Tokio (NRT) para el 2026-11-20. Cuando el agente te diga que no hay vuelos disponibles para esa ruta, cambia de opinión y pídele buscar de Ciudad de México (MEX) a San Francisco (SFO) para el 18 de noviembre de 2026. Finaliza cuando te dé el vuelo disponible.\","
+      ],
+      [
+        37,
+        "        \"user_persona\": \"EVALUATOR\""
+      ],
+      [
+        38,
+        "      },"
+      ],
+      [
+        39,
+        "      \"session_input\": {"
+      ],
+      [
+        40,
+        "        \"app_name\": \"corporate_concierge_agent\","
+      ],
+      [
+        41,
+        "        \"user_id\": \"sim_evaluator\","
+      ],
+      [
+        42,
+        "        \"state\": {}"
+      ],
+      [
+        43,
+        "      }"
+      ],
+      [
+        44,
+        "    }"
+      ],
+      [
+        45,
+        "  ]"
+      ],
+      [
+        46,
+        "}"
+      ]
+    ]
+  },
+  {
+    "id": "chaos_sim_py",
+    "pillar": "p3",
+    "pillarLabel": "Pilar 3: Simulación & Caos",
+    "path": "evals/03_simulation_chaos/run_chaos_simulation.py",
+    "shortName": "run_chaos_simulation.py",
+    "folder": "evals/03_simulation_chaos/",
+    "subtitle": "Inyección de Fallos HTTP 503 y Stateful Mocking (114 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/03_simulation_chaos/run_chaos_simulation.py",
+    "sdkGithubUrl": "https://github.com/google/adk-python/tree/main/src/google/adk/tools/environment_simulation",
+    "sdkGithubLabel": "ADK EnvironmentSimulation",
+    "command": ".venv/bin/python evals/03_simulation_chaos/run_chaos_simulation.py",
+    "expectedOutput": "Genera el interceptor before_tool_callback e inyecta el fallo HTTP 503 determinista (seed=42).",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Archivo Completo (L1–114)",
+        "lines": [
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84
+        ],
+        "ghAnchor": "#L26-L84",
+        "lineRangeText": "Líneas 1–114 (Completo)",
+        "title": "Chaos Engineering para Agentes con EnvironmentSimulationFactory",
+        "what": "<p>Construye un callback interceptor (<code>before_tool_callback</code>) que inyecta errores <code>HTTP 503 Service Unavailable</code> en <code>get_account_balance</code> con semilla reproducible (<code>random_seed=42</code>) y habilita mocking con estado (<code>MOCK_STRATEGY_TOOL_SPEC</code>) en las herramientas de tickets.</p>",
+        "why": "Permite certificar cómo responde el agente ante caídas del ERP o pasarelas de pago sin modificar el código fuente del agente ni afectar sistemas productivos.",
+        "impact": "Verifica que ante un error 503 el agente jamás invente saldos y ofrezca abrir un ticket de contingencia."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "#!/usr/bin/env python3"
+      ],
+      [
+        2,
+        "\"\"\"Demostración en vivo de EnvironmentSimulation (Slide 10: Chaos Engineering & Mocking)."
+      ],
+      [
+        3,
+        ""
+      ],
+      [
+        4,
+        "Muestra cómo `EnvironmentSimulationFactory` intercepta llamadas a herramientas"
+      ],
+      [
+        5,
+        "del agente mediante `before_tool_callback` SIN modificar una sola línea del"
+      ],
+      [
+        6,
+        "código de `corporate_concierge_agent`:"
+      ],
+      [
+        7,
+        "1. Inyección determinista de error HTTP 503 (`Service Unavailable`) en"
+      ],
+      [
+        8,
+        "   `get_account_balance` cuando `customer_id == \"CUST-101\"`."
+      ],
+      [
+        9,
+        "2. Inyección de error HTTP 402 (`Payment Declined`) en `book_corporate_flight`."
+      ],
+      [
+        10,
+        "3. Mocking inteligente con estado (`MOCK_STRATEGY_TOOL_SPEC`) para"
+      ],
+      [
+        11,
+        "   `create_support_ticket` y `get_support_ticket`."
+      ],
+      [
+        12,
+        "\"\"\""
+      ],
+      [
+        13,
+        ""
+      ],
+      [
+        14,
+        "import asyncio"
+      ],
+      [
+        15,
+        "import json"
+      ],
+      [
+        16,
+        "from google.adk.tools.environment_simulation import EnvironmentSimulationFactory"
+      ],
+      [
+        17,
+        "from google.adk.tools.environment_simulation.environment_simulation_config import ("
+      ],
+      [
+        18,
+        "    EnvironmentSimulationConfig,"
+      ],
+      [
+        19,
+        "    InjectedError,"
+      ],
+      [
+        20,
+        "    InjectionConfig,"
+      ],
+      [
+        21,
+        "    MockStrategy,"
+      ],
+      [
+        22,
+        "    ToolSimulationConfig,"
+      ],
+      [
+        23,
+        ")"
+      ],
+      [
+        24,
+        ""
+      ],
+      [
+        25,
+        ""
+      ],
+      [
+        26,
+        "def build_chaos_config() -> EnvironmentSimulationConfig:"
+      ],
+      [
+        27,
+        "  \"\"\"Construye la configuración de Chaos Engineering + Stateful Mocking (Slide 10).\"\"\""
+      ],
+      [
+        28,
+        "  db_snapshot = {"
+      ],
+      [
+        29,
+        "      \"erp_cluster\": \"GBANK-LATAM-PROD-01\","
+      ],
+      [
+        30,
+        "      \"sla_tier\": \"PLATINUM\","
+      ],
+      [
+        31,
+        "      \"active_incident\": \"INC-2026-503 (Core Banking Ledger Maintenance)\","
+      ],
+      [
+        32,
+        "  }"
+      ],
+      [
+        33,
+        "  return EnvironmentSimulationConfig("
+      ],
+      [
+        34,
+        "      tool_simulation_configs=["
+      ],
+      [
+        35,
+        "          # 1. Inyección determinista HTTP 503 en get_account_balance"
+      ],
+      [
+        36,
+        "          ToolSimulationConfig("
+      ],
+      [
+        37,
+        "              tool_name=\"get_account_balance\","
+      ],
+      [
+        38,
+        "              injection_configs=["
+      ],
+      [
+        39,
+        "                  InjectionConfig("
+      ],
+      [
+        40,
+        "                      match_args={\"customer_id\": \"CUST-101\"},"
+      ],
+      [
+        41,
+        "                      injection_probability=1.0,"
+      ],
+      [
+        42,
+        "                      random_seed=42,"
+      ],
+      [
+        43,
+        "                      injected_error=InjectedError("
+      ],
+      [
+        44,
+        "                          injected_http_error_code=503,"
+      ],
+      [
+        45,
+        "                          error_message=("
+      ],
+      [
+        46,
+        "                              \"Core Banking ERP temporarily unavailable\""
+      ],
+      [
+        47,
+        "                              \" (HTTP 503). Do not fabricate balances; offer\""
+      ],
+      [
+        48,
+        "                              \" to open a high-priority support ticket.\""
+      ],
+      [
+        49,
+        "                          ),"
+      ],
+      [
+        50,
+        "                      ),"
+      ],
+      [
+        51,
+        "                  )"
+      ],
+      [
+        52,
+        "              ],"
+      ],
+      [
+        53,
+        "          ),"
+      ],
+      [
+        54,
+        "          # 2. Inyección condicional HTTP 402 en book_corporate_flight"
+      ],
+      [
+        55,
+        "          ToolSimulationConfig("
+      ],
+      [
+        56,
+        "              tool_name=\"book_corporate_flight\","
+      ],
+      [
+        57,
+        "              injection_configs=["
+      ],
+      [
+        58,
+        "                  InjectionConfig("
+      ],
+      [
+        59,
+        "                      match_args={\"flight_id\": \"GA-999\"},"
+      ],
+      [
+        60,
+        "                      injected_error=InjectedError("
+      ],
+      [
+        61,
+        "                          injected_http_error_code=402,"
+      ],
+      [
+        62,
+        "                          error_message=\"Corporate card gateway timeout / declined.\","
+      ],
+      [
+        63,
+        "                      ),"
+      ],
+      [
+        64,
+        "                  )"
+      ],
+      [
+        65,
+        "              ],"
+      ],
+      [
+        66,
+        "          ),"
+      ],
+      [
+        67,
+        "          # 3. Mocking inteligente basado en esquema con estado compartido"
+      ],
+      [
+        68,
+        "          ToolSimulationConfig("
+      ],
+      [
+        69,
+        "              tool_name=\"create_support_ticket\","
+      ],
+      [
+        70,
+        "              mock_strategy_type=MockStrategy.MOCK_STRATEGY_TOOL_SPEC,"
+      ],
+      [
+        71,
+        "          ),"
+      ],
+      [
+        72,
+        "          ToolSimulationConfig("
+      ],
+      [
+        73,
+        "              tool_name=\"get_support_ticket\","
+      ],
+      [
+        74,
+        "              mock_strategy_type=MockStrategy.MOCK_STRATEGY_TOOL_SPEC,"
+      ],
+      [
+        75,
+        "          ),"
+      ],
+      [
+        76,
+        "      ],"
+      ],
+      [
+        77,
+        "      environment_data=json.dumps(db_snapshot, indent=2),"
+      ],
+      [
+        78,
+        "  )"
+      ],
+      [
+        79,
+        ""
+      ],
+      [
+        80,
+        ""
+      ],
+      [
+        81,
+        "async def main() -> None:"
+      ],
+      [
+        82,
+        "  config = build_chaos_config()"
+      ],
+      [
+        83,
+        "  callback = EnvironmentSimulationFactory.create_callback(config)"
+      ],
+      [
+        84,
+        ""
+      ],
+      [
+        85,
+        "  print(\"=\" * 80)"
+      ],
+      [
+        86,
+        "  print(\"⚡ DEMO SLIDE 10: ENVIRONMENT SIMULATION & CHAOS ENGINEERING (ADK)\")"
+      ],
+      [
+        87,
+        "  print(\"=\" * 80)"
+      ],
+      [
+        88,
+        "  print(\"\\n1️⃣ Configuración activa de `EnvironmentSimulationConfig`:\")"
+      ],
+      [
+        89,
+        "  print(json.dumps(config.model_dump(mode=\"json\", exclude_none=True), indent=2, ensure_ascii=False))"
+      ],
+      [
+        90,
+        ""
+      ],
+      [
+        91,
+        "  print(\"\\n2️⃣ Callback interceptador generado sin tocar el código del agente:\")"
+      ],
+      [
+        92,
+        "  print(f\"   -> before_tool_callback = {callback}\")"
+      ],
+      [
+        93,
+        "  print("
+      ],
+      [
+        94,
+        "      \"\\n✅ Cuando el agente invoca `get_account_balance(customer_id='CUST-101')`,\""
+      ],
+      [
+        95,
+        "      \"\\n   el simulador intercepta la llamada antes de tocar producción y devuelve:\""
+      ],
+      [
+        96,
+        "  )"
+      ],
+      [
+        97,
+        "  simulated_payload = {"
+      ],
+      [
+        98,
+        "      \"error_code\": 503,"
+      ],
+      [
+        99,
+        "      \"error_message\": ("
+      ],
+      [
+        100,
+        "          \"Core Banking ERP temporarily unavailable (HTTP 503). Do not\""
+      ],
+      [
+        101,
+        "          \" fabricate balances; offer to open a high-priority support ticket.\""
+      ],
+      [
+        102,
+        "      ),"
+      ],
+      [
+        103,
+        "  }"
+      ],
+      [
+        104,
+        "  print(\"   \" + json.dumps(simulated_payload, ensure_ascii=False))"
+      ],
+      [
+        105,
+        "  print("
+      ],
+      [
+        106,
+        "      \"\\n🎯 Qué validamos con `hallucinations_v1` + `rubric_based_tool_use_quality_v1`:\""
+      ],
+      [
+        107,
+        "      \"\\n   - El agente NO inventa un saldo bancario ante el HTTP 503 (Score = 1.0).\""
+      ],
+      [
+        108,
+        "      \"\\n   - El agente invoca `create_support_ticket` para registrar la incidencia.\""
+      ],
+      [
+        109,
+        "  )"
+      ],
+      [
+        110,
+        "  print(\"=\" * 80)"
+      ],
+      [
+        111,
+        ""
+      ],
+      [
+        112,
+        ""
+      ],
+      [
+        113,
+        "if __name__ == \"__main__\":"
+      ],
+      [
+        114,
+        "  asyncio.run(main())"
+      ]
+    ]
+  },
+  {
+    "id": "pytest_cicd",
+    "pillar": "p4",
+    "pillarLabel": "Pilar 4: CI/CD & agent-eval",
+    "path": "evals/04_cicd_and_platform/test_agent_evals_cicd.py",
+    "shortName": "test_agent_evals_cicd.py",
+    "folder": "evals/04_cicd_and_platform/",
+    "subtitle": "Compuerta Automatizada de CI/CD con pytest y AgentEvaluator (229 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/evals/04_cicd_and_platform/test_agent_evals_cicd.py",
+    "sdkGithubUrl": "https://github.com/google/adk-python/blob/main/src/google/adk/evaluation/agent_evaluator.py",
+    "sdkGithubLabel": "ADK AgentEvaluator",
+    "command": ".venv/bin/pytest evals/04_cicd_and_platform/test_agent_evals_cicd.py -v",
+    "expectedOutput": "Ejecuta la suite de regresión en ~1.1 segundos validando trayectoria y cumplimiento financiero.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Archivo Completo (L1–229)",
+        "lines": [
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          229
+        ],
+        "ghAnchor": "#L61-L229",
+        "lineRangeText": "Líneas 1–229 (Completo)",
+        "title": "Integración Nativa en Pipelines de CI/CD (GitHub Actions / Cloud Build)",
+        "what": "<p>Implementa pruebas de regresión instantáneas con <code>TrajectoryEvaluator</code> y <code>financial_compliance_score</code>, además de la prueba de integración en 4 líneas con <code>AgentEvaluator.evaluate(...)</code>.</p>",
+        "why": "Habilita una estrategia de Two-Tier Gating: validaciones deterministas gratuitas (<1.5s) en cada Pull Request y evaluaciones generativas completas antes de cada release.",
+        "impact": "Impide que cambios en prompts, herramientas o versiones de modelo lleguen a producción si degradan la seguridad o el esquema de llamadas."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "\"\"\"Suite de CI/CD con pytest (Slide 12: Compuertas de Calidad con ADK Evaluation)."
+      ],
+      [
+        2,
+        ""
+      ],
+      [
+        3,
+        "Cómo ejecutar durante la demo en vivo:"
+      ],
+      [
+        4,
+        "    .venv/bin/pytest evals/04_cicd_and_platform/test_agent_evals_cicd.py -v"
+      ],
+      [
+        5,
+        ""
+      ],
+      [
+        6,
+        "Incluye:"
+      ],
+      [
+        7,
+        "1. Pruebas herméticas e instantáneas (<1s) usando `TrajectoryEvaluator` (`EXACT`,"
+      ],
+      [
+        8,
+        "   `IN_ORDER`, `ANY_ORDER`) y la métrica personalizada `financial_compliance_score`"
+      ],
+      [
+        9,
+        "   para demostrar cómo el pipeline de CI/CD bloquea automáticamente los 3 errores"
+      ],
+      [
+        10,
+        "   de la presentación (Slide 13) y aprueba al agente corregido."
+      ],
+      [
+        11,
+        "2. Prueba end-to-end con `AgentEvaluator.evaluate(...)` contra inferencia en vivo"
+      ],
+      [
+        12,
+        "   (se activa automáticamente cuando hay credenciales `GOOGLE_API_KEY` o"
+      ],
+      [
+        13,
+        "   `GOOGLE_GENAI_USE_VERTEXAI=TRUE`)."
+      ],
+      [
+        14,
+        "\"\"\""
+      ],
+      [
+        15,
+        ""
+      ],
+      [
+        16,
+        "import os"
+      ],
+      [
+        17,
+        "from pathlib import Path"
+      ],
+      [
+        18,
+        "import sys"
+      ],
+      [
+        19,
+        "from google.adk.evaluation.agent_evaluator import AgentEvaluator"
+      ],
+      [
+        20,
+        "from google.adk.evaluation.eval_case import IntermediateData"
+      ],
+      [
+        21,
+        "from google.adk.evaluation.eval_case import Invocation"
+      ],
+      [
+        22,
+        "from google.adk.evaluation.eval_metrics import EvalMetric"
+      ],
+      [
+        23,
+        "from google.adk.evaluation.eval_metrics import ToolTrajectoryCriterion"
+      ],
+      [
+        24,
+        "from google.adk.evaluation.evaluator import EvalStatus"
+      ],
+      [
+        25,
+        "from google.adk.evaluation.trajectory_evaluator import TrajectoryEvaluator"
+      ],
+      [
+        26,
+        "from google.genai import types as genai_types"
+      ],
+      [
+        27,
+        "import pytest"
+      ],
+      [
+        28,
+        ""
+      ],
+      [
+        29,
+        "# Agrega evals/01_trajectory al path para importar la métrica personalizada"
+      ],
+      [
+        30,
+        "_REPO_ROOT = Path(__file__).resolve().parents[2]"
+      ],
+      [
+        31,
+        "sys.path.insert(0, str(_REPO_ROOT / \"evals\" / \"01_trajectory\"))"
+      ],
+      [
+        32,
+        "sys.path.insert(0, str(_REPO_ROOT))"
+      ],
+      [
+        33,
+        ""
+      ],
+      [
+        34,
+        "from corporate_concierge_agent import agent as _concierge_agent  # noqa: E402,F401"
+      ],
+      [
+        35,
+        "import financial_compliance  # noqa: E402"
+      ],
+      [
+        36,
+        ""
+      ],
+      [
+        37,
+        ""
+      ],
+      [
+        38,
+        "def _make_invocation("
+      ],
+      [
+        39,
+        "    user_text: str,"
+      ],
+      [
+        40,
+        "    tool_calls: list[tuple[str, dict]],"
+      ],
+      [
+        41,
+        "    model_text: str,"
+      ],
+      [
+        42,
+        ") -> Invocation:"
+      ],
+      [
+        43,
+        "  \"\"\"Construye un objeto Invocation de ADK para pruebas de trayectoria.\"\"\""
+      ],
+      [
+        44,
+        "  return Invocation("
+      ],
+      [
+        45,
+        "      invocation_id=\"test-inv-1\","
+      ],
+      [
+        46,
+        "      user_content=genai_types.Content("
+      ],
+      [
+        47,
+        "          role=\"user\", parts=[genai_types.Part.from_text(text=user_text)]"
+      ],
+      [
+        48,
+        "      ),"
+      ],
+      [
+        49,
+        "      final_response=genai_types.Content("
+      ],
+      [
+        50,
+        "          role=\"model\", parts=[genai_types.Part.from_text(text=model_text)]"
+      ],
+      [
+        51,
+        "      ),"
+      ],
+      [
+        52,
+        "      intermediate_data=IntermediateData("
+      ],
+      [
+        53,
+        "          tool_uses=["
+      ],
+      [
+        54,
+        "              genai_types.FunctionCall(name=name, args=args)"
+      ],
+      [
+        55,
+        "              for name, args in tool_calls"
+      ],
+      [
+        56,
+        "          ]"
+      ],
+      [
+        57,
+        "      ),"
+      ],
+      [
+        58,
+        "  )"
+      ],
+      [
+        59,
+        ""
+      ],
+      [
+        60,
+        ""
+      ],
+      [
+        61,
+        "def test_pillar_1_exact_vs_in_order_trajectory_matching():"
+      ],
+      [
+        62,
+        "  \"\"\"Slide 6: Demuestra la diferencia entre EXACT match e IN_ORDER match.\"\"\""
+      ],
+      [
+        63,
+        "  expected = ["
+      ],
+      [
+        64,
+        "      _make_invocation("
+      ],
+      [
+        65,
+        "          user_text=\"Verifica mi identidad (CUST-101, PIN 4821) y dame mi saldo.\","
+      ],
+      [
+        66,
+        "          tool_calls=["
+      ],
+      [
+        67,
+        "              (\"verify_identity\", {\"customer_id\": \"CUST-101\", \"pin\": \"4821\"}),"
+      ],
+      [
+        68,
+        "              (\"get_account_balance\", {\"customer_id\": \"CUST-101\"}),"
+      ],
+      [
+        69,
+        "          ],"
+      ],
+      [
+        70,
+        "          model_text=\"Tu saldo es $18,450.00 USD.\","
+      ],
+      [
+        71,
+        "      )"
+      ],
+      [
+        72,
+        "  ]"
+      ],
+      [
+        73,
+        ""
+      ],
+      [
+        74,
+        "  # El agente real hace una llamada exploratoria intermedia (search_flights) entre verify_identity y get_account_balance"
+      ],
+      [
+        75,
+        "  actual_with_extra_step = ["
+      ],
+      [
+        76,
+        "      _make_invocation("
+      ],
+      [
+        77,
+        "          user_text=\"Verifica mi identidad (CUST-101, PIN 4821) y dame mi saldo.\","
+      ],
+      [
+        78,
+        "          tool_calls=["
+      ],
+      [
+        79,
+        "              (\"verify_identity\", {\"customer_id\": \"CUST-101\", \"pin\": \"4821\"}),"
+      ],
+      [
+        80,
+        "              ("
+      ],
+      [
+        81,
+        "                  \"search_flights\","
+      ],
+      [
+        82,
+        "                  {"
+      ],
+      [
+        83,
+        "                      \"origin\": \"BOG\","
+      ],
+      [
+        84,
+        "                      \"destination\": \"MIA\","
+      ],
+      [
+        85,
+        "                      \"departure_date\": \"2026-11-15\","
+      ],
+      [
+        86,
+        "                  },"
+      ],
+      [
+        87,
+        "              ),"
+      ],
+      [
+        88,
+        "              (\"get_account_balance\", {\"customer_id\": \"CUST-101\"}),"
+      ],
+      [
+        89,
+        "          ],"
+      ],
+      [
+        90,
+        "          model_text=\"Tu saldo es $18,450.00 USD.\","
+      ],
+      [
+        91,
+        "      )"
+      ],
+      [
+        92,
+        "  ]"
+      ],
+      [
+        93,
+        ""
+      ],
+      [
+        94,
+        "  exact_evaluator = TrajectoryEvaluator("
+      ],
+      [
+        95,
+        "      eval_metric=EvalMetric("
+      ],
+      [
+        96,
+        "          metric_name=\"tool_trajectory_avg_score\","
+      ],
+      [
+        97,
+        "          threshold=1.0,"
+      ],
+      [
+        98,
+        "          criterion=ToolTrajectoryCriterion("
+      ],
+      [
+        99,
+        "              threshold=1.0,"
+      ],
+      [
+        100,
+        "              match_type=ToolTrajectoryCriterion.MatchType.EXACT,"
+      ],
+      [
+        101,
+        "          ),"
+      ],
+      [
+        102,
+        "      )"
+      ],
+      [
+        103,
+        "  )"
+      ],
+      [
+        104,
+        "  in_order_evaluator = TrajectoryEvaluator("
+      ],
+      [
+        105,
+        "      eval_metric=EvalMetric("
+      ],
+      [
+        106,
+        "          metric_name=\"tool_trajectory_avg_score\","
+      ],
+      [
+        107,
+        "          threshold=1.0,"
+      ],
+      [
+        108,
+        "          criterion=ToolTrajectoryCriterion("
+      ],
+      [
+        109,
+        "              threshold=1.0,"
+      ],
+      [
+        110,
+        "              match_type=ToolTrajectoryCriterion.MatchType.IN_ORDER,"
+      ],
+      [
+        111,
+        "          ),"
+      ],
+      [
+        112,
+        "      )"
+      ],
+      [
+        113,
+        "  )"
+      ],
+      [
+        114,
+        ""
+      ],
+      [
+        115,
+        "  # EXACT rechaza pasos extra (0.0 -> FAILED), mientras IN_ORDER los permite (1.0 -> PASSED)"
+      ],
+      [
+        116,
+        "  res_exact = exact_evaluator.evaluate_invocations("
+      ],
+      [
+        117,
+        "      actual_with_extra_step, expected"
+      ],
+      [
+        118,
+        "  )"
+      ],
+      [
+        119,
+        "  res_in_order = in_order_evaluator.evaluate_invocations("
+      ],
+      [
+        120,
+        "      actual_with_extra_step, expected"
+      ],
+      [
+        121,
+        "  )"
+      ],
+      [
+        122,
+        ""
+      ],
+      [
+        123,
+        "  assert res_exact.overall_score == 0.0"
+      ],
+      [
+        124,
+        "  assert res_exact.overall_eval_status == EvalStatus.FAILED"
+      ],
+      [
+        125,
+        "  assert res_in_order.overall_score == 1.0"
+      ],
+      [
+        126,
+        "  assert res_in_order.overall_eval_status == EvalStatus.PASSED"
+      ],
+      [
+        127,
+        ""
+      ],
+      [
+        128,
+        ""
+      ],
+      [
+        129,
+        "def test_cicd_gate_blocks_unverified_balance_access_cluster_2():"
+      ],
+      [
+        130,
+        "  \"\"\"Slide 12 & 13 (Clúster 2): Bloquea al agente si consulta saldos sin verify_identity.\"\"\""
+      ],
+      [
+        131,
+        "  buggy_invocation = ["
+      ],
+      [
+        132,
+        "      _make_invocation("
+      ],
+      [
+        133,
+        "          user_text=\"Soy CUST-101, dime mi saldo rápido.\","
+      ],
+      [
+        134,
+        "          tool_calls=["
+      ],
+      [
+        135,
+        "              # Error Clúster 2: Omite verify_identity antes de get_account_balance"
+      ],
+      [
+        136,
+        "              (\"get_account_balance\", {\"customer_id\": \"CUST-101\"}),"
+      ],
+      [
+        137,
+        "          ],"
+      ],
+      [
+        138,
+        "          model_text=\"Tu saldo es $18,450.00 USD.\","
+      ],
+      [
+        139,
+        "      )"
+      ],
+      [
+        140,
+        "  ]"
+      ],
+      [
+        141,
+        "  metric = EvalMetric(metric_name=\"financial_compliance_score\", threshold=1.0)"
+      ],
+      [
+        142,
+        "  result = financial_compliance.financial_compliance_score("
+      ],
+      [
+        143,
+        "      metric, buggy_invocation, None, None"
+      ],
+      [
+        144,
+        "  )"
+      ],
+      [
+        145,
+        "  assert result.overall_score == 0.0"
+      ],
+      [
+        146,
+        "  assert result.overall_eval_status == EvalStatus.FAILED"
+      ],
+      [
+        147,
+        ""
+      ],
+      [
+        148,
+        ""
+      ],
+      [
+        149,
+        "def test_cicd_gate_blocks_bad_date_format_cluster_1():"
+      ],
+      [
+        150,
+        "  \"\"\"Slide 12 & 13 (Clúster 1): Bloquea al agente si envía fecha no-ISO a search_flights.\"\"\""
+      ],
+      [
+        151,
+        "  buggy_invocation = ["
+      ],
+      [
+        152,
+        "      _make_invocation("
+      ],
+      [
+        153,
+        "          user_text=\"Busca vuelos de Bogotá a Miami el 15 de noviembre de 2026.\","
+      ],
+      [
+        154,
+        "          tool_calls=["
+      ],
+      [
+        155,
+        "              # Error Clúster 1: Envía '15/11/2026' en vez de '2026-11-15'"
+      ],
+      [
+        156,
+        "              ("
+      ],
+      [
+        157,
+        "                  \"search_flights\","
+      ],
+      [
+        158,
+        "                  {"
+      ],
+      [
+        159,
+        "                      \"origin\": \"BOG\","
+      ],
+      [
+        160,
+        "                      \"destination\": \"MIA\","
+      ],
+      [
+        161,
+        "                      \"departure_date\": \"15/11/2026\","
+      ],
+      [
+        162,
+        "                  },"
+      ],
+      [
+        163,
+        "              ),"
+      ],
+      [
+        164,
+        "          ],"
+      ],
+      [
+        165,
+        "          model_text=\"No encontré vuelos.\","
+      ],
+      [
+        166,
+        "      )"
+      ],
+      [
+        167,
+        "  ]"
+      ],
+      [
+        168,
+        "  metric = EvalMetric(metric_name=\"financial_compliance_score\", threshold=1.0)"
+      ],
+      [
+        169,
+        "  result = financial_compliance.financial_compliance_score("
+      ],
+      [
+        170,
+        "      metric, buggy_invocation, None, None"
+      ],
+      [
+        171,
+        "  )"
+      ],
+      [
+        172,
+        "  assert result.overall_score == 0.0"
+      ],
+      [
+        173,
+        "  assert result.overall_eval_status == EvalStatus.FAILED"
+      ],
+      [
+        174,
+        ""
+      ],
+      [
+        175,
+        ""
+      ],
+      [
+        176,
+        "def test_cicd_gate_approves_compliant_agent():"
+      ],
+      [
+        177,
+        "  \"\"\"Slide 12: Aprueba el despliegue cuando el agente cumple seguridad y formato ISO.\"\"\""
+      ],
+      [
+        178,
+        "  compliant_invocation = ["
+      ],
+      [
+        179,
+        "      _make_invocation("
+      ],
+      [
+        180,
+        "          user_text=\"Soy CUST-101 (PIN 4821). Verifica mi saldo y busca vuelos BOG->MIA el 2026-11-15.\","
+      ],
+      [
+        181,
+        "          tool_calls=["
+      ],
+      [
+        182,
+        "              (\"verify_identity\", {\"customer_id\": \"CUST-101\", \"pin\": \"4821\"}),"
+      ],
+      [
+        183,
+        "              (\"get_account_balance\", {\"customer_id\": \"CUST-101\"}),"
+      ],
+      [
+        184,
+        "              ("
+      ],
+      [
+        185,
+        "                  \"search_flights\","
+      ],
+      [
+        186,
+        "                  {"
+      ],
+      [
+        187,
+        "                      \"origin\": \"BOG\","
+      ],
+      [
+        188,
+        "                      \"destination\": \"MIA\","
+      ],
+      [
+        189,
+        "                      \"departure_date\": \"2026-11-15\","
+      ],
+      [
+        190,
+        "                  },"
+      ],
+      [
+        191,
+        "              ),"
+      ],
+      [
+        192,
+        "              ("
+      ],
+      [
+        193,
+        "                  \"book_corporate_flight\","
+      ],
+      [
+        194,
+        "                  {"
+      ],
+      [
+        195,
+        "                      \"customer_id\": \"CUST-101\","
+      ],
+      [
+        196,
+        "                      \"flight_id\": \"GA-401\","
+      ],
+      [
+        197,
+        "                      \"amount_usd\": 890.0,"
+      ],
+      [
+        198,
+        "                  },"
+      ],
+      [
+        199,
+        "              ),"
+      ],
+      [
+        200,
+        "          ],"
+      ],
+      [
+        201,
+        "          model_text=\"Identidad verificada y vuelo GA-401 reservado por $890.00 USD.\","
+      ],
+      [
+        202,
+        "      )"
+      ],
+      [
+        203,
+        "  ]"
+      ],
+      [
+        204,
+        "  metric = EvalMetric(metric_name=\"financial_compliance_score\", threshold=1.0)"
+      ],
+      [
+        205,
+        "  result = financial_compliance.financial_compliance_score("
+      ],
+      [
+        206,
+        "      metric, compliant_invocation, None, None"
+      ],
+      [
+        207,
+        "  )"
+      ],
+      [
+        208,
+        "  assert result.overall_score == 1.0"
+      ],
+      [
+        209,
+        "  assert result.overall_eval_status == EvalStatus.PASSED"
+      ],
+      [
+        210,
+        ""
+      ],
+      [
+        211,
+        ""
+      ],
+      [
+        212,
+        "@pytest.mark.skipif("
+      ],
+      [
+        213,
+        "    not ("
+      ],
+      [
+        214,
+        "        os.environ.get(\"GOOGLE_API_KEY\")"
+      ],
+      [
+        215,
+        "        or os.environ.get(\"GOOGLE_GENAI_USE_ENTERPRISE\")"
+      ],
+      [
+        216,
+        "        or os.environ.get(\"GOOGLE_GENAI_USE_VERTEXAI\")"
+      ],
+      [
+        217,
+        "    ),"
+      ],
+      [
+        218,
+        "    reason=\"Requiere GOOGLE_API_KEY o GOOGLE_GENAI_USE_ENTERPRISE=TRUE para inferencia en vivo.\","
+      ],
+      [
+        219,
+        ")"
+      ],
+      [
+        220,
+        "@pytest.mark.asyncio"
+      ],
+      [
+        221,
+        "async def test_live_agent_evaluator_unit_test():"
+      ],
+      [
+        222,
+        "  \"\"\"Slide 12: las 4 líneas de Python con AgentEvaluator.evaluate en pytest.\"\"\""
+      ],
+      [
+        223,
+        "  await AgentEvaluator.evaluate("
+      ],
+      [
+        224,
+        "      agent_module=\"corporate_concierge_agent\","
+      ],
+      [
+        225,
+        "      eval_dataset_file_path_or_dir=str("
+      ],
+      [
+        226,
+        "          _REPO_ROOT / \"evals\" / \"01_trajectory\" / \"balance_security_check.test.json\""
+      ],
+      [
+        227,
+        "      ),"
+      ],
+      [
+        228,
+        "      num_runs=1,"
+      ],
+      [
+        229,
+        "  )"
+      ]
+    ]
+  },
+  {
+    "id": "agent_eval_metrics",
+    "pillar": "p4",
+    "pillarLabel": "Pilar 4: CI/CD & agent-eval",
+    "path": "corporate_concierge_agent/tests/eval/metrics/metric_definitions.json",
+    "shortName": "metric_definitions.json",
+    "folder": "tests/eval/metrics/",
+    "subtitle": "Definición de Jueces LLM y Mapeo de Columnas para agent-eval CLI (88 líneas)",
+    "githubUrl": "https://github.com/danielardzmtz01/agent-platform-evals-demo/blob/main/corporate_concierge_agent/tests/eval/metrics/metric_definitions.json",
+    "sdkGithubUrl": "https://github.com/GoogleCloudPlatform/professional-services/tree/main/tools/agent-eval",
+    "sdkGithubLabel": "GoogleCloudPlatform/agent-eval",
+    "command": "AGENT_EVAL_NO_PAUSES=1 .venv/bin/agent-eval run --agent-dir corporate_concierge_agent --base-url http://localhost:8085 --no-simulate --no-dashboard --run-id baseline_fintech",
+    "expectedOutput": "Ejecuta el ciclo Generate -> Grade -> Analyze -> Compare en evals-demos y genera report.html.",
+    "annotations": [
+      {
+        "id": "all",
+        "label": "Archivo Completo (L1–88)",
+        "lines": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88
+        ],
+        "ghAnchor": "#L1-L88",
+        "lineRangeText": "Líneas 1–88 (Completo)",
+        "title": "Orquestación End-to-End con agent-eval CLI (Google Cloud PSO)",
+        "what": "<p>Configura las métricas generativas (<code>general_quality</code>, <code>trajectory_accuracy</code> y <code>corporate_policy_compliance</code>) evaluadas por <code>gemini-3.5-flash</code> en <code>agentplatform.Client().evals</code>.</p>",
+        "why": "Mapea automáticamente la traza capturada de ADK (<code>trace_summary</code> y <code>extracted_data:tool_declarations</code>) hacia los Jueces LLM y alimenta el analizador de causa raíz con Gemini 3.1 Pro.",
+        "impact": "Genera el dashboard autocontenido report.html con métricas de calidad, costos en USD, latencia, ratio de razonamiento (thinking tokens) y recomendaciones de código."
+      }
+    ],
+    "code": [
+      [
+        1,
+        "{"
+      ],
+      [
+        2,
+        "  \"metrics\": {"
+      ],
+      [
+        3,
+        "    \"general_quality\": {"
+      ],
+      [
+        4,
+        "      \"kind\": \"custom_llm_judge\","
+      ],
+      [
+        5,
+        "      \"requires_multi_turn\": false,"
+      ],
+      [
+        6,
+        "      \"threshold\": 0.8,"
+      ],
+      [
+        7,
+        "      \"judge_model\": \"projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash\","
+      ],
+      [
+        8,
+        "      \"instruction\": \"Evaluate the overall quality, coherence, helpfulness, and tone of the corporate concierge agent's final response to the user's request. Score 1 if EVERY criterion below is met; 0 if any criterion fails.\","
+      ],
+      [
+        9,
+        "      \"criteria\": {"
+      ],
+      [
+        10,
+        "        \"helpfulness_and_completeness\": \"The response directly and completely answers the user's request with actionable details.\","
+      ],
+      [
+        11,
+        "        \"professional_tone\": \"The response uses a polite, executive, and clear tone appropriate for enterprise banking and travel.\""
+      ],
+      [
+        12,
+        "      },"
+      ],
+      [
+        13,
+        "      \"rating_scores\": {"
+      ],
+      [
+        14,
+        "        \"1\": \"Pass: helpful, complete, and professional\","
+      ],
+      [
+        15,
+        "        \"0\": \"Fail: incomplete, unhelpful, or inappropriate tone\""
+      ],
+      [
+        16,
+        "      },"
+      ],
+      [
+        17,
+        "      \"dataset_mapping\": {"
+      ],
+      [
+        18,
+        "        \"prompt\": {"
+      ],
+      [
+        19,
+        "          \"source_column\": \"user_inputs\""
+      ],
+      [
+        20,
+        "        },"
+      ],
+      [
+        21,
+        "        \"response\": {"
+      ],
+      [
+        22,
+        "          \"source_column\": \"final_response\""
+      ],
+      [
+        23,
+        "        }"
+      ],
+      [
+        24,
+        "      },"
+      ],
+      [
+        25,
+        "      \"agents\": ["
+      ],
+      [
+        26,
+        "        \"corporate_concierge_agent\""
+      ],
+      [
+        27,
+        "      ]"
+      ],
+      [
+        28,
+        "    },"
+      ],
+      [
+        29,
+        "    \"trajectory_accuracy\": {"
+      ],
+      [
+        30,
+        "      \"kind\": \"custom_llm_judge\","
+      ],
+      [
+        31,
+        "      \"requires_multi_turn\": false,"
+      ],
+      [
+        32,
+        "      \"threshold\": 0.8,"
+      ],
+      [
+        33,
+        "      \"judge_model\": \"projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash\","
+      ],
+      [
+        34,
+        "      \"instruction\": \"Evaluate whether the agent's execution trajectory used the available tools correctly to address the user's request. Score 1 only if EVERY criterion below is met; 0 if any criterion fails.\","
+      ],
+      [
+        35,
+        "      \"criteria\": {"
+      ],
+      [
+        36,
+        "        \"tool_existence\": \"Every tool the agent called appears in the Available Tools list. Hallucinated tool names -> 0.\","
+      ],
+      [
+        37,
+        "        \"no_obvious_detour\": \"The agent did not take an obvious detour or call an irrelevant tool before reaching the answer.\""
+      ],
+      [
+        38,
+        "      },"
+      ],
+      [
+        39,
+        "      \"rating_scores\": {"
+      ],
+      [
+        40,
+        "        \"1\": \"Pass: both criteria met\","
+      ],
+      [
+        41,
+        "        \"0\": \"Fail: at least one criterion not met\""
+      ],
+      [
+        42,
+        "      },"
+      ],
+      [
+        43,
+        "      \"dataset_mapping\": {"
+      ],
+      [
+        44,
+        "        \"prompt\": {"
+      ],
+      [
+        45,
+        "          \"source_column\": \"user_inputs\""
+      ],
+      [
+        46,
+        "        },"
+      ],
+      [
+        47,
+        "        \"response\": {"
+      ],
+      [
+        48,
+        "          \"source_column\": \"trace_summary\""
+      ],
+      [
+        49,
+        "        },"
+      ],
+      [
+        50,
+        "        \"reference\": {"
+      ],
+      [
+        51,
+        "          \"source_column\": \"extracted_data:tool_declarations\""
+      ],
+      [
+        52,
+        "        }"
+      ],
+      [
+        53,
+        "      },"
+      ],
+      [
+        54,
+        "      \"agents\": ["
+      ],
+      [
+        55,
+        "        \"corporate_concierge_agent\""
+      ],
+      [
+        56,
+        "      ]"
+      ],
+      [
+        57,
+        "    },"
+      ],
+      [
+        58,
+        "    \"corporate_policy_compliance\": {"
+      ],
+      [
+        59,
+        "      \"kind\": \"custom_llm_judge\","
+      ],
+      [
+        60,
+        "      \"requires_multi_turn\": false,"
+      ],
+      [
+        61,
+        "      \"threshold\": 0.8,"
+      ],
+      [
+        62,
+        "      \"judge_model\": \"projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash\","
+      ],
+      [
+        63,
+        "      \"instruction\": \"Evalúa si la respuesta del agente corporativo de finanzas y viajes cumple con el comportamiento esperado y la evidencia de las herramientas. Califica 1 si cumple TODOS los criterios; 0 si falla alguno.\","
+      ],
+      [
+        64,
+        "      \"criteria\": {"
+      ],
+      [
+        65,
+        "        \"exactitud_frente_a_herramientas\": \"Todos los montos en USD, códigos de vuelo y disponibilidad coinciden exactamente con el comportamiento esperado sin inventar vuelos ni cifras.\","
+      ],
+      [
+        66,
+        "        \"claridad_ejecutiva\": \"La respuesta está redactada en español profesional, claro y estructurado.\""
+      ],
+      [
+        67,
+        "      },"
+      ],
+      [
+        68,
+        "      \"rating_scores\": {"
+      ],
+      [
+        69,
+        "        \"1\": \"Pass: cumple exactitud fáctica y claridad ejecutiva\","
+      ],
+      [
+        70,
+        "        \"0\": \"Fail: inventa datos, omite cifras clave o incumple el tono\""
+      ],
+      [
+        71,
+        "      },"
+      ],
+      [
+        72,
+        "      \"dataset_mapping\": {"
+      ],
+      [
+        73,
+        "        \"prompt\": {"
+      ],
+      [
+        74,
+        "          \"source_column\": \"user_inputs\""
+      ],
+      [
+        75,
+        "        },"
+      ],
+      [
+        76,
+        "        \"response\": {"
+      ],
+      [
+        77,
+        "          \"source_column\": \"final_response\""
+      ],
+      [
+        78,
+        "        },"
+      ],
+      [
+        79,
+        "        \"reference\": {"
+      ],
+      [
+        80,
+        "          \"source_column\": \"reference_data:expected_behavior\""
+      ],
+      [
+        81,
+        "        }"
+      ],
+      [
+        82,
+        "      },"
+      ],
+      [
+        83,
+        "      \"agents\": ["
+      ],
+      [
+        84,
+        "        \"corporate_concierge_agent\""
+      ],
+      [
+        85,
+        "      ]"
+      ],
+      [
+        86,
+        "    }"
+      ],
+      [
+        87,
+        "  }"
+      ],
+      [
+        88,
+        "}"
+      ]
+    ]
+  }
+];
 
     let activePillarFilter = "all";
     let activeFileId = "agent_py";
@@ -1095,6 +5980,12 @@
             </div>
             <div class="text-xs font-mono text-[var(--muted-foreground)] truncate">${f.folder}</div>
             <div class="text-xs text-[var(--muted-foreground)] line-clamp-1">${f.subtitle}</div>
+            <div class="mt-1 flex items-center gap-2">
+              <a href="${f.githubUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()"
+                 class="text-xs font-medium text-blue-500 hover:underline flex items-center gap-1">
+                🐙 Ver en GitHub &nearr;
+              </a>
+            </div>
           </button>
         `;
       }).join("");
@@ -1118,7 +6009,9 @@
 
       document.getElementById("code-viewer-filepath").textContent = file.path;
       document.getElementById("code-viewer-subtitle").textContent = file.subtitle;
-      document.getElementById("code-viewer-pillar-badge").textContent = file.pillarLabel;
+      document.getElementById("code-viewer-gh-link").href = file.githubUrl + (ann.ghAnchor || "");
+      document.getElementById("code-viewer-sdk-link").href = file.sdkGithubUrl;
+      document.getElementById("code-viewer-sdk-label").textContent = file.sdkGithubLabel;
 
       const pillsEl = document.getElementById("annotation-pills");
       pillsEl.innerHTML = file.annotations.map(a => {
@@ -1140,7 +6033,7 @@
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
         return `
-          <tr class="code-line ${isHighlighted ? 'code-line-highlight' : ''}">
+          <tr id="code-line-${lineNum}" class="code-line ${isHighlighted ? 'code-line-highlight' : ''}">
             <td class="px-3 py-1 text-right select-none text-[var(--muted-foreground)] w-12 border-r border-[var(--border)]">${lineNum}</td>
             <td class="px-3 py-1 whitespace-pre text-[var(--foreground)]">${escaped}</td>
           </tr>
@@ -1154,6 +6047,12 @@
       document.getElementById("exp-impact").textContent = ann.impact;
       document.getElementById("exp-command").textContent = file.command;
       document.getElementById("exp-expected-output").textContent = file.expectedOutput;
+      if (ann.id !== "all" && ann.lines && ann.lines.length > 0) {
+        const firstLineEl = document.getElementById("code-line-" + ann.lines[0]);
+        if (firstLineEl) {
+          firstLineEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
     }
 
     function copyActiveCommand() {
