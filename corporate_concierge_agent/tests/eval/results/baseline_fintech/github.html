@@ -7,6 +7,15 @@
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
     :root {
+      --background: #f6f8fa;
+      --card: #ffffff;
+      --sidebar: #f0f3f6;
+      --border: #d0d7de;
+      --foreground: #1f2328;
+      --muted-foreground: #57606a;
+      --primary: #0969da;
+    }
+    html.dark {
       --background: #0d1117;
       --card: #161b22;
       --sidebar: #010409;
@@ -63,6 +72,10 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <button onclick="toggleTheme()" id="theme-toggle-btn"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--sidebar)] hover:bg-blue-600/20 text-[var(--foreground)] border border-[var(--border)] transition flex items-center gap-1.5">
+          <span>🌙</span> Modo Oscuro
+        </button>
         <a href="https://github.com/danielardzmtz01/agent-platform-evals-demo" target="_blank" rel="noopener"
            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--sidebar)] hover:bg-blue-600/20 text-[var(--foreground)] border border-[var(--border)] transition flex items-center gap-1.5">
           <span>🐙</span> Ver Repo Real en GitHub (danielardzmtz01/agent-platform-evals-demo) &nearr;
@@ -6663,6 +6676,18 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
             </div>
           </div>
         `;
+      }
+    }
+
+    function toggleTheme() {
+      const root = document.documentElement;
+      const btn = document.getElementById("theme-toggle-btn");
+      if (root.classList.contains("dark")) {
+        root.classList.remove("dark");
+        if (btn) btn.innerHTML = "<span>🌙</span> Modo Oscuro";
+      } else {
+        root.classList.add("dark");
+        if (btn) btn.innerHTML = "<span>☀️</span> Modo Claro";
       }
     }
 
