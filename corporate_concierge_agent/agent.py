@@ -19,7 +19,7 @@ from google.adk import Agent
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 os.environ.setdefault("GOOGLE_GENAI_USE_ENTERPRISE", "TRUE")
-os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "evals-demos")
+os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "tu-proyecto-gcp")
 os.environ.setdefault("GOOGLE_CLOUD_LOCATION", "global")
 
 _ACCOUNTS: dict[str, dict[str, Any]] = {}

@@ -122,7 +122,7 @@
       <div class="lg:col-span-3 bg-[var(--card)] border border-[var(--border)] rounded-xl overflow-hidden flex flex-col">
         <div class="p-3 bg-[var(--sidebar)] border-b border-[var(--border)] flex items-center justify-between">
           <span class="text-xs font-semibold text-[var(--foreground)]">📁 Explorer</span>
-          <span class="text-xs font-mono text-[var(--muted-foreground)]">evals-demos</span>
+          <span class="text-xs font-mono text-[var(--muted-foreground)]">tu-proyecto-gcp</span>
         </div>
         <div id="file-tree-list" class="divide-y divide-[var(--border)] max-h-[640px] overflow-y-auto">
           <!-- Populated by JS -->
@@ -473,7 +473,7 @@
           <div class="px-4 py-2.5 bg-[var(--card)] border-b border-[var(--border)] flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span id="action-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-              <span id="action-console-title" class="text-xs font-mono font-bold text-[var(--foreground)]">actions-runner@evals-demos: ~/demos/agent_platform_evals_demo</span>
+              <span id="action-console-title" class="text-xs font-mono font-bold text-[var(--foreground)]">actions-runner@tu-proyecto-gcp: ~/demos/agent_platform_evals_demo</span>
             </div>
             <span id="action-duration-badge" class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/15 text-emerald-500">exit code 0</span>
           </div>
@@ -575,7 +575,7 @@
     <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 flex flex-wrap items-center justify-between gap-2">
       <div>
         <span class="text-xs font-bold text-[var(--foreground)]">📊 Reporte Interactivo de <code class="font-mono">agent-eval</code> CLI (Google Cloud Professional Services)</span>
-        <span class="text-xs text-[var(--muted-foreground)] ml-2">Conectado a <code class="font-mono">evals-demos</code> · Autorater: <code class="font-mono">gemini-3.5-flash</code> · Diagnóstico: <code class="font-mono">gemini-3.1-pro-preview</code></span>
+        <span class="text-xs text-[var(--muted-foreground)] ml-2">Conectado a <code class="font-mono">tu-proyecto-gcp</code> · Autorater: <code class="font-mono">gemini-3.5-flash</code> · Diagnóstico: <code class="font-mono">gemini-3.1-pro-preview</code></span>
       </div>
       <a href="http://danielardzmtz.c.googlers.com:8086/report.html" target="_blank" rel="noopener"
          class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-500 transition">
@@ -1314,7 +1314,7 @@
       ],
       [
         22,
-        "os.environ.setdefault(\"GOOGLE_CLOUD_PROJECT\", \"evals-demos\")"
+        "os.environ.setdefault(\"GOOGLE_CLOUD_PROJECT\", \"tu-proyecto-gcp\")"
       ],
       [
         23,
@@ -5674,7 +5674,7 @@
     "sdkGithubUrl": "https://github.com/GoogleCloudPlatform/professional-services/tree/main/tools/agent-eval",
     "sdkGithubLabel": "GoogleCloudPlatform/agent-eval",
     "command": "cd ~/demos/agent_platform_evals_demo && set -a && source .env && set +a && AGENT_EVAL_NO_PAUSES=1 .venv/bin/agent-eval run --agent-dir corporate_concierge_agent --base-url http://localhost:8085 --no-simulate --no-dashboard --run-id baseline_fintech",
-    "expectedOutput": "Ejecuta el ciclo Generate -> Grade -> Analyze -> Compare en evals-demos y genera report.html.",
+    "expectedOutput": "Ejecuta el ciclo Generate -> Grade -> Analyze -> Compare en tu-proyecto-gcp y genera report.html.",
     "annotations": [
       {
         "id": "all",
@@ -5804,7 +5804,7 @@
       ],
       [
         7,
-        "      \"judge_model\": \"projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash\","
+        "      \"judge_model\": \"projects/tu-proyecto-gcp/locations/global/publishers/google/models/gemini-3.5-flash\","
       ],
       [
         8,
@@ -5908,7 +5908,7 @@
       ],
       [
         33,
-        "      \"judge_model\": \"projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash\","
+        "      \"judge_model\": \"projects/tu-proyecto-gcp/locations/global/publishers/google/models/gemini-3.5-flash\","
       ],
       [
         34,
@@ -6024,7 +6024,7 @@
       ],
       [
         62,
-        "      \"judge_model\": \"projects/evals-demos/locations/global/publishers/google/models/gemini-3.5-flash\","
+        "      \"judge_model\": \"projects/tu-proyecto-gcp/locations/global/publishers/google/models/gemini-3.5-flash\","
       ],
       [
         63,
@@ -6369,7 +6369,7 @@ v3 (Óptimo: Secuencia exacta + ISO Date)   1.0 (🟢 PASSED)  1.0 (🟢 PASSED)
       const durBadge = document.getElementById("action-duration-badge");
 
       statusDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
-      durBadge.textContent = "Running on evals-demos...";
+      durBadge.textContent = "Running on tu-proyecto-gcp...";
       durBadge.className = "px-2 py-0.5 rounded text-xs font-mono bg-amber-500/15 text-amber-500";
       consoleOut.textContent = "⏳ Ejecutando workflow '" + workflowName + "' en /usr/local/google/home/danielardzmtz/demos/agent_platform_evals_demo...\n";
 

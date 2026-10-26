@@ -19,13 +19,13 @@ Proyecto ejecutable alineado 1:1 con la presentación **"De Prototipos a Producc
   - `run_offline_demo_showcase.py`: Showcase interactivo en terminal de los 4 bloques de la presentación (<2 segundos).
 - `notebook_agent_platform_evals_demo.ipynb`: Notebook interactivo de principio a fin.
 
-## Configuración Activa (GCP Project `evals-demos`)
+## Configuración Activa (GCP Project `tu-proyecto-gcp`)
 
-El archivo `.env` ya está configurado automáticamente para el proyecto **`evals-demos`**:
+El archivo `.env` ya está configurado automáticamente para el proyecto **`tu-proyecto-gcp`**:
 
 ```dotenv
 GOOGLE_GENAI_USE_VERTEXAI=TRUE
-GOOGLE_CLOUD_PROJECT=evals-demos
+GOOGLE_CLOUD_PROJECT=tu-proyecto-gcp
 GOOGLE_CLOUD_LOCATION=global
 DEMO_AGENT_MODEL=gemini-3.5-flash
 ```
